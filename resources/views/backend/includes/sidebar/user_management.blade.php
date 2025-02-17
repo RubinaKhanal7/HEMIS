@@ -40,7 +40,7 @@
         @can('list_school_adminusers')
         <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'school-adminusers' ? 'active' : '' }}"
                 href="{{ route('admin.school-adminusers.index') }}">
-                <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{ __('School Admin Users') }}
+                <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{ __('Campus Admin Users') }}
 
                 </div>
             </a>

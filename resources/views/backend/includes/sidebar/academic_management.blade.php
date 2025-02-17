@@ -32,7 +32,7 @@
                     <a class="nav-link {{ Request::segment(2) == 'sections' ? 'active' : '' }}"
                         href="{{ route('admin.sections.index') }}">
                         <div class="d-flex align-items-center">
-                            <i class="fa fa-angle-double-right"></i> {{__('Section') }}
+                            <i class="fa fa-angle-double-right"></i> {{__('Academic Level') }}
                         </div>
                     </a>
                 </li>
@@ -42,11 +42,24 @@
                     <a class="nav-link {{ Request::segment(2) == 'classes' ? 'active' : '' }}"
                         href="{{ route('admin.classes.index') }}">
                         <div class="d-flex align-items-center">
-                            <i class="fa fa-angle-double-right"></i>{{ __('Class/Grade') }}
+                            <i class="fa fa-angle-double-right"></i>{{ __('Faculty') }}
                         </div>
                     </a>
                 </li>
             @endcan
+
+            {{-- Added Line need to upgrade it --}}
+            @can('list_classes')
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::segment(2) == 'classes' ? 'active' : '' }}"
+                        href="{{ route('admin.classes.index') }}">
+                        <div class="d-flex align-items-center">
+                            <i class="fa fa-angle-double-right"></i>{{ __('Program') }}
+                        </div>
+                    </a>
+                </li>
+            @endcan
+
             @can('list_subjects')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::segment(2) == 'subjects' ? 'active' : '' }}"
@@ -68,12 +81,13 @@
                 </li>
             @endcan
 
+            
             @can('view_assign_classteachers')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::segment(2) == 'assign-classteachers' ? 'active' : '' }}"
                         href="{{ route('admin.assign-classteachers.index') }}">
                         <div class="d-flex align-items-center">
-                            <i class="fa fa-angle-double-right"></i>{{__('Assign Class Teacher') }}
+                            <i class="fa fa-angle-double-right"></i>{{__('Assign Instructor') }}
                         </div>
                     </a>
                 </li>
