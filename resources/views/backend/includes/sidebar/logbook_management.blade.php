@@ -20,7 +20,7 @@
             @can('list_teacher_logs')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'teacher-logs' ? 'active' : '' }}"
                         href="{{ route('admin.teacher-logs.index') }}">
-                        <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{ __('Teachers Log Book')}}
+                        <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{ __('Instructors Log Book')}}
                         </div>
                     </a>
                 </li>
@@ -28,7 +28,7 @@
             @can('list_headteacher_logs')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'headteacher-logs' ? 'active' : '' }}"
                         href="{{ route('admin.headteacher-logs.index') }}">
-                        <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{__('Head Teachers Log Book')}}
+                        <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{__('Campus Chief Log Book')}}
                         </div>
                     </a>
                 </li>

@@ -2,6 +2,38 @@
 
 All notable changes to `laravel-pdf` will be documented in this file.
 
+## 1.5.3 - 2024-12-16
+
+### What's Changed
+
+* update contributing link as no CONTRIBUTING.md file by @Nathan-Cowin in https://github.com/spatie/laravel-pdf/pull/192
+* Complete views and disks by @adelf in https://github.com/spatie/laravel-pdf/pull/200
+* Allow spatie/browsershot v5 by @hailwood in https://github.com/spatie/laravel-pdf/pull/199
+* Fix inconsistent behavior in save() method when using vs not using a disk by @aalyusuf in https://github.com/spatie/laravel-pdf/pull/196
+* add assertDontSee test method by @Nathan-Cowin in https://github.com/spatie/laravel-pdf/pull/191
+
+### New Contributors
+
+* @Nathan-Cowin made their first contribution in https://github.com/spatie/laravel-pdf/pull/192
+* @adelf made their first contribution in https://github.com/spatie/laravel-pdf/pull/200
+* @hailwood made their first contribution in https://github.com/spatie/laravel-pdf/pull/199
+* @aalyusuf made their first contribution in https://github.com/spatie/laravel-pdf/pull/196
+
+**Full Changelog**: https://github.com/spatie/laravel-pdf/compare/1.5.2...1.5.3
+
+## 1.5.2 - 2024-07-16
+
+### What's Changed
+
+* Bump dependabot/fetch-metadata from 2.1.0 to 2.2.0 by @dependabot in https://github.com/spatie/laravel-pdf/pull/158
+* Make getBrowsershot public by @dbpolito in https://github.com/spatie/laravel-pdf/pull/161
+
+### New Contributors
+
+* @dbpolito made their first contribution in https://github.com/spatie/laravel-pdf/pull/161
+
+**Full Changelog**: https://github.com/spatie/laravel-pdf/compare/1.5.1...1.5.2
+
 ## 1.5.1 - 2024-05-08
 
 ### What's Changed
