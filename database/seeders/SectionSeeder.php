@@ -14,12 +14,10 @@ class SectionSeeder extends Seeder
     public function run(): void
     {
         $sections = [
-            'A(en)',
-            'A(np)',
-            'B(en)',
-            'B(np)',
-            'C(en)',
-            'C(np)'
+            'Faculty of Management',
+            'Faculty of Humanities & Social Sciences',
+            'Faculty of Education',
+            'Faculty of Law'
         ];
 
 

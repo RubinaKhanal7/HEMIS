@@ -32,7 +32,7 @@
                     <a class="nav-link {{ Request::segment(2) == 'sections' ? 'active' : '' }}"
                         href="{{ route('admin.sections.index') }}">
                         <div class="d-flex align-items-center">
-                            <i class="fa fa-angle-double-right"></i> {{__('Academic Level') }}
+                            <i class="fa fa-angle-double-right"></i> {{__('Faculty') }}
                         </div>
                     </a>
                 </li>
@@ -42,7 +42,7 @@
                     <a class="nav-link {{ Request::segment(2) == 'classes' ? 'active' : '' }}"
                         href="{{ route('admin.classes.index') }}">
                         <div class="d-flex align-items-center">
-                            <i class="fa fa-angle-double-right"></i>{{ __('Faculty') }}
+                            <i class="fa fa-angle-double-right"></i>{{ __('Academic Level') }}
                         </div>
                     </a>
                 </li>
