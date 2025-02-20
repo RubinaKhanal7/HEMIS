@@ -16,7 +16,7 @@ class SectionController extends Controller
 
     public function index()
     {
-        $page_title = 'Section Listing';
+        $page_title = 'Faculty Listing';
         $sections = Section::orderBy('created_at', 'desc')->paginate(10);
         return view('backend.school_admin.section.index', compact('page_title', 'sections'));
     }

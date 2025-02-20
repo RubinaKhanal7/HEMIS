@@ -14,10 +14,9 @@ class ClassSeeder extends Seeder
     public function run(): void
     {
         $classes = [
-            'Class 1',
-            'Class 2',
-            'Class 3',
-            'Class 4'
+            'Intermediate',
+            'Bachelors',
+            'Masters',
         ];
 
 

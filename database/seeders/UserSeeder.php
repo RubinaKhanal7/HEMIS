@@ -77,7 +77,7 @@ class UserSeeder extends Seeder
 
         $schoolAdminUser = User::create([
             'username' => "schooladmin",
-            'email' => 'schooladmin@mail.com',
+            'email' => 'collegeadmin@mail.com',
             'password' => 'password',
             'user_type_id' => $schoolAdminUserType->id,
             'role_id' => 5,

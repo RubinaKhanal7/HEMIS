@@ -35,7 +35,7 @@
                                             <tr>
                                                 <th>Id</th>
                                                 {{-- <th>School ID</th> --}}
-                                                <th>Section Name</th>
+                                                <th>Faculty</th>
                                                 <th>Status</th>
                                                 <th>Created At</th>
                                                 <th>Action</th>
@@ -55,7 +55,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Add Section</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Faculty</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="">
@@ -73,7 +73,7 @@
                                 </div> --}}
                                 {{-- <div class="form-group col-md-4 col-xs-12"> --}}
                                 <div class="p-2 label-input">
-                                    <label>Section Name<span class="must">*</span></label>
+                                    <label>Faculty<span class="must">*</span></label>
 
                                     <div class="single-input-modal">
                                         <input type="text" value="{{ old('section_name') }}" name="section_name"

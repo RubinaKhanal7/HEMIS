@@ -17,7 +17,7 @@ class ClassController extends Controller
 {
     public function index()
     {
-        $page_title = 'Class Listing';
+        $page_title = 'Academic Level Listing';
         // $classmgt = Classg::orderBy('created_at', 'desc')->paginate(10);
         // $classmgts = Classg::with('sections')->get();
         $sectionmgt = Section::orderBy('created_at', 'desc')->paginate(10);
