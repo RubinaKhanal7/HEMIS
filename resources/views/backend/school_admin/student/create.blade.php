@@ -1,6 +1,5 @@
 @extends('backend.layouts.master')
 
-
 <!-- Main content -->
 @section('content')
     <div class="mt-4">
@@ -32,9 +31,7 @@
                                         <h5>Student's Basic Information:</h5>
                                         <div class="hr-line-dashed"></div>
 
-
                                         <div class="col-md-12 col-lg-12 d-flex flex-wrap justify-content-between gap-1">
-
 
                                             <div class="form-group col-lg-3 col-sm-3">
                                                 <label for="f_name">First Name (English):</label>
@@ -79,7 +76,6 @@
                                                 @enderror
                                             </div>
 
-
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="email">Email:</label>
                                                 <input type="text" name="email" value="{{ old('email') }}" class="form-control" id="email" placeholder="Enter Email">
@@ -102,27 +98,23 @@
                                                 @enderror
                                             </div>
 
-
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="phone">Gender:</label><br>
-
 
                                                 <label for="gender_male" class="l-radio">
                                                     <input type="radio" name="gender" value="Male" id="gender_male" {{ old('gender') == 'Male' ? 'checked' : '' }}>
                                                     <span>Male</span>
                                                 </label>
 
-
                                                 <label for="gender_female" class="l-radio">
                                                     <input type="radio" name="gender" value="Female" id="gender_female" {{ old('gender') == 'Female' ? 'checked' : '' }}>
                                                     <span>Female</span>
                                                 </label>
-                                               
+                                                
                                                 @error('gender')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-
 
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="caste ">Caste :</label>
@@ -131,7 +123,6 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-
 
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="edj ">EDJ :</label>
@@ -154,7 +145,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                           
+                                            
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="citizenship">Citizenship Id:</label>
                                                 <input type="text" name="citizenship" value="{{ old('citizenship') }}" class="form-control" id="citizenship" placeholder="Enter Citizenship">
@@ -162,7 +153,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                           
+                                            
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="national_id">National ID:</label>
                                                 <input type="text" name="national_id" value="{{ old('national_id') }}" class="form-control" id="national_id" placeholder="Enter National ID">
@@ -170,7 +161,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                           
+                                            
                                             <div class="col-md-12 col-lg-12 mt-4">
                                                 <div class="hr-line-dashed"></div>
                                                 <h5>Student's Picture:</h5>
@@ -188,7 +179,6 @@
                                                 </div>
                                             </div>
 
-
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="citizenship_front">Citizenship Front:</label>
                                                 <input type="file" name="citizenship_pic[front]" class="form-control" id="citizenship_front" accept="image/*">
@@ -196,7 +186,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                           
+                                            
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="citizenship_back">Citizenship Back:</label>
                                                 <input type="file" name="citizenship_pic[back]" class="form-control" id="citizenship_back" accept="image/*">
@@ -205,19 +195,18 @@
                                                 @enderror
                                             </div>
 
-
                                         </div>
 
-
                                     </div>
-                                   
+                                 
+                               
+
+                                    
                                     <div class="hr-line-dashed mt-4"></div>
                                     <h5 class="">Student's Permanent Address:</h5>
 
-
                                     <div class="hr-line-dashed"></div>
                                     <div class="col-md-12 col-lg-12 d-flex justify-content-around">
-
 
                                         <div class="col-md-6 col-lg-6 col-sm-6 pt-4 pb-4 d-flex  gap-3">
                                             <div class="">
@@ -241,9 +230,7 @@
                                             <div class="">
                                                 <label for="district_id">Choose District</label>
 
-
                                                 <div class="select">
-
 
                                                     <select id="district_id" name="district_id" data-iteration="0"
                                                         class="district_id" required>
@@ -274,11 +261,10 @@
                                                     </span>
                                                 @enderror
                                             </div>
-                                       
+                                        
                                             <div class="">
                                                 <label for="ward_id">Choose Ward</label>
                                                 <div class="select">
-
 
                                                     <select id="ward_id" name="ward_id" data-iteration="0"
                                                         class="ward_id" required>
@@ -293,10 +279,8 @@
                                             </div>
                                         </div>
 
-
                                     </div>
                                     <div class="col-md-12 col-lg-12 d-flex gap-2 justify-content-between">
-
 
                                         <div class=" col-lg-4 col-sm-4">
                                             <label for="tole">Tole:</label>
@@ -316,18 +300,21 @@
                                                 <strong class="text-danger">{{ $message }}</strong>
                                             @enderror
                                         </div>
+
+
                                     </div>
 
+                                    
                                     <div class="hr-line-dashed mt-4"></div>
                                     <h5 class="">Student's Temporary Address:</h5>
-                                    <div class="hr-line-dashed"></div>
                                     
+                                    <div class="hr-line-dashed"></div>
                                     <div class="col-md-12 col-lg-12 d-flex justify-content-around">
                                         <div class="col-md-6 col-lg-6 col-sm-6 pt-4 pb-4 d-flex gap-3">
                                             <div class="">
-                                                <label for="temporary_state_id">Choose State</label>
+                                                <label for="temp_state_id">Choose State</label>
                                                 <div class="select">
-                                                    <select id="temporary_state_id" name="temporary_state_id" data-iteration="1" class="state_id" required>
+                                                    <select id="temp_state_id" name="temp_state_id" data-iteration="1" class="temp_state_id" required>
                                                         <option disabled value="">Choose State</option>
                                                         @foreach ($states as $state)
                                                             <option value="{{ $state->id }}" {{ $adminStateId == $state->id ? 'selected' : '' }}>
@@ -336,88 +323,75 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
-                                                @error('temporary_state_id')
+                                                @error('temp_state_id')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="">
-                                                <label for="temporary_district_id">Choose District</label>
+                                                <label for="temp_district_id">Choose District</label>
                                                 <div class="select">
-                                                    <select id="temporary_district_id" name="temporary_district_id" data-iteration="1" class="district_id" required>
-                                                        <option value="{{ $adminDistrictId }}" selected>{{ Auth::user()->district->name }}</option>
+                                                    <select id="temp_district_id" name="temp_district_id" data-iteration="1" class="temp_district_id" required>
+                                                        <option value="{{ $adminDistrictId }}" selected>
+                                                            {{ Auth::user()->district->name }}
+                                                        </option>
                                                     </select>
                                                 </div>
-                                                @error('temporary_district_id')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
+                                                @error('temp_district_id')
+                                                    <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-lg-6 pt-4 pb-4 d-flex gap-3">
                                             <div>
-                                                <label for="temporary_municipality_id">Choose Municipality</label>
+                                                <label for="temp_municipality_id">Choose Municipality</label>
                                                 <div class="select">
-                                                    <select id="temporary_municipality_id" name="temporary_municipality_id" data-iteration="1" class="municipality_id" required>
+                                                    <select id="temp_municipality_id" name="temp_municipality_id" data-iteration="1" class="temp_municipality_id" required>
                                                         <option value="{{ $adminMunicipalityId }}" selected>{{ Auth::user()->municipality->name }}</option>
                                                     </select>
                                                 </div>
-                                                @error('temporary_municipality_id')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
+                                                @error('temp_municipality_id')
+                                                    <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="">
-                                                <label for="temporary_ward_id">Choose Ward</label>
+                                                <label for="temp_ward_id">Choose Ward</label>
                                                 <div class="select">
-                                                    <select id="temporary_ward_id" name="temporary_ward_id" data-iteration="1" class="ward_id" required>
-                                                        <option value="{{ old('temporary_ward_id') }}">Choose Ward</option>
+                                                    <select id="temp_ward_id" name="temp_ward_id" data-iteration="1" class="temp_ward_id" required>
+                                                        <option value="{{ old('temp_ward_id') }}">Choose Ward</option>
                                                     </select>
                                                 </div>
-                                                @error('temporary_ward_id')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
+                                                @error('temp_ward_id')
+                                                    <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                         </div>
                                     </div>
+                                    
                                     <div class="col-md-12 col-lg-12 d-flex gap-2 justify-content-between">
-
-
-                                        <div class=" col-lg-4 col-sm-4">
-                                            <label for="tole">Tole:</label>
-                                            <input type="text" name="tole"
-                                                value="{{ old('tole') }}" class="form-control"
-                                                id="tole" placeholder="Enter Tole">
-                                            @error('tole')
+                                        <div class="col-lg-4 col-sm-4">
+                                            <label for="temp_tole">Tole:</label>
+                                            <input type="text" name="temp_tole" value="{{ old('temp_tole') }}" class="form-control" id="temp_tole" placeholder="Enter Tole">
+                                            @error('temp_tole')
                                                 <strong class="text-danger">{{ $message }}</strong>
                                             @enderror
                                         </div>
                                         <div class="form-group col-lg-4 col-sm-4">
-                                            <label for="house_number">House Number:</label>
-                                            <input type="text" name="house_number"
-                                                value="{{ old('house_number') }}" class="form-control"
-                                                id="house_number" placeholder="Enter House Number">
-                                            @error('house_number')
+                                            <label for="temp_house_number">House Number:</label>
+                                            <input type="text" name="temp_house_number" value="{{ old('temp_house_number') }}" class="form-control" id="temp_house_number" placeholder="Enter House Number">
+                                            @error('temp_house_number')
                                                 <strong class="text-danger">{{ $message }}</strong>
                                             @enderror
                                         </div>
-
-
-
-
                                     </div>
+                                    </div>
+                                    
                                 <div class="tab">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="hr-line-dashed"></div>
                                         <h5>Student's Parent Information:</h5>
                                         <div class="hr-line-dashed"></div>
 
-
                                         <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
-
 
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="father_name">Father's Name:</label>
@@ -438,7 +412,6 @@
                                                 @enderror
                                             </div>
 
-
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="father_email">Father's Email:</label>
                                                 <input type="text" name="father_email"
@@ -448,7 +421,6 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-
 
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="">Father's Occupation:</label>
@@ -477,6 +449,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
+                                            
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="mother_email">Mother's Email:</label>
                                                 <input type="text" name="mother_email"
@@ -495,52 +468,42 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                           
+                                            
                                             </div>
                                         </div>
                                     </div>
 
-
                                 </div>
-
 
                                 <div class="tab">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="hr-line-dashed"></div>
                                         <h5>Student Enrollment & Academic Information:</h5>
                                         <div class="hr-line-dashed"></div>
-                               
+                                
                                         <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="level_of_study">Level of Study:</label>
-                                                <input type="text" name="level_of_study"
-                                                    value="{{ old('level_of_study') }}"
-                                                    class="form-control" id="level_of_study" placeholder="Enter Level of Study">
-                                                @error('level_of_study')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
+                                                <select name="level_of_study" class="form-control" id="level_of_study">
+                                                    <option value="" selected disabled>Select Level of Study</option>
+                                                </select>
                                             </div>
-                               
+                                            
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="faculty">Faculty:</label>
-                                                <input type="text" name="faculty"
-                                                    value="{{ old('faculty') }}"
-                                                    class="form-control" id="faculty" placeholder="Enter Faculty">
-                                                @error('faculty')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
+                                                <select name="faculty" class="form-control" id="faculty" disabled>
+                                                    <option value="" selected disabled>Select Faculty</option>
+                                                </select>
                                             </div>
-                               
+                                            
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="program">Program:</label>
-                                                <input type="text" name="program"
-                                                    value="{{ old('program') }}"
-                                                    class="form-control" id="program" placeholder="Enter Program">
-                                                @error('program')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
+                                                <select name="program" class="form-control" id="program" disabled>
+                                                    <option value="" selected disabled>Select Program</option>
+                                                </select>
                                             </div>
-                               
+                                            
+                                
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="admission_year">Admission Year (Batch):</label>
                                                 <input type="text" name="admission_year"
@@ -550,7 +513,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                               
+                                
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="date_of_admission">Date of Admission:</label>
                                                 <input type="date" name="date_of_admission"
@@ -560,7 +523,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                               
+                                
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="program_duration">Academic Program Duration:</label>
                                                 <input type="text" name="program_duration"
@@ -574,15 +537,14 @@
                                     </div>
                                 </div>
 
-
                                 <div class="tab">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="hr-line-dashed"></div>
                                         <h5>Student's Previous Academic Information:</h5>
                                         <div class="hr-line-dashed"></div>
-                               
+                                
                                         <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
-                               
+                                
                                             <!-- Name of Level of Study -->
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="previous_level_of_study">Name of Level of Study:</label>
@@ -593,7 +555,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                               
+                                
                                             <!-- Board/University/College -->
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="previous_board">Board/University/College:</label>
@@ -604,7 +566,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                               
+                                
                                             <!-- Registration Number -->
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="previous_registration">Registration Number:</label>
@@ -615,7 +577,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                               
+                                
                                             <!-- Name of Institution -->
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="previous_institution">Name of Institution:</label>
@@ -626,7 +588,7 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                               
+                                
                                             <!-- Attachment of Previous Studies Records -->
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="previous_records_attachment">Attachment of Previous Studies Records:</label>
@@ -634,14 +596,14 @@
                                                 @error('previous_records_attachment')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
-                               
+                                
                                                 @if(!empty($student->previousAcademic->records_attachment))
                                                     <p class="mt-2">
                                                         <a href="{{ asset('uploads/previous_records/' . $student->previousAcademic->records_attachment) }}" target="_blank">View Uploaded Document</a>
                                                     </p>
                                                 @endif
                                             </div>
-                               
+                                
                                         </div>
                                     </div>
                                 </div>
@@ -653,7 +615,6 @@
                                     <p><input placeholder="Password..." oninput="this.className = ''"></p>
                                 </div> --}}
 
-
                                 <div class=" d-flex justify-content-end mt-4">
                                     <div style="">
                                         <button class="btn btn-secondary" type="button" id="prevBtn"
@@ -661,12 +622,10 @@
                                         <button class="btn btn-primary" id="submitBtn" type="submit"
                                             style="display: none;">Submit</button>
 
-
                                         <button class="btn btn-primary" type="button" id="nextBtn"
                                             onclick="nextPrev(1)">Next</button>
                                     </div>
                                 </div>
-
 
                                 {{-- <!--This indicates the steps of the form: -->
                                 <div style="text-align:center;margin-top:40px;">
@@ -676,11 +635,9 @@
                                     <span class="step"></span>
                                 </div> --}}
 
-
                             </form>
 
-
-                               
+                                
                         </div>
                     </div>
                 </div>
@@ -693,45 +650,84 @@
 @include('backend.includes.nepalidate')
 @include('backend.includes.cropperjs')
 
-
-    <script>
-        $(document).ready(function() {
-            // Attach change event handler to the class dropdown
-            $('select[name="class_id"]').change(function() {
-                // Get the selected class ID
-                var classId = $(this).val();
-
-
-                // Fetch sections based on the selected class ID
-                $.ajax({
-                    url: 'get-sections/' + classId, // Replace with the actual route
-                    type: 'GET',
-                    success: function(data) {
-                        // Clear existing options
-                        $('select[name="section_id"]').empty();
-
-
-                        // Add the default option
-                        $('select[name="section_id"]').append(
-                            '<option disabled>Select Section</option>');
-
-
-                        // Add new options based on the fetched sections
-                        $.each(data, function(key, value) {
-                            $('select[name="section_id"]').append('<option value="' +
-                                key + '">' + value + '</option>');
-                        });
-                    }
-                });
+<script>
+$(document).ready(function() {
+    // Load levels of study (classes) on page load
+    $.ajax({
+        url: '{{ route("admin.get.classes") }}',
+        type: 'GET',
+        success: function(data) {
+            $('#level_of_study').empty();
+            $('#level_of_study').append('<option value="" selected disabled>Select Level of Study</option>');
+            $.each(data, function(key, value) {
+                $('#level_of_study').append('<option value="' + key + '">' + value + '</option>');
             });
-        });
-    </script>
+        },
+        error: function(xhr, status, error) {
+            console.error("Error loading classes:", error);
+        }
+    });
 
+    // When level of study changes, load faculties (sections)
+    $('#level_of_study').change(function() {
+        var classId = $(this).val();
+        
+        if (classId) {
+            $('#faculty').prop('disabled', false);
+            $('#program').prop('disabled', true).empty().append('<option value="" selected disabled>Select Program</option>');
+            
+            $.ajax({
+                url: '{{ route("admin.get.sections", "") }}/' + classId,
+                type: 'GET',
+                success: function(data) {
+                    $('#faculty').empty();
+                    $('#faculty').append('<option value="" selected disabled>Select Faculty</option>');
+                    $.each(data, function(key, value) {
+                        $('#faculty').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading sections:", error);
+                }
+            });
+        } else {
+            $('#faculty').prop('disabled', true);
+            $('#program').prop('disabled', true);
+        }
+    });
+
+    // When faculty changes, load programs
+    $('#faculty').change(function() {
+        var sectionId = $(this).val();
+        
+        if (sectionId) {
+            $('#program').prop('disabled', false);
+            
+            $.ajax({
+                url: '{{ route("admin.get.programs", "") }}/' + sectionId,
+                type: 'GET',
+                success: function(data) {
+                    $('#program').empty();
+                    $('#program').append('<option value="" selected disabled>Select Program</option>');
+                    $.each(data, function(key, value) {
+                        $('#program').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading programs:", error);
+                }
+            });
+        } else {
+            $('#program').prop('disabled', true);
+        }
+    });
+});
+    </script>
+    
 
     <script>
         var currentTab = 0; // Current tab is set to be the first tab (0)
         showTab(currentTab); // Display the current tab
-
 
         function showTab(n) {
             // This function will display the specified tab of the form ...
@@ -752,7 +748,6 @@
             fixStepIndicator(n)
         }
 
-
         function nextPrev(n) {
             // This function will figure out which tab to display
             var x = document.getElementsByClassName("tab");
@@ -771,7 +766,6 @@
             // Otherwise, display the correct tab:
             showTab(currentTab);
         }
-
 
         function validateForm() {
             // This function deals with validation of the form fields
@@ -795,7 +789,6 @@
             return valid; // return the valid status
         }
 
-
         function fixStepIndicator(n) {
             // This function removes the "active" class of all steps...
             var i, x = document.getElementsByClassName("step");
@@ -807,126 +800,110 @@
         }
     </script>
 
-
-   
-
-
     <script>
         $(document).ready(function() {
-            var preselectedStateId = '{{ $adminStateId }}';
-            var preselectedDistrictId = '{{ $adminDistrictId }}';
-            var preselectedMunicipalityId = '{{ $adminMunicipalityId }}';
+    var preselectedStateId = '{{ $adminStateId }}';
+    var preselectedDistrictId = '{{ $adminDistrictId }}';
+    var preselectedMunicipalityId = '{{ $adminMunicipalityId }}';
 
-
-            // Function to load districts
-            function loadDistricts(state_id, district_id = null) {
-                var append_to = 'district_id';
-                $.ajax({
-                    url: '/admin/get-district-by-state/' + state_id,
-                    type: 'GET',
-                    success: function(response) {
-                        var options = '<option disabled value>Choose District</option>';
-                        response.forEach(function(district) {
-                            options +=
-                                `<option value="${district.id}" ${district_id == district.id ? 'selected' : ''}>${district.name}</option>`;
-                        });
-                        $('#' + append_to).html(options);
-
-
-                        // Load municipalities for the preselected or first loaded district
-                        if (district_id) {
-                            loadMunicipalities(district_id, preselectedMunicipalityId);
-                        } else if (response.length > 0) {
-                            loadMunicipalities(response[0].id);
-                        }
-                    },
-                    error: function() {
-                        console.log("error in the ajax");
-                        $('#' + append_to).html('<option value="">No districts found</option>');
-                    }
+    // Function to load districts for both permanent and temporary addresses
+    function loadDistricts(state_id, district_id = null, isTemporary = false) {
+        var append_to = isTemporary ? 'temp_district_id' : 'district_id';
+        $.ajax({
+            url: '/admin/get-district-by-state/' + state_id,
+            type: 'GET',
+            success: function(response) {
+                var options = '<option disabled value>Choose District</option>';
+                response.forEach(function(district) {
+                    options += `<option value="${district.id}" ${district_id == district.id ? 'selected' : ''}>${district.name}</option>`;
                 });
-            }
+                $('#' + append_to).html(options);
 
-
-            // Function to load municipalities
-            function loadMunicipalities(district_id, municipality_id = null) {
-                var append_to = 'municipalitiy_id'; // Ensure this ID matches your select ID
-                $.ajax({
-                    url: '/admin/get-municipality-by-district/' + district_id,
-                    type: 'GET',
-                    success: function(response) {
-                        var options = '<option disabled selected value>Choose Municipality</option>';
-                        response.forEach(function(municipality) {
-                            options +=
-                                `<option value="${municipality.id}" ${municipality_id == municipality.id ? 'selected' : ''}>${municipality.name}</option>`;
-                        });
-                        $('#' + append_to).html(options);
-
-
-                        // Load wards for the preselected or first loaded municipality
-                        if (municipality_id) {
-                            loadWards(municipality_id);
-                        } else if (response.length > 0) {
-                            loadWards(response[0].id);
-                        }
-                    },
-                    error: function() {
-                        console.log("error in the ajax");
-                        $('#' + append_to).html('<option value="">No municipalities found</option>');
-                    }
-                });
-            }
-
-
-            // Function to load wards
-            function loadWards(municipality_id) {
-                var append_to = 'ward_id'; // Ensure this ID matches your select ID for wards
-                $.ajax({
-                    url: '/admin/get-ward-by-municipality/' + municipality_id,
-                    type: 'GET',
-                    success: function(response) {
-                        var options = '<option disabled selected value>Choose Ward</option>';
-                        response.forEach(function(ward) {
-                            options += `<option value="${ward.id}">${ward.name}</option>`;
-                        });
-                        $('#' + append_to).html(options);
-                    },
-                    error: function() {
-                        console.log("error in the ajax");
-                        $('#' + append_to).html('<option value="">No wards found</option>');
-                    }
-                });
-            }
-
-
-            // Listen for state changes to reload districts
-            $(document).on('change', '.state_id', function() {
-                var state_id = $(this).val();
-                loadDistricts(state_id);
-            });
-
-
-            // Listen for district changes to reload municipalities
-            $(document).on('change', '.district_id', function() {
-                var district_id = $(this).val();
-                loadMunicipalities(district_id);
-            });
-
-
-            // Listen for municipality changes to reload wards
-            $(document).on('change', '.municipality_id', function() {
-                var municipality_id = $(this).val();
-                loadWards(municipality_id);
-            });
-
-
-            // Preload districts, municipalities, and wards if there are preselected values
-            if (preselectedStateId) {
-                loadDistricts(preselectedStateId, preselectedDistrictId);
+                // Load municipalities for the preselected or first loaded district
+                if (district_id) {
+                    loadMunicipalities(district_id, preselectedMunicipalityId, isTemporary);
+                } else if (response.length > 0) {
+                    loadMunicipalities(response[0].id, null, isTemporary);
+                }
             }
         });
+    }
 
+    // Function to load municipalities for both addresses
+    function loadMunicipalities(district_id, municipality_id = null, isTemporary = false) {
+        var append_to = isTemporary ? 'temp_municipality_id' : 'municipalitiy_id';
+        $.ajax({
+            url: '/admin/get-municipality-by-district/' + district_id,
+            type: 'GET',
+            success: function(response) {
+                var options = '<option disabled selected value>Choose Municipality</option>';
+                response.forEach(function(municipality) {
+                    options += `<option value="${municipality.id}" ${municipality_id == municipality.id ? 'selected' : ''}>${municipality.name}</option>`;
+                });
+                $('#' + append_to).html(options);
 
+                // Load wards for the preselected or first loaded municipality
+                if (municipality_id) {
+                    loadWards(municipality_id, isTemporary);
+                } else if (response.length > 0) {
+                    loadWards(response[0].id, isTemporary);
+                }
+            }
+        });
+    }
+
+    // Function to load wards for both addresses
+    function loadWards(municipality_id, isTemporary = false) {
+        var append_to = isTemporary ? 'temp_ward_id' : 'ward_id';
+        $.ajax({
+            url: '/admin/get-ward-by-municipality/' + municipality_id,
+            type: 'GET',
+            success: function(response) {
+                var options = '<option disabled selected value>Choose Ward</option>';
+                response.forEach(function(ward) {
+                    options += `<option value="${ward.id}">${ward.name}</option>`;
+                });
+                $('#' + append_to).html(options);
+            }
+        });
+    }
+
+    // Event listeners for permanent address
+    $('.state_id').change(function() {
+        loadDistricts($(this).val(), null, false);
+    });
+
+    $('.district_id').change(function() {
+        loadMunicipalities($(this).val(), null, false);
+    });
+
+    $('.municipality_id').change(function() {
+        loadWards($(this).val(), false);
+    });
+
+    // Event listeners for temporary address
+    $('.temp_state_id').change(function() {
+        loadDistricts($(this).val(), null, true);
+    });
+
+    $('.temp_district_id').change(function() {
+        loadMunicipalities($(this).val(), null, true);
+    });
+
+    $('.temp_municipality_id').change(function() {
+        loadWards($(this).val(), true);
+    });
+
+    // Initial load for permanent address
+    if (preselectedStateId) {
+        loadDistricts(preselectedStateId, preselectedDistrictId, false);
+    }
+
+    // Initial load for temporary address
+    if (preselectedStateId) {
+        loadDistricts(preselectedStateId, preselectedDistrictId, true);
+    }
+});
   // Function to generate a random 3-digit number
   function generateRandomNumber() {
         const length = 3;
@@ -939,13 +916,11 @@
         return randomNumber;
     }
 
-
     // Function to generate the admission number based on municipality ID and school ID
     function generateAdmissionNumber(municipalityId, schoolId) {
         const randomNumber = generateRandomNumber();
         return `${municipalityId}${schoolId}${randomNumber}`;
     }
-
 
     // Set the generated admission number to the input field
     function updateAdmissionNumber() {
@@ -957,7 +932,6 @@
         }
     }
 
-
     // Event listener for DOM content loaded
     document.addEventListener('DOMContentLoaded', function () {
         // Update admission number on page load if not set
@@ -966,7 +940,6 @@
             updateAdmissionNumber();
         }
 
-
         // Update admission number when municipality selection changes
         const municipalitySelect = document.getElementById('municipalitiy_id');
         if (municipalitySelect) {
@@ -974,132 +947,15 @@
         }
     });
 
-    $(document).ready(function() {
-    // Cache DOM elements for temporary address
-    const tempStateSelect = $('#temporary_state_id');
-    const tempDistrictSelect = $('#temporary_district_id');
-    const tempMunicipalitySelect = $('#temporary_municipality_id');
-    const tempWardSelect = $('#temporary_ward_id');
-
-    // Function to load districts for temporary address
-    function loadTemporaryDistricts(stateId, selectedDistrictId = null) {
-        $.ajax({
-            url: '/admin/get-district-by-state/' + stateId,
-            type: 'GET',
-            success: function(response) {
-                let options = '<option disabled value>Choose District</option>';
-                response.forEach(function(district) {
-                    options += `<option value="${district.id}" 
-                        ${selectedDistrictId == district.id ? 'selected' : ''}>
-                        ${district.name}
-                    </option>`;
-                });
-                tempDistrictSelect.html(options);
-
-                // Load municipalities for the first district if none selected
-                const districtId = selectedDistrictId || (response.length > 0 ? response[0].id : null);
-                if (districtId) {
-                    loadTemporaryMunicipalities(districtId);
-                }
-            },
-            error: function() {
-                console.error("Error loading districts");
-                tempDistrictSelect.html('<option value="">No districts found</option>');
-            }
-        });
-    }
-
-    // Function to load municipalities for temporary address
-    function loadTemporaryMunicipalities(districtId, selectedMunicipalityId = null) {
-        $.ajax({
-            url: '/admin/get-municipality-by-district/' + districtId,
-            type: 'GET',
-            success: function(response) {
-                let options = '<option disabled value>Choose Municipality</option>';
-                response.forEach(function(municipality) {
-                    options += `<option value="${municipality.id}" 
-                        ${selectedMunicipalityId == municipality.id ? 'selected' : ''}>
-                        ${municipality.name}
-                    </option>`;
-                });
-                tempMunicipalitySelect.html(options);
-
-                // Load wards for the first municipality if none selected
-                const municipalityId = selectedMunicipalityId || (response.length > 0 ? response[0].id : null);
-                if (municipalityId) {
-                    loadTemporaryWards(municipalityId);
-                }
-            },
-            error: function() {
-                console.error("Error loading municipalities");
-                tempMunicipalitySelect.html('<option value="">No municipalities found</option>');
-            }
-        });
-    }
-
-    // Function to load wards for temporary address
-    function loadTemporaryWards(municipalityId, selectedWardId = null) {
-        $.ajax({
-            url: '/admin/get-ward-by-municipality/' + municipalityId,
-            type: 'GET',
-            success: function(response) {
-                let options = '<option disabled value>Choose Ward</option>';
-                response.forEach(function(ward) {
-                    options += `<option value="${ward.id}" 
-                        ${selectedWardId == ward.id ? 'selected' : ''}>
-                        ${ward.name}
-                    </option>`;
-                });
-                tempWardSelect.html(options);
-            },
-            error: function() {
-                console.error("Error loading wards");
-                tempWardSelect.html('<option value="">No wards found</option>');
-            }
-        });
-    }
-
-    // Event Listeners for temporary address selects
-    tempStateSelect.on('change', function() {
-        const stateId = $(this).val();
-        if (stateId) {
-            loadTemporaryDistricts(stateId);
-        }
-    });
-
-    tempDistrictSelect.on('change', function() {
-        const districtId = $(this).val();
-        if (districtId) {
-            loadTemporaryMunicipalities(districtId);
-        }
-    });
-
-    tempMunicipalitySelect.on('change', function() {
-        const municipalityId = $(this).val();
-        if (municipalityId) {
-            loadTemporaryWards(municipalityId);
-        }
-    });
-
-    // Initial load of districts for temporary address if state is pre-selected
-    const initialStateId = tempStateSelect.val();
-    if (initialStateId) {
-        loadTemporaryDistricts(initialStateId);
-    }
-});
-
 
 </script>
 
-
-   
-
+    
 
     <script>
         function toggleGuardianFields() {
             var otherFieldsContainer = document.getElementById('otherGuardianFields');
             var guardianOtherRadio = document.getElementById('guardian_other');
-
 
             if (guardianOtherRadio.checked) {
                 otherFieldsContainer.style.display = 'flex'; // Show the additional fields
@@ -1111,7 +967,7 @@
             }
         }
     </script>
+
+
 @endsection
-
-
 

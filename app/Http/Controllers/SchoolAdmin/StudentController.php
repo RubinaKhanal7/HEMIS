@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Classg;
 use App\Models\Section;
 use App\Models\Student;
+use App\Models\Program;
 use App\Models\SchoolUser;
 use App\Models\SchoolHouse;
 use Illuminate\Http\Request;
@@ -137,18 +138,35 @@ class StudentController extends Controller
         }
     }
 
+    public function getClasses()
+    {
+        $schoolId = session('school_id');
+        $classes = Classg::where('school_id', $schoolId)
+            ->orderBy('created_at', 'desc')
+            ->pluck('class', 'id'); 
+    
+        return response()->json($classes);
+    }
+    
 
-
-
-
-
-
-    // RETRIVING SECTIONS OF THE RESPECTIVE CLASS
     public function getSections($classId)
     {
-        $sections = Classg::find($classId)->sections()->pluck('sections.section_name', 'sections.id');
+        $sections = Section::where('class_id', $classId)
+            ->orderBy('section_name')
+            ->pluck('section_name', 'id');
+            
         return response()->json($sections);
     }
+
+    public function getPrograms($sectionId)
+    {
+        $programs = Program::where('section_id', $sectionId)
+            ->orderBy('title')
+            ->pluck('title', 'id');
+            
+        return response()->json($programs);
+    }
+    
 
     // CREATE STUDENT
     protected function saveStudent(array $studentInput)
@@ -283,79 +301,185 @@ class StudentController extends Controller
         }
     }
 
+ 
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            // Personal Information
+            'first_name_en' => 'required|string|max:255',
+            'first_name_np' => 'required|string|max:255',
+            'last_name_en' => 'required|string|max:255',
+            'last_name_np' => 'required|string|max:255',
+            'middle_name_en' => 'nullable|string|max:255',
+            'middle_name_np' => 'nullable|string|max:255',
+            'mobile_number' => 'required|string|max:15',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|in:Male,Female,Other',
+            'caste' => 'nullable|string|max:255',
+            'ethnicity' => 'required|string|max:255',
+            'edj' => 'nullable|string|max:255',
+            'disability_status' => 'nullable|in:yes,no',
+            'citizenship_id' => 'nullable|string|max:255',
+            'national_id' => 'nullable|string|max:255',
+            
+            // Images
+            'student_photo' => 'nullable|image|max:2048',
+            'citizenship_front' => 'nullable|image|max:2048',
+            'citizenship_back' => 'nullable|image|max:2048',
+            
+            // Permanent Address
+            'permanent_province' => 'required|string|max:255',
+            'permanent_district' => 'required|string|max:255',
+            'permanent_local_level' => 'required|string|max:255',
+            'permanent_ward_no' => 'required|string|max:10',
+            'permanent_tole' => 'nullable|string|max:255',
+            'permanent_house_no' => 'nullable|string|max:255',
+            
+            // Temporary Address
+            'temporary_province' => 'nullable|string|max:255',
+            'temporary_district' => 'nullable|string|max:255',
+            'temporary_local_level' => 'nullable|string|max:255',
+            'temporary_ward_no' => 'nullable|string|max:10',
+            'temporary_tole' => 'nullable|string|max:255',
+            'temporary_house_no' => 'nullable|string|max:255',
+            
+            // Guardian Information
+            'father_name' => 'nullable|string|max:255',
+            'father_contact_no' => 'nullable|string|max:15',
+            'father_occupation' => 'nullable|string|max:255',
+            'mother_name' => 'nullable|string|max:255',
+            'mother_contact_no' => 'nullable|string|max:15',
+            'mother_occupation' => 'nullable|string|max:255',
+            
+            // Academic Information
+            'level_of_study' => 'required|string|max:255',
+            'faculty' => 'required|string|max:255',
+            'program' => 'required|string|max:255',
+            'admission_year' => 'required|date_format:Y',
+            'date_of_admission' => 'required|date',
+            'academic_program_duration' => 'required|string|max:255',
+            
+            // Previous Academic Information
+            'previous_level_of_study' => 'required|string|max:255',
+            'previous_board_university_college' => 'required|string|max:255',
+            'previous_registration_no' => 'required|string|max:255',
+            'previous_institution_name' => 'required|string|max:255',
+            'previous_study_records_attachment' => 'nullable|file|max:2048',
+            
+            // Foreign Keys
+            'school_id' => 'nullable|exists:schools,id',
+            'section_id' => 'required|exists:sections,id',
+            'class_id' => 'required|exists:classes,id',
+            'program_id' => 'required|exists:programs,id',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
         try {
-            DB::beginTransaction();
-    
-            // CREATING USER WITH ITS RESPECTIVE VALIDATION FUNCTION
-            $userInput = $this->validateUserData($request, true);
-    
-            // Generate username based on first letter of f_name, first letter of l_name, and admission number
-            $admissionNumber = $request->input('admission_no') ?? '';
-            $username = strtolower(substr($userInput['f_name'], 0, 1) . substr($userInput['l_name'], 0, 1) . '-' . $admissionNumber);
-            $userInput['username'] = $username;
-    
-            // Generate email dynamically if not provided
-            if (!$request->filled('email')) {
-                $email = strtolower($userInput['f_name'] . '.' . $userInput['l_name'] . '.' . $admissionNumber . '@gmail.com');
-                $count = User::where('email', $email)->count();
-                if ($count > 0) {
-                    // If the email already exists, append a number to make it unique
-                    $email = strtolower($userInput['f_name'] . '.' . $userInput['l_name'] . '.' . $admissionNumber . $count . '@gmail.com');
-                }
-                $userInput['email'] = $email;
-            } else {
-                $userInput['email'] = $request->input('email');
+            // Handle file uploads
+            $studentPhoto = null;
+            $citizenshipFront = null;
+            $citizenshipBack = null;
+            $previousRecords = null;
+
+            if ($request->hasFile('student_photo')) {
+                $studentPhoto = $this->uploadFile($request->file('student_photo'), 'student_photos');
             }
-    
-            if ($request->has('inputCroppedPic') && !is_null($request->inputCroppedPic)) {
-                $userInput['image'] = $this->saveUserImage($request->input('inputCroppedPic'));
+
+            if ($request->hasFile('citizenship_front')) {
+                $citizenshipFront = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
             }
-    
-            // STUDENT USER CREATED AND ASSIGNED
-            $studentUser = $this->createUser($userInput);
-            $studentUser->assignRole(11);
-    
-            // Create student_sessions record
-            $this->createStudentSession($studentUser->id, $request->input('class_id'), $request->input('section_id'));
-    
-            // CREATING STUDENT WITH ITS RESPECTIVE VALIDATION
-            $studentInput = $userInput;
-            $studentInput['user_id'] = $studentUser->id;
-            $studentInput['school_id'] = session('school_id');
-            $studentInput['reservation_quota_id'] = $request->input('reservation_quota_id') ?? "";
-            $studentInput['class_id'] = $request->input('class_id') ?? "";
-            $studentInput['section_id'] = $request->input('section_id') ?? "";
-            $studentInput['admission_no'] = $request->input('admission_no') ?? "";
-            $studentInput['admission_date'] = $request->input('admission_date') ?? "";
-            $studentInput['roll_no'] = $request->input('roll_no') ?? "";
-            $studentInput['school_house_id'] = $request->input('school_house_id');
-            $studentInput['student_photo'] = $studentUser->image;
-            $studentInput['guardian_name'] = $request->input('guardian_name') ?? "";
-            $studentInput['guardian_relation'] = $request->input('guardian_relation') ?? "";
-            $studentInput['guardian_phone'] = $request->input('guardian_phone') ?? "";
-            $studentInput['guardian_email'] = $request->input('guardian_email') ?? "";
-    
-            // Add transfer_certificate if a file is present
-            $transferCertificatePath = $this->saveTransferCertificate($request);
-            if (!is_null($transferCertificatePath)) {
-                $studentInput['transfer_certificate'] = $transferCertificatePath;
+
+            if ($request->hasFile('citizenship_back')) {
+                $citizenshipBack = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
             }
-    
-            $this->saveStudent($studentInput);
-    
-            // Create entry in the SchoolUser pivot table
-            $this->createSchoolUserEntry($studentInput['school_id'], $studentUser->id);
-    
-            DB::commit();
-    
-            return redirect()->route('admin.students.index')->withToastSuccess('Student successfully created');
+
+            if ($request->hasFile('previous_study_records_attachment')) {
+                $previousRecords = $this->uploadFile($request->file('previous_study_records_attachment'), 'previous_records');
+            }
+
+            // Create student record
+            $student = Student::create([
+                // Personal Information
+                'first_name_np' => $request->first_name_np,
+                'middle_name_np' => $request->middle_name_np,
+                'last_name_np' => $request->last_name_np,
+                'first_name_en' => $request->first_name_en,
+                'middle_name_en' => $request->middle_name_en,
+                'last_name_en' => $request->last_name_en,
+                'mobile_number' => $request->mobile_number,
+                'date_of_birth' => $request->date_of_birth,
+                'gender' => $request->gender,
+                'caste' => $request->caste,
+                'ethnicity' => $request->ethnicity,
+                'edj' => $request->edj,
+                'disability_status' => $request->disability_status,
+                'citizenship_id' => $request->citizenship_id,
+                'national_id' => $request->national_id,
+                'student_photo' => $studentPhoto,
+                'citizenship_front' => $citizenshipFront,
+                'citizenship_back' => $citizenshipBack,
+
+                // Address Information
+                'permanent_district' => $request->permanent_district,
+                'permanent_province' => $request->permanent_province,
+                'permanent_local_level' => $request->permanent_local_level,
+                'permanent_ward_no' => $request->permanent_ward_no,
+                'permanent_tole' => $request->permanent_tole,
+                'permanent_house_no' => $request->permanent_house_no,
+                'temporary_district' => $request->temporary_district,
+                'temporary_province' => $request->temporary_province,
+                'temporary_local_level' => $request->temporary_local_level,
+                'temporary_ward_no' => $request->temporary_ward_no,
+                'temporary_tole' => $request->temporary_tole,
+                'temporary_house_no' => $request->temporary_house_no,
+
+                // Guardian Information
+                'father_name' => $request->father_name,
+                'father_contact_no' => $request->father_contact_no,
+                'father_occupation' => $request->father_occupation,
+                'mother_name' => $request->mother_name,
+                'mother_contact_no' => $request->mother_contact_no,
+                'mother_occupation' => $request->mother_occupation,
+
+                // Academic Information
+                'level_of_study' => $request->level_of_study,
+                'faculty' => $request->faculty,
+                'program' => $request->program,
+                'admission_year' => $request->admission_year,
+                'date_of_admission' => $request->date_of_admission,
+                'academic_program_duration' => $request->academic_program_duration,
+
+                // Previous Academic Information
+                'previous_level_of_study' => $request->previous_level_of_study,
+                'previous_board_university_college' => $request->previous_board_university_college,
+                'previous_registration_no' => $request->previous_registration_no,
+                'previous_institution_name' => $request->previous_institution_name,
+                'previous_study_records_attachment' => $previousRecords,
+
+                // Foreign Keys
+                'school_id' => Auth::user()->school_id,
+                'user_id' => Auth::id(),
+                'section_id' => $request->section_id,
+                'class_id' => $request->class_id,
+                'program_id' => $request->program_id,
+            ]);
+
+            return redirect()->route('admin.students.index')
+                ->with('success', 'Student registered successfully!');
+
         } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withToastError($e->getMessage())->withInput();
+            return redirect()->back()
+                ->with('error', 'Error registering student: ' . $e->getMessage())
+                ->withInput();
         }
     }
+
+
     
 
     public function show(Request $request)

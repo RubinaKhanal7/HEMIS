@@ -11,21 +11,57 @@ class Student extends Model
 
     protected $fillable = [
         'user_id', 
-        'school_id', 
-        'reservation_quota_id', 
-        'admission_no', 
-        'roll_no', 
-        'admission_date', 
-        'school_house_id', 
-        'student_photo', 
-        'guardian_is', 
-        'guardian_name', 
-        'guardian_relation', 
-        'guardian_phone', 
-        'guardian_email', 
-        'transfer_certificate', 
-        'class_id', 
-        'section_id'
+        'first_name_np',
+        'middle_name_np',
+        'last_name_np',
+        'first_name_en',
+        'middle_name_en',
+        'last_name_en',
+        'mobile_number',
+        'date_of_birth',
+        'gender',
+        'caste',
+        'ethnicity',
+        'edj',
+        'disability_status',
+        'citizenship_id',
+        'national_id',
+        'student_photo',
+        'citizenship_front',
+        'citizenship_back',
+        'permanent_district',
+        'permanent_province',
+        'permanent_local_level',
+        'permanent_ward_no',
+        'permanent_tole',
+        'permanent_house_no',
+        'temporary_district',
+        'temporary_province',
+        'temporary_local_level',
+        'temporary_ward_no',
+        'temporary_tole',
+        'temporary_house_no',
+        'father_name',
+        'father_contact_no',
+        'father_occupation',
+        'mother_name',
+        'mother_contact_no',
+        'mother_occupation',
+        'level_of_study',
+        'faculty',
+        'program',
+        'admission_year',
+        'date_of_admission',
+        'academic_program_duration',
+        'previous_level_of_study',
+        'previous_board_university_college',
+        'previous_registration_no',
+        'previous_institution_name',
+        'previous_study_records_attachment',
+        'school_id',
+        'class_id',
+        'section_id',
+        'program_id'
     ];
 
     public function user()
@@ -51,6 +87,11 @@ class Student extends Model
     public function sections()
     {
         return $this->belongsTo(Section::class, 'section_id');
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class, 'program_id');
     }
 
     public function studentLeaves()

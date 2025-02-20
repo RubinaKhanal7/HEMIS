@@ -13,8 +13,11 @@ Route::post('students/{student_id}/additional-information', [StudentController::
 
 
 
+Route::get('/get-classes', [StudentController::class, 'getClasses'])->name('get.classes'); 
+Route::get('/get-sections/{id}', [StudentController::class, 'getSections'])->name('get.sections');
+Route::get('/get-programs/{section_id}', [StudentController::class, 'getPrograms'])->name('get.programs');
 
-Route::get('students/get-sections/{classId}', [StudentController::class, 'getSections'])->name('student.get-sections');
+
 
 Route::get('/get-district-by-state/{state_id}', [StudentController::class, 'getDistrict'])->name('get-districts');
 Route::get('student/import/index', [StudentController::class, 'importAllStudentIndex'])->name('students.import');

@@ -79,6 +79,13 @@ return new class extends Migration
             $table->string('previous_institution_name');
             $table->string('previous_study_records_attachment')->nullable();
            
+            // Foreign Keys
+            $table->foreignId('school_id')->nullable()->constrained('schools')->onDelete('set null');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('section_id')->constrained('sections')->onDelete('cascade');
+            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
+            $table->foreignId('program_id')->constrained('programs')->onDelete('cascade');
+           
             $table->timestamps();
         });
     }
@@ -92,4 +99,3 @@ return new class extends Migration
         Schema::dropIfExists('students');
     }
 };
-

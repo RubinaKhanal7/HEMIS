@@ -52,7 +52,7 @@ class SubjectSeeder extends Seeder
             ],
             [
                 'school_id' => '1',
-                'subject_code' => 'CMA',
+                'subject_code' => 'BES',
                 'subject' => 'Business Economics',
                 'credit_hour' => '107',
             ],

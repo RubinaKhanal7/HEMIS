@@ -20,4 +20,9 @@ class Program extends Model
     {
         return $this->belongsTo(Section::class, 'section_id');
     }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'program_id');
+    }
 }
