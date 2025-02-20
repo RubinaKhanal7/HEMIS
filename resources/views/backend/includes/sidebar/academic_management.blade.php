@@ -49,10 +49,10 @@
             @endcan
 
             {{-- Added Line need to upgrade it --}}
-            @can('list_classes')
+            @can('list_programs')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::segment(2) == 'classes' ? 'active' : '' }}"
-                        href="{{ route('admin.classes.index') }}">
+                        href="{{ route('admin.programs.index') }}">
                         <div class="d-flex align-items-center">
                             <i class="fa fa-angle-double-right"></i>{{ __('Program') }}
                         </div>

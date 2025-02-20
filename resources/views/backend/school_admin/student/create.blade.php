@@ -210,10 +210,6 @@
 
 
                                     </div>
-                                 
-                               
-
-
                                    
                                     <div class="hr-line-dashed mt-4"></div>
                                     <h5 class="">Student's Permanent Address:</h5>
@@ -320,123 +316,99 @@
                                                 <strong class="text-danger">{{ $message }}</strong>
                                             @enderror
                                         </div>
+                                    </div>
+
+                                    <div class="hr-line-dashed mt-4"></div>
+                                    <h5 class="">Student's Temporary Address:</h5>
+                                    <div class="hr-line-dashed"></div>
+                                    
+                                    <div class="col-md-12 col-lg-12 d-flex justify-content-around">
+                                        <div class="col-md-6 col-lg-6 col-sm-6 pt-4 pb-4 d-flex gap-3">
+                                            <div class="">
+                                                <label for="temporary_state_id">Choose State</label>
+                                                <div class="select">
+                                                    <select id="temporary_state_id" name="temporary_state_id" data-iteration="1" class="state_id" required>
+                                                        <option disabled value="">Choose State</option>
+                                                        @foreach ($states as $state)
+                                                            <option value="{{ $state->id }}" {{ $adminStateId == $state->id ? 'selected' : '' }}>
+                                                                {{ $state->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                @error('temporary_state_id')
+                                                    <strong class="text-danger">{{ $message }}</strong>
+                                                @enderror
+                                            </div>
+                                            <div class="">
+                                                <label for="temporary_district_id">Choose District</label>
+                                                <div class="select">
+                                                    <select id="temporary_district_id" name="temporary_district_id" data-iteration="1" class="district_id" required>
+                                                        <option value="{{ $adminDistrictId }}" selected>{{ Auth::user()->district->name }}</option>
+                                                    </select>
+                                                </div>
+                                                @error('temporary_district_id')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 pt-4 pb-4 d-flex gap-3">
+                                            <div>
+                                                <label for="temporary_municipality_id">Choose Municipality</label>
+                                                <div class="select">
+                                                    <select id="temporary_municipality_id" name="temporary_municipality_id" data-iteration="1" class="municipality_id" required>
+                                                        <option value="{{ $adminMunicipalityId }}" selected>{{ Auth::user()->municipality->name }}</option>
+                                                    </select>
+                                                </div>
+                                                @error('temporary_municipality_id')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                            <div class="">
+                                                <label for="temporary_ward_id">Choose Ward</label>
+                                                <div class="select">
+                                                    <select id="temporary_ward_id" name="temporary_ward_id" data-iteration="1" class="ward_id" required>
+                                                        <option value="{{ old('temporary_ward_id') }}">Choose Ward</option>
+                                                    </select>
+                                                </div>
+                                                @error('temporary_ward_id')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-12 d-flex gap-2 justify-content-between">
+
+
+                                        <div class=" col-lg-4 col-sm-4">
+                                            <label for="tole">Tole:</label>
+                                            <input type="text" name="tole"
+                                                value="{{ old('tole') }}" class="form-control"
+                                                id="tole" placeholder="Enter Tole">
+                                            @error('tole')
+                                                <strong class="text-danger">{{ $message }}</strong>
+                                            @enderror
+                                        </div>
+                                        <div class="form-group col-lg-4 col-sm-4">
+                                            <label for="house_number">House Number:</label>
+                                            <input type="text" name="house_number"
+                                                value="{{ old('house_number') }}" class="form-control"
+                                                id="house_number" placeholder="Enter House Number">
+                                            @error('house_number')
+                                                <strong class="text-danger">{{ $message }}</strong>
+                                            @enderror
+                                        </div>
 
 
 
 
                                     </div>
-
-
-                                   
-                                        <div class="hr-line-dashed mt-4"></div>
-                                        <h5 class="">Student's Temporary Address:</h5>
-   
-                                        <div class="hr-line-dashed"></div>
-                                        <div class="col-md-12 col-lg-12 d-flex justify-content-around">
-   
-                                            <div class="col-md-6 col-lg-6 col-sm-6 pt-4 pb-4 d-flex  gap-3">
-                                                <div class="">
-                                                    <label for="state_id">Choose State</label>
-                                                    <div class="select">
-                                                        <select id="state_id" name="state_id" data-iteration="0"
-                                                            class="state_id" required>
-                                                            <option disabled value="">Choose State</option>
-                                                            @foreach ($states as $state)
-                                                                <option value="{{ $state->id }}"
-                                                                    {{ $adminStateId == $state->id ? 'selected' : '' }}>
-                                                                    {{ $state->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    @error('state_id')
-                                                        <strong class="text-danger">{{ $message }}</strong>
-                                                    @enderror
-                                                </div>
-                                                <div class="">
-                                                    <label for="district_id">Choose District</label>
-   
-                                                    <div class="select">
-   
-                                                        <select id="district_id" name="district_id" data-iteration="0"
-                                                            class="district_id" required>
-                                                            {{-- <option value="{{ old('district_id') }}">Choose District</option> --}}
-                                                            <option value="{{ $adminDistrictId }}" selected>
-                                                                {{ Auth::user()->district->name }}</option>
-                                                        </select>
-                                                    </div>
-                                                    @error('district_id')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 col-lg-6 pt-4 pb-4 d-flex gap-3">
-                                                <div>
-                                                    <label for="municipalitiy_id">Choose Municipality</label>
-                                                    <div class="select">
-                                                        <select id="municipalitiy_id" name="municipality_id" data-iteration="0" class="municipality_id" required>
-                                                            <option value="{{ $adminMunicipalityId }}" selected>{{ Auth::user()->municipality->name }}</option>
-                                                            <!-- Add other municipality options here -->
-                                                        </select>
-                                                    </div>
-                                                    @error('municipalitiy_id')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                           
-                                                <div class="">
-                                                    <label for="ward_id">Choose Ward</label>
-                                                    <div class="select">
-   
-                                                        <select id="ward_id" name="ward_id" data-iteration="0"
-                                                            class="ward_id" required>
-                                                            <option value="{{ old('ward_id') }}">Choose Ward</option>
-                                                        </select>
-                                                    </div>
-                                                    @error('ward_id')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-   
-                                        </div>
-                                        <div class="col-md-12 col-lg-12 d-flex gap-2 justify-content-between">
-   
-                                            <div class=" col-lg-4 col-sm-4">
-                                                <label for="tole">Tole:</label>
-                                                <input type="text" name="tole"
-                                                    value="{{ old('tole') }}" class="form-control"
-                                                    id="tole" placeholder="Enter Tole">
-                                                @error('tole')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                            <div class="form-group col-lg-4 col-sm-4">
-                                                <label for="house_number">House Number:</label>
-                                                <input type="text" name="house_number"
-                                                    value="{{ old('house_number') }}" class="form-control"
-                                                    id="house_number" placeholder="Enter House Number">
-                                                @error('house_number')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                   
-
-
-
-
-
-
                                 <div class="tab">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="hr-line-dashed"></div>
@@ -1002,7 +974,119 @@
         }
     });
 
+    $(document).ready(function() {
+    // Cache DOM elements for temporary address
+    const tempStateSelect = $('#temporary_state_id');
+    const tempDistrictSelect = $('#temporary_district_id');
+    const tempMunicipalitySelect = $('#temporary_municipality_id');
+    const tempWardSelect = $('#temporary_ward_id');
 
+    // Function to load districts for temporary address
+    function loadTemporaryDistricts(stateId, selectedDistrictId = null) {
+        $.ajax({
+            url: '/admin/get-district-by-state/' + stateId,
+            type: 'GET',
+            success: function(response) {
+                let options = '<option disabled value>Choose District</option>';
+                response.forEach(function(district) {
+                    options += `<option value="${district.id}" 
+                        ${selectedDistrictId == district.id ? 'selected' : ''}>
+                        ${district.name}
+                    </option>`;
+                });
+                tempDistrictSelect.html(options);
+
+                // Load municipalities for the first district if none selected
+                const districtId = selectedDistrictId || (response.length > 0 ? response[0].id : null);
+                if (districtId) {
+                    loadTemporaryMunicipalities(districtId);
+                }
+            },
+            error: function() {
+                console.error("Error loading districts");
+                tempDistrictSelect.html('<option value="">No districts found</option>');
+            }
+        });
+    }
+
+    // Function to load municipalities for temporary address
+    function loadTemporaryMunicipalities(districtId, selectedMunicipalityId = null) {
+        $.ajax({
+            url: '/admin/get-municipality-by-district/' + districtId,
+            type: 'GET',
+            success: function(response) {
+                let options = '<option disabled value>Choose Municipality</option>';
+                response.forEach(function(municipality) {
+                    options += `<option value="${municipality.id}" 
+                        ${selectedMunicipalityId == municipality.id ? 'selected' : ''}>
+                        ${municipality.name}
+                    </option>`;
+                });
+                tempMunicipalitySelect.html(options);
+
+                // Load wards for the first municipality if none selected
+                const municipalityId = selectedMunicipalityId || (response.length > 0 ? response[0].id : null);
+                if (municipalityId) {
+                    loadTemporaryWards(municipalityId);
+                }
+            },
+            error: function() {
+                console.error("Error loading municipalities");
+                tempMunicipalitySelect.html('<option value="">No municipalities found</option>');
+            }
+        });
+    }
+
+    // Function to load wards for temporary address
+    function loadTemporaryWards(municipalityId, selectedWardId = null) {
+        $.ajax({
+            url: '/admin/get-ward-by-municipality/' + municipalityId,
+            type: 'GET',
+            success: function(response) {
+                let options = '<option disabled value>Choose Ward</option>';
+                response.forEach(function(ward) {
+                    options += `<option value="${ward.id}" 
+                        ${selectedWardId == ward.id ? 'selected' : ''}>
+                        ${ward.name}
+                    </option>`;
+                });
+                tempWardSelect.html(options);
+            },
+            error: function() {
+                console.error("Error loading wards");
+                tempWardSelect.html('<option value="">No wards found</option>');
+            }
+        });
+    }
+
+    // Event Listeners for temporary address selects
+    tempStateSelect.on('change', function() {
+        const stateId = $(this).val();
+        if (stateId) {
+            loadTemporaryDistricts(stateId);
+        }
+    });
+
+    tempDistrictSelect.on('change', function() {
+        const districtId = $(this).val();
+        if (districtId) {
+            loadTemporaryMunicipalities(districtId);
+        }
+    });
+
+    tempMunicipalitySelect.on('change', function() {
+        const municipalityId = $(this).val();
+        if (municipalityId) {
+            loadTemporaryWards(municipalityId);
+        }
+    });
+
+    // Initial load of districts for temporary address if state is pre-selected
+    const initialStateId = tempStateSelect.val();
+    if (initialStateId) {
+        loadTemporaryDistricts(initialStateId);
+    }
+});
 
 
 </script>

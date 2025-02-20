@@ -1,8 +1,10 @@
 <?php
 
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+
 
 return new class extends Migration
 {
@@ -14,36 +16,73 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
 
-            $table->unsignedBigInteger('school_id');
-            $table->foreign('school_id')->references('id')->on('schools')->onDelete('cascade')->onUpdate('cascade');
-
-            $table->unsignedBigInteger('section_id');
-            $table->foreign('section_id')->references('id')->on('sections');
-
-            $table->unsignedBigInteger('class_id');
-            $table->foreign('class_id')->references('id')->on('classes');
-
-            $table->string('reservation_quota_id')->nullable();
-            $table->string('admission_no')->nullable();
-            $table->string('roll_no')->nullable();
-            $table->string('admission_date')->nullable();
-
-            $table->unsignedBigInteger('school_house_id')->nullable();
-            $table->foreign('school_house_id')->references('id')->on('school_houses');
-
+            // Personal Information
+            $table->string('first_name_np');
+            $table->string('middle_name_np')->nullable();
+            $table->string('last_name_np');
+            $table->string('first_name_en');
+            $table->string('middle_name_en')->nullable();
+            $table->string('last_name_en');
+            $table->string('mobile_number');
+            $table->date('date_of_birth');
+            $table->string('gender');
+            $table->string('caste')->nullable();
+            $table->string('ethnicity');
+            $table->string('edj')->nullable();
+            $table->string('disability_status')->nullable();
+            $table->string('citizenship_id')->nullable();
+            $table->string('national_id')->nullable();
             $table->string('student_photo')->nullable();
-            $table->string('guardian_is')->nullable();
-            $table->string('guardian_name')->nullable();
-            $table->string('guardian_phone')->nullable();
-            $table->string('guardian_relation')->nullable();
-            $table->string('guardian_email')->nullable();
-            $table->string('transfer_certificate')->nullable();
+            $table->string('citizenship_front')->nullable();
+            $table->string('citizenship_back')->nullable();
+
+
+            // Address Information
+            $table->string('permanent_district');
+            $table->string('permanent_province');
+            $table->string('permanent_local_level');
+            $table->string('permanent_ward_no');
+            $table->string('permanent_tole')->nullable();
+            $table->string('permanent_house_no')->nullable();
+           
+            $table->string('temporary_district')->nullable();
+            $table->string('temporary_province')->nullable();
+            $table->string('temporary_local_level')->nullable();
+            $table->string('temporary_ward_no')->nullable();
+            $table->string('temporary_tole')->nullable();
+            $table->string('temporary_house_no')->nullable();
+
+
+            // Guardian Information
+            $table->string('father_name')->nullable();
+            $table->string('father_contact_no')->nullable();
+            $table->string('father_occupation')->nullable();
+            $table->string('mother_name')->nullable();
+            $table->string('mother_contact_no')->nullable();
+            $table->string('mother_occupation')->nullable();
+
+
+            // Student Enrollment Academic Information
+            $table->string('level_of_study');
+            $table->string('faculty');
+            $table->string('program');
+            $table->year('admission_year');
+            $table->date('date_of_admission');
+            $table->string('academic_program_duration');
+
+
+            // Previous Academic Information
+            $table->string('previous_level_of_study');
+            $table->string('previous_board_university_college');
+            $table->string('previous_registration_no');
+            $table->string('previous_institution_name');
+            $table->string('previous_study_records_attachment')->nullable();
+           
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
@@ -53,3 +92,4 @@ return new class extends Migration
         Schema::dropIfExists('students');
     }
 };
+
