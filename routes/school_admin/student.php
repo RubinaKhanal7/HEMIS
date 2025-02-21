@@ -12,11 +12,8 @@ Route::get('students-additionalinformations/{student_id}', [StudentController::c
 Route::post('students/{student_id}/additional-information', [StudentController::class, 'updateAdditionalInformation'])->name('students.additionalInformation.update');
 
 
-
-Route::get('/get-classes', [StudentController::class, 'getClasses'])->name('get.classes'); 
-Route::get('/get-sections/{id}', [StudentController::class, 'getSections'])->name('get.sections');
-Route::get('/get-programs/{section_id}', [StudentController::class, 'getPrograms'])->name('get.programs');
-
+Route::get('/get-sections', [StudentController::class, 'getSections'])->name('get.sections');
+Route::get('/get-programs', [StudentController::class, 'getPrograms'])->name('get.programs');
 
 
 Route::get('/get-district-by-state/{state_id}', [StudentController::class, 'getDistrict'])->name('get-districts');
@@ -31,3 +28,4 @@ Route::post('students/save-roll-number', [StudentController::class, 'saveRollNum
 Route::get('/admin/students/export-selected', [StudentController::class, 'exportSelected'])->name('students.export-selected');
 Route::get('/admin/students/export-all', [StudentController::class, 'exportAll'])->name('students.export-all');
 
+Route::get('/form', [StudentController::class, 'loadFormData'])->name('form.load');

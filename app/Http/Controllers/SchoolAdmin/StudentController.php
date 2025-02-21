@@ -7,9 +7,9 @@ use Image, View;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Classg;
+use App\Models\Program;
 use App\Models\Section;
 use App\Models\Student;
-use App\Models\Program;
 use App\Models\SchoolUser;
 use App\Models\SchoolHouse;
 use Illuminate\Http\Request;
@@ -28,6 +28,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Services\StudentUserService;
 use App\Models\Municipality;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 use App\Exports\StudentsExport;
 
@@ -44,6 +45,27 @@ class StudentController extends Controller
         $this->formService = $formService;
         $this->studentUserService = $studentUserService;
     }
+
+    public function loadFormData(Request $request) 
+{
+    $classes = Classg::select('id', 'class')
+                     ->where('is_active', 1)
+                     ->get();
+    return view('backend.school_admin.student.index', compact('classes'));
+}
+
+
+public function getFaculties($classId)
+{
+    $sections = Section::select('sections.id', 'sections.section_name as name')
+        ->join('class_sections', 'sections.id', '=', 'class_sections.section_id')
+        ->where('class_sections.class_id', $classId)
+        ->where('sections.is_active', 1)
+        ->get();
+    
+    return response()->json($sections);
+}
+
 
     public function getDistrict($province_id)
     {
@@ -73,19 +95,20 @@ class StudentController extends Controller
         $page_title = 'Create Student';
         $states = $this->formService->getProvinces();
         $schoolId = session('school_id');
+        
         $classes = Classg::where('school_id', $schoolId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        ->orderBy('created_at', 'desc')
+        ->get();
+    
         $school_houses = SchoolHouse::all();
         $bloodGroups = BloodGroupType::pluck('type', 'id');
-        // $bloodGroups = BloodGroupType::all();
-        // dd($bloodGroups);
-
+        
         $adminStateId = Auth::user()->state_id;
         $adminDistrictId = Auth::user()->district_id;
         $adminMunicipalityId = Auth::user()->municipality_id;
         $adminSchoolId = Auth::user()->school_id;
 
+    
         return view(
             'backend.school_admin.student.create',
             compact(
@@ -97,10 +120,12 @@ class StudentController extends Controller
                 'adminDistrictId',
                 'adminMunicipalityId',
                 'adminSchoolId',
-                'bloodGroups'
+                'bloodGroups',
             )
         );
     }
+    
+    
 
     public function additionalInformationStudents($student_id, Request $request)
     {
@@ -138,35 +163,39 @@ class StudentController extends Controller
         }
     }
 
-    public function getClasses()
-    {
-        $schoolId = session('school_id');
-        $classes = Classg::where('school_id', $schoolId)
-            ->orderBy('created_at', 'desc')
-            ->pluck('class', 'id'); 
-    
-        return response()->json($classes);
-    }
-    
 
-    public function getSections($classId)
-    {
-        $sections = Section::where('class_id', $classId)
-            ->orderBy('section_name')
-            ->pluck('section_name', 'id');
-            
-        return response()->json($sections);
-    }
 
-    public function getPrograms($sectionId)
-    {
-        $programs = Program::where('section_id', $sectionId)
-            ->orderBy('title')
-            ->pluck('title', 'id');
-            
-        return response()->json($programs);
-    }
+
+
+
+
+    // RETRIVING SECTIONS OF THE RESPECTIVE CLASS
+//     public function getSections($classId)
+//     {
+
+//         $sections = DB::table('sections')
+//                     ->where('class_id', $classId)
+//                     ->pluck('section_name', 'id');
+//         return response()->json($sections);
+//     }
+//     public function getPrograms($sectionId)
+// {
+
+//     $programs = DB::table('programs')
+//                 ->where('section_id', $sectionId)
+//                 ->pluck('title', 'id');
+//     return response()->json($programs);
+// }
+
+// public function getClasses()
+// {
+//     $schoolId = session('school_id');
+//     $classes = Classg::where('school_id', $schoolId)
+//         ->orderBy('created_at', 'desc')
+//         ->pluck('class', 'id'); 
     
+//     return response()->json($classes);
+// }
 
     // CREATE STUDENT
     protected function saveStudent(array $studentInput)
@@ -301,186 +330,145 @@ class StudentController extends Controller
         }
     }
 
- 
+    public function getSections(Request $request)
+{
+    $sections = Section::where('class_id', $request->class_id)
+        ->get();
+    
+    return response()->json($sections);
+}
+
+public function getPrograms(Request $request)
+{
+    $programs = Program::where('section_id', $request->section_id)
+        ->where('class_id', $request->class_id)
+        ->get();
+    
+    return response()->json($programs);
+}
+
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             // Personal Information
-            'first_name_en' => 'required|string|max:255',
-            'first_name_np' => 'required|string|max:255',
-            'last_name_en' => 'required|string|max:255',
-            'last_name_np' => 'required|string|max:255',
-            'middle_name_en' => 'nullable|string|max:255',
-            'middle_name_np' => 'nullable|string|max:255',
-            'mobile_number' => 'required|string|max:15',
+            'first_name_np' => 'required|string',
+            'last_name_np' => 'required|string',
+            'first_name_en' => 'required|string',
+            'last_name_en' => 'required|string',
+            'mobile_number' => 'required|string',
             'date_of_birth' => 'required|date',
-            'gender' => 'required|in:Male,Female,Other',
-            'caste' => 'nullable|string|max:255',
-            'ethnicity' => 'required|string|max:255',
-            'edj' => 'nullable|string|max:255',
-            'disability_status' => 'nullable|in:yes,no',
-            'citizenship_id' => 'nullable|string|max:255',
-            'national_id' => 'nullable|string|max:255',
-            
-            // Images
-            'student_photo' => 'nullable|image|max:2048',
-            'citizenship_front' => 'nullable|image|max:2048',
-            'citizenship_back' => 'nullable|image|max:2048',
-            
-            // Permanent Address
-            'permanent_province' => 'required|string|max:255',
-            'permanent_district' => 'required|string|max:255',
-            'permanent_local_level' => 'required|string|max:255',
-            'permanent_ward_no' => 'required|string|max:10',
-            'permanent_tole' => 'nullable|string|max:255',
-            'permanent_house_no' => 'nullable|string|max:255',
-            
-            // Temporary Address
-            'temporary_province' => 'nullable|string|max:255',
-            'temporary_district' => 'nullable|string|max:255',
-            'temporary_local_level' => 'nullable|string|max:255',
-            'temporary_ward_no' => 'nullable|string|max:10',
-            'temporary_tole' => 'nullable|string|max:255',
-            'temporary_house_no' => 'nullable|string|max:255',
-            
-            // Guardian Information
-            'father_name' => 'nullable|string|max:255',
-            'father_contact_no' => 'nullable|string|max:15',
-            'father_occupation' => 'nullable|string|max:255',
-            'mother_name' => 'nullable|string|max:255',
-            'mother_contact_no' => 'nullable|string|max:15',
-            'mother_occupation' => 'nullable|string|max:255',
-            
-            // Academic Information
-            'level_of_study' => 'required|string|max:255',
-            'faculty' => 'required|string|max:255',
-            'program' => 'required|string|max:255',
-            'admission_year' => 'required|date_format:Y',
-            'date_of_admission' => 'required|date',
-            'academic_program_duration' => 'required|string|max:255',
-            
-            // Previous Academic Information
-            'previous_level_of_study' => 'required|string|max:255',
-            'previous_board_university_college' => 'required|string|max:255',
-            'previous_registration_no' => 'required|string|max:255',
-            'previous_institution_name' => 'required|string|max:255',
-            'previous_study_records_attachment' => 'nullable|file|max:2048',
-            
-            // Foreign Keys
-            'school_id' => 'nullable|exists:schools,id',
-            'section_id' => 'required|exists:sections,id',
-            'class_id' => 'required|exists:classes,id',
-            'program_id' => 'required|exists:programs,id',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        try {
-            // Handle file uploads
-            $studentPhoto = null;
-            $citizenshipFront = null;
-            $citizenshipBack = null;
-            $previousRecords = null;
-
-            if ($request->hasFile('student_photo')) {
-                $studentPhoto = $this->uploadFile($request->file('student_photo'), 'student_photos');
-            }
-
-            if ($request->hasFile('citizenship_front')) {
-                $citizenshipFront = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
-            }
-
-            if ($request->hasFile('citizenship_back')) {
-                $citizenshipBack = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
-            }
-
-            if ($request->hasFile('previous_study_records_attachment')) {
-                $previousRecords = $this->uploadFile($request->file('previous_study_records_attachment'), 'previous_records');
-            }
-
-            // Create student record
-            $student = Student::create([
-                // Personal Information
-                'first_name_np' => $request->first_name_np,
-                'middle_name_np' => $request->middle_name_np,
-                'last_name_np' => $request->last_name_np,
-                'first_name_en' => $request->first_name_en,
-                'middle_name_en' => $request->middle_name_en,
-                'last_name_en' => $request->last_name_en,
-                'mobile_number' => $request->mobile_number,
-                'date_of_birth' => $request->date_of_birth,
-                'gender' => $request->gender,
-                'caste' => $request->caste,
-                'ethnicity' => $request->ethnicity,
-                'edj' => $request->edj,
-                'disability_status' => $request->disability_status,
-                'citizenship_id' => $request->citizenship_id,
-                'national_id' => $request->national_id,
-                'student_photo' => $studentPhoto,
-                'citizenship_front' => $citizenshipFront,
-                'citizenship_back' => $citizenshipBack,
-
-                // Address Information
-                'permanent_district' => $request->permanent_district,
-                'permanent_province' => $request->permanent_province,
-                'permanent_local_level' => $request->permanent_local_level,
-                'permanent_ward_no' => $request->permanent_ward_no,
-                'permanent_tole' => $request->permanent_tole,
-                'permanent_house_no' => $request->permanent_house_no,
-                'temporary_district' => $request->temporary_district,
-                'temporary_province' => $request->temporary_province,
-                'temporary_local_level' => $request->temporary_local_level,
-                'temporary_ward_no' => $request->temporary_ward_no,
-                'temporary_tole' => $request->temporary_tole,
-                'temporary_house_no' => $request->temporary_house_no,
-
-                // Guardian Information
-                'father_name' => $request->father_name,
-                'father_contact_no' => $request->father_contact_no,
-                'father_occupation' => $request->father_occupation,
-                'mother_name' => $request->mother_name,
-                'mother_contact_no' => $request->mother_contact_no,
-                'mother_occupation' => $request->mother_occupation,
-
-                // Academic Information
-                'level_of_study' => $request->level_of_study,
-                'faculty' => $request->faculty,
-                'program' => $request->program,
-                'admission_year' => $request->admission_year,
-                'date_of_admission' => $request->date_of_admission,
-                'academic_program_duration' => $request->academic_program_duration,
-
-                // Previous Academic Information
-                'previous_level_of_study' => $request->previous_level_of_study,
-                'previous_board_university_college' => $request->previous_board_university_college,
-                'previous_registration_no' => $request->previous_registration_no,
-                'previous_institution_name' => $request->previous_institution_name,
-                'previous_study_records_attachment' => $previousRecords,
-
-                // Foreign Keys
-                'school_id' => Auth::user()->school_id,
-                'user_id' => Auth::id(),
-                'section_id' => $request->section_id,
-                'class_id' => $request->class_id,
-                'program_id' => $request->program_id,
-            ]);
-
-            return redirect()->route('admin.students.index')
-                ->with('success', 'Student registered successfully!');
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Error registering student: ' . $e->getMessage())
-                ->withInput();
-        }
-    }
-
-
+            'gender' => 'required|in:Male,Female',
+            'ethnicity' => 'required|string',
+            'student_photo' => 'nullable|image|mimes:jpeg,png,jpg',
+            'citizenship_front' => 'nullable|image|mimes:jpeg,png,jpg',
+            'citizenship_back' => 'nullable|image|mimes:jpeg,png,jpg',
     
+            // Address Information
+            'permanent_province' => 'required|string',
+            'permanent_district' => 'required|string',
+            'permanent_local_level' => 'required|string',
+            'permanent_ward_no' => 'required|string',
+    
+            // Academic Information
+            'level_of_study' => 'required|exists:classes,id', // This maps to class_id
+            'faculty' => 'required|exists:sections,id', // This maps to section_id
+            'program' => 'required|exists:programs,id',
+            'admission_year' => 'required|digits:4',
+            'date_of_admission' => 'required|date',
+            'academic_program_duration' => 'required|string',
+    
+            // Previous Academic Information
+            'previous_level_of_study' => 'required|string',
+            'previous_board_university_college' => 'required|string',
+            'previous_registration_no' => 'required|string',
+            'previous_institution_name' => 'required|string',
+            'previous_study_records_attachment' => 'nullable|file',
+        ]);
+    
+        // Handle file uploads
+        if ($request->hasFile('student_photo')) {
+            $photoPath = $request->file('student_photo')->store('student_photos', 'public');
+        }
+    
+        if ($request->hasFile('citizenship_front')) {
+            $citizenshipFrontPath = $request->file('citizenship_front')->store('citizenship', 'public');
+        }
+    
+        if ($request->hasFile('citizenship_back')) {
+            $citizenshipBackPath = $request->file('citizenship_back')->store('citizenship', 'public');
+        }
+    
+        if ($request->hasFile('previous_study_records_attachment')) {
+            $recordsPath = $request->file('previous_study_records_attachment')->store('previous_records', 'public');
+        }
+    
+        $student = Student::create([
+            // Personal Information
+            'first_name_np' => $request->first_name_np,
+            'middle_name_np' => $request->middle_name_np,
+            'last_name_np' => $request->last_name_np,
+            'first_name_en' => $request->first_name_en,
+            'middle_name_en' => $request->middle_name_en,
+            'last_name_en' => $request->last_name_en,
+            'mobile_number' => $request->mobile_number,
+            'date_of_birth' => $request->date_of_birth,
+            'gender' => $request->gender,
+            'caste' => $request->caste,
+            'ethnicity' => $request->ethnicity,
+            'edj' => $request->edj,
+            'disability_status' => $request->disability_status,
+            'citizenship_id' => $request->citizenship_id,
+            'national_id' => $request->national_id,
+            'student_photo' => $photoPath ?? null,
+            'citizenship_front' => $citizenshipFrontPath ?? null,
+            'citizenship_back' => $citizenshipBackPath ?? null,
+    
+            // Address Information
+            'permanent_province' => $request->permanent_province,
+            'permanent_district' => $request->permanent_district,
+            'permanent_local_level' => $request->permanent_local_level,
+            'permanent_ward_no' => $request->permanent_ward_no,
+            'permanent_tole' => $request->tole,
+            'permanent_house_no' => $request->house_number,
+            
+            'temporary_province' => $request->temp_state_id,
+            'temporary_district' => $request->temp_district_id,
+            'temporary_local_level' => $request->temp_municipality_id,
+            'temporary_ward_no' => $request->temp_ward_id,
+            'temporary_tole' => $request->temp_tole,
+            'temporary_house_no' => $request->temp_house_number,
+    
+            // Guardian Information
+            'father_name' => $request->father_name,
+            'father_contact_no' => $request->father_contact_no,
+            'father_occupation' => $request->father_occupation,
+            'mother_name' => $request->mother_name,
+            'mother_contact_no' => $request->mother_contact_no,
+            'mother_occupation' => $request->mother_occupation,
+    
+            // Academic Information
+            'class_id' => $request->level_of_study,
+            'section_id' => $request->faculty,
+            'program_id' => $request->program,
+            'admission_year' => $request->admission_year,
+            'date_of_admission' => $request->date_of_admission,
+            'academic_program_duration' => $request->academic_program_duration,
+    
+            // Previous Academic Information
+            'previous_level_of_study' => $request->previous_level_of_study,
+            'previous_board_university_college' => $request->previous_board_university_college,
+            'previous_registration_no' => $request->previous_registration_no,
+            'previous_institution_name' => $request->previous_institution_name,
+            'previous_study_records_attachment' => $recordsPath ?? null,
+    
+            // Additional fields
+            'school_id' => auth()->user()->school_id,
+            'user_id' => auth()->id(),
+        ]);
+    
+        return redirect()->route('admin.students.index')
+            ->with('success', 'Student registered successfully');
+    }  
 
     public function show(Request $request)
     {

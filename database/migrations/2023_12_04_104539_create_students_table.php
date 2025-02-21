@@ -1,10 +1,8 @@
-<?php
-
+<?php 
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
 
 return new class extends Migration
 {
@@ -15,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-
 
             // Personal Information
             $table->string('first_name_np');
@@ -37,7 +34,6 @@ return new class extends Migration
             $table->string('citizenship_front')->nullable();
             $table->string('citizenship_back')->nullable();
 
-
             // Address Information
             $table->string('permanent_district');
             $table->string('permanent_province');
@@ -45,14 +41,13 @@ return new class extends Migration
             $table->string('permanent_ward_no');
             $table->string('permanent_tole')->nullable();
             $table->string('permanent_house_no')->nullable();
-           
+            
             $table->string('temporary_district')->nullable();
             $table->string('temporary_province')->nullable();
             $table->string('temporary_local_level')->nullable();
             $table->string('temporary_ward_no')->nullable();
             $table->string('temporary_tole')->nullable();
             $table->string('temporary_house_no')->nullable();
-
 
             // Guardian Information
             $table->string('father_name')->nullable();
@@ -62,15 +57,11 @@ return new class extends Migration
             $table->string('mother_contact_no')->nullable();
             $table->string('mother_occupation')->nullable();
 
-
             // Student Enrollment Academic Information
-            $table->string('level_of_study');
-            $table->string('faculty');
-            $table->string('program');
+            
             $table->year('admission_year');
             $table->date('date_of_admission');
             $table->string('academic_program_duration');
-
 
             // Previous Academic Information
             $table->string('previous_level_of_study');
@@ -78,18 +69,17 @@ return new class extends Migration
             $table->string('previous_registration_no');
             $table->string('previous_institution_name');
             $table->string('previous_study_records_attachment')->nullable();
-           
+            
             // Foreign Keys
             $table->foreignId('school_id')->nullable()->constrained('schools')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('section_id')->constrained('sections')->onDelete('cascade');
             $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
             $table->foreignId('program_id')->constrained('programs')->onDelete('cascade');
-           
+            
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.

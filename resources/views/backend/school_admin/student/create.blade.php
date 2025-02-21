@@ -1,5 +1,6 @@
 @extends('backend.layouts.master')
 
+
 <!-- Main content -->
 @section('content')
     <div class="mt-4">
@@ -30,59 +31,51 @@
                                         <div class="hr-line-dashed"></div>
                                         <h5>Student's Basic Information:</h5>
                                         <div class="hr-line-dashed"></div>
-
+                                       
                                         <div class="col-md-12 col-lg-12 d-flex flex-wrap justify-content-between gap-1">
-
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="f_name">First Name (English):</label>
-                                                <input type="text" name="f_name" value="{{ old('f_name') }}" class="form-control" id="f_name" placeholder="Enter First Name">
-                                                @error('f_name')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                            <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="f_name">First Name (Nepali):</label>
-                                                <input type="text" name="f_name_nepali" value="{{ old('f_name_nepali') }}" class="form-control" id="f_name" placeholder="Enter First Name">
-                                                @error('f_name_nepali')
+                                                <label for="first_name_en">First Name (English):</label>
+                                                <input type="text" name="first_name_en" value="{{ old('first_name_en') }}" class="form-control" id="first_name_en" placeholder="Enter First Name">
+                                                @error('first_name_en')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="m_name">Middle Name (English):</label>
-                                                <input type="text" name="m_name" value="{{ old('m_name') }}" class="form-control" id="m_name" placeholder="Enter Middle Name">
-                                                @error('m_name')
+                                                <label for="first_name_np">First Name (Nepali):</label>
+                                                <input type="text" name="first_name_np" value="{{ old('first_name_np') }}" class="form-control" id="first_name_np" placeholder="Enter First Name">
+                                                @error('first_name_np')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="m_name">Middle Name (Nepali):</label>
-                                                <input type="text" name="m_name_nepali" value="{{ old('m_name_nepali') }}" class="form-control" id="m_name" placeholder="Enter Middle Name">
-                                                @error('m_name_nepali')
+                                                <label for="middle_name_en">Middle Name (English):</label>
+                                                <input type="text" name="middle_name_en" value="{{ old('middle_name_en') }}" class="form-control" id="middle_name_en" placeholder="Enter Middle Name">
+                                                @error('middle_name_en')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="l_name">Last Name (English):</label>
-                                                <input type="text" name="l_name" value="{{ old('l_name') }}" class="form-control" id="l_name" placeholder="Enter Last Name">
-                                                @error('l_name')
+                                                <label for="middle_name_np">Middle Name (Nepali):</label>
+                                                <input type="text" name="middle_name_np" value="{{ old('middle_name_np') }}" class="form-control" id="middle_name_np" placeholder="Enter Middle Name">
+                                                @error('middle_name_np')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="l_name">Last Name (Nepali):</label>
-                                                <input type="text" name="l_name_nepali" value="{{ old('l_name_nepali') }}" class="form-control" id="l_name" placeholder="Enter Last Name">
-                                                @error('l_name_nepali')
+                                                <label for="last_name_en">Last Name (English):</label>
+                                                <input type="text" name="last_name_en" value="{{ old('last_name_en') }}" class="form-control" id="last_name_en" placeholder="Enter Last Name">
+                                                @error('last_name_en')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="email">Email:</label>
-                                                <input type="text" name="email" value="{{ old('email') }}" class="form-control" id="email" placeholder="Enter Email">
-                                                @error('email')
+                                            <div class="form-group col-lg-3 col-sm-3">
+                                                <label for="last_name_np">Last Name (Nepali):</label>
+                                                <input type="text" name="last_name_np" value="{{ old('last_name_np') }}" class="form-control" id="last_name_np" placeholder="Enter Last Name">
+                                                @error('last_name_np')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="mobile_number">Mobile No. :</label>
                                                 <input type="text" name="mobile_number" value="{{ old('mobile_number') }}" class="form-control" id="mobile_number" placeholder="Enter Mobile Number">
@@ -92,45 +85,51 @@
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="dob">Date of Birth:</label>
-                                                <input type="text" name="dob" value="{{ old('dob') }}" class="form-control" id="dob-datepicker" placeholder="Enter DOB">
-                                                @error('dob')
+                                                <input type="text" name="date_of_birth" value="{{ old('date_of_birth') }}" class="form-control" id="dob-datepicker" placeholder="Enter DOB">
+                                                @error('date_of_birth')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="phone">Gender:</label><br>
-
+                                                <label for="gender">Gender:</label><br>
                                                 <label for="gender_male" class="l-radio">
                                                     <input type="radio" name="gender" value="Male" id="gender_male" {{ old('gender') == 'Male' ? 'checked' : '' }}>
                                                     <span>Male</span>
                                                 </label>
-
                                                 <label for="gender_female" class="l-radio">
                                                     <input type="radio" name="gender" value="Female" id="gender_female" {{ old('gender') == 'Female' ? 'checked' : '' }}>
                                                     <span>Female</span>
                                                 </label>
-                                                
                                                 @error('gender')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="caste ">Caste :</label>
+                                                <label for="caste">Caste:</label>
                                                 <input type="text" name="caste" value="{{ old('caste') }}" class="form-control" id="caste" placeholder="Enter Caste">
                                                 @error('caste')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="edj ">EDJ :</label>
+                                                <label for="ethnicity">Ethnicity:</label>
+                                                <input type="text" name="ethnicity" value="{{ old('ethnicity') }}" class="form-control" id="ethnicity" placeholder="Enter Ethnicity">
+                                                @error('ethnicity')
+                                                    <strong class="text-danger">{{ $message }}</strong>
+                                                @enderror
+                                            </div>
+                                       
+                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                <label for="edj">EDJ:</label>
                                                 <input type="text" name="edj" value="{{ old('edj') }}" class="form-control" id="edj" placeholder="Enter EDJ">
                                                 @error('edj')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label>Disability Status:</label>
                                                 <div>
@@ -145,15 +144,15 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                            
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="citizenship">Citizenship Id:</label>
-                                                <input type="text" name="citizenship" value="{{ old('citizenship') }}" class="form-control" id="citizenship" placeholder="Enter Citizenship">
-                                                @error('citizenship')
+                                                <input type="text" name="citizenship_id" value="{{ old('citizenship_id') }}" class="form-control" id="citizenship" placeholder="Enter Citizenship">
+                                                @error('citizenship_id')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                            
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="national_id">National ID:</label>
                                                 <input type="text" name="national_id" value="{{ old('national_id') }}" class="form-control" id="national_id" placeholder="Enter National ID">
@@ -161,14 +160,14 @@
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                            
+                                       
                                             <div class="col-md-12 col-lg-12 mt-4">
                                                 <div class="hr-line-dashed"></div>
                                                 <h5>Student's Picture:</h5>
                                                 <div class="col-lg-4">
                                                     <img src="" id="image" style="width: 20%;">
                                                     <div class="form-group">
-                                                        <input type="file" id="imageFile" class="form-control" placeholder="Image" name="image" data-ratio="16" data-ratiowidth="16">
+                                                        <input type="file" id="imageFile" class="form-control" placeholder="Image" name="student_photo" data-ratio="16" data-ratiowidth="16">
                                                     </div>
                                                     <div id="previewWrapper" class="hidden">
                                                         <br>
@@ -178,42 +177,35 @@
                                                     </div>
                                                 </div>
                                             </div>
-
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="citizenship_front">Citizenship Front:</label>
-                                                <input type="file" name="citizenship_pic[front]" class="form-control" id="citizenship_front" accept="image/*">
-                                                @error('citizenship_pic.front')
+                                                <input type="file" name="citizenship_front" class="form-control" id="citizenship_front" accept="image/*">
+                                                @error('citizenship_front')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                            
+                                       
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="citizenship_back">Citizenship Back:</label>
-                                                <input type="file" name="citizenship_pic[back]" class="form-control" id="citizenship_back" accept="image/*">
-                                                @error('citizenship_pic.back')
+                                                <input type="file" name="citizenship_back" class="form-control" id="citizenship_back" accept="image/*">
+                                                @error('citizenship_back')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-
-                                        </div>
-
+                                        </div>                                        
                                     </div>
-                                 
-                               
-
-                                    
                                     <div class="hr-line-dashed mt-4"></div>
                                     <h5 class="">Student's Permanent Address:</h5>
-
+                                   
                                     <div class="hr-line-dashed"></div>
                                     <div class="col-md-12 col-lg-12 d-flex justify-content-around">
-
-                                        <div class="col-md-6 col-lg-6 col-sm-6 pt-4 pb-4 d-flex  gap-3">
+                                   
+                                        <div class="col-md-6 col-lg-6 col-sm-6 pt-4 pb-4 d-flex gap-3">
                                             <div class="">
                                                 <label for="state_id">Choose State</label>
                                                 <div class="select">
-                                                    <select id="state_id" name="state_id" data-iteration="0"
-                                                        class="state_id" required>
+                                                    <select id="state_id" name="permanent_province" class="state_id" required>
                                                         <option disabled value="">Choose State</option>
                                                         @foreach ($states as $state)
                                                             <option value="{{ $state->id }}"
@@ -229,14 +221,11 @@
                                             </div>
                                             <div class="">
                                                 <label for="district_id">Choose District</label>
-
                                                 <div class="select">
-
-                                                    <select id="district_id" name="district_id" data-iteration="0"
-                                                        class="district_id" required>
-                                                        {{-- <option value="{{ old('district_id') }}">Choose District</option> --}}
+                                                    <select id="district_id" name="permanent_district" class="district_id" required>
                                                         <option value="{{ $adminDistrictId }}" selected>
-                                                            {{ Auth::user()->district->name }}</option>
+                                                            {{ Auth::user()->district->name }}
+                                                        </option>
                                                     </select>
                                                 </div>
                                                 @error('district_id')
@@ -246,28 +235,28 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                   
                                         <div class="col-md-6 col-lg-6 pt-4 pb-4 d-flex gap-3">
                                             <div>
-                                                <label for="municipalitiy_id">Choose Municipality</label>
+                                                <label for="municipality_id">Choose Municipality</label>
                                                 <div class="select">
-                                                    <select id="municipalitiy_id" name="municipality_id" data-iteration="0" class="municipality_id" required>
-                                                        <option value="{{ $adminMunicipalityId }}" selected>{{ Auth::user()->municipality->name }}</option>
-                                                        <!-- Add other municipality options here -->
+                                                    <select id="municipality_id" name="permanent_local_level" class="municipality_id" required>
+                                                        <option value="{{ $adminMunicipalityId }}" selected>
+                                                            {{ Auth::user()->municipality->name }}
+                                                        </option>
                                                     </select>
                                                 </div>
-                                                @error('municipalitiy_id')
+                                                @error('municipality_id')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
                                                     </span>
                                                 @enderror
                                             </div>
-                                        
+                                   
                                             <div class="">
                                                 <label for="ward_id">Choose Ward</label>
                                                 <div class="select">
-
-                                                    <select id="ward_id" name="ward_id" data-iteration="0"
-                                                        class="ward_id" required>
+                                                    <select id="ward_id" name="permanent_ward_no" class="ward_id" required>
                                                         <option value="{{ old('ward_id') }}">Choose Ward</option>
                                                     </select>
                                                 </div>
@@ -278,46 +267,39 @@
                                                 @enderror
                                             </div>
                                         </div>
-
                                     </div>
+                                   
                                     <div class="col-md-12 col-lg-12 d-flex gap-2 justify-content-between">
-
-                                        <div class=" col-lg-4 col-sm-4">
+                                        <div class="col-lg-4 col-sm-4">
                                             <label for="tole">Tole:</label>
-                                            <input type="text" name="tole"
-                                                value="{{ old('tole') }}" class="form-control"
-                                                id="tole" placeholder="Enter Tole">
+                                            <input type="text" name="tole" value="{{ old('tole') }}" class="form-control" id="tole" placeholder="Enter Tole">
                                             @error('tole')
                                                 <strong class="text-danger">{{ $message }}</strong>
                                             @enderror
                                         </div>
                                         <div class="form-group col-lg-4 col-sm-4">
                                             <label for="house_number">House Number:</label>
-                                            <input type="text" name="house_number"
-                                                value="{{ old('house_number') }}" class="form-control"
-                                                id="house_number" placeholder="Enter House Number">
+                                            <input type="text" name="house_number" value="{{ old('house_number') }}" class="form-control" id="house_number" placeholder="Enter House Number">
                                             @error('house_number')
                                                 <strong class="text-danger">{{ $message }}</strong>
                                             @enderror
                                         </div>
-
-
                                     </div>
-
-                                    
+                                   
                                     <div class="hr-line-dashed mt-4"></div>
                                     <h5 class="">Student's Temporary Address:</h5>
-                                    
+                                   
                                     <div class="hr-line-dashed"></div>
                                     <div class="col-md-12 col-lg-12 d-flex justify-content-around">
                                         <div class="col-md-6 col-lg-6 col-sm-6 pt-4 pb-4 d-flex gap-3">
                                             <div class="">
                                                 <label for="temp_state_id">Choose State</label>
                                                 <div class="select">
-                                                    <select id="temp_state_id" name="temp_state_id" data-iteration="1" class="temp_state_id" required>
+                                                    <select id="temp_state_id" name="temp_state_id" class="temp_state_id" required>
                                                         <option disabled value="">Choose State</option>
                                                         @foreach ($states as $state)
-                                                            <option value="{{ $state->id }}" {{ $adminStateId == $state->id ? 'selected' : '' }}>
+                                                            <option value="{{ $state->id }}"
+                                                                {{ $adminStateId == $state->id ? 'selected' : '' }}>
                                                                 {{ $state->name }}
                                                             </option>
                                                         @endforeach
@@ -330,7 +312,7 @@
                                             <div class="">
                                                 <label for="temp_district_id">Choose District</label>
                                                 <div class="select">
-                                                    <select id="temp_district_id" name="temp_district_id" data-iteration="1" class="temp_district_id" required>
+                                                    <select id="temp_district_id" name="temp_district_id" class="temp_district_id" required>
                                                         <option value="{{ $adminDistrictId }}" selected>
                                                             {{ Auth::user()->district->name }}
                                                         </option>
@@ -341,22 +323,26 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                   
                                         <div class="col-md-6 col-lg-6 pt-4 pb-4 d-flex gap-3">
                                             <div>
                                                 <label for="temp_municipality_id">Choose Municipality</label>
                                                 <div class="select">
-                                                    <select id="temp_municipality_id" name="temp_municipality_id" data-iteration="1" class="temp_municipality_id" required>
-                                                        <option value="{{ $adminMunicipalityId }}" selected>{{ Auth::user()->municipality->name }}</option>
+                                                    <select id="temp_municipality_id" name="temp_municipality_id" class="temp_municipality_id" required>
+                                                        <option value="{{ $adminMunicipalityId }}" selected>
+                                                            {{ Auth::user()->municipality->name }}
+                                                        </option>
                                                     </select>
                                                 </div>
                                                 @error('temp_municipality_id')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
+                                   
                                             <div class="">
                                                 <label for="temp_ward_id">Choose Ward</label>
                                                 <div class="select">
-                                                    <select id="temp_ward_id" name="temp_ward_id" data-iteration="1" class="temp_ward_id" required>
+                                                    <select id="temp_ward_id" name="temp_ward_id" class="temp_ward_id" required>
                                                         <option value="{{ old('temp_ward_id') }}">Choose Ward</option>
                                                     </select>
                                                 </div>
@@ -366,7 +352,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                   
                                     <div class="col-md-12 col-lg-12 d-flex gap-2 justify-content-between">
                                         <div class="col-lg-4 col-sm-4">
                                             <label for="temp_tole">Tole:</label>
@@ -384,108 +370,94 @@
                                         </div>
                                     </div>
                                     </div>
-                                    
-                                <div class="tab">
-                                    <div class="col-lg-12 col-md-12">
-                                        <div class="hr-line-dashed"></div>
-                                        <h5>Student's Parent Information:</h5>
-                                        <div class="hr-line-dashed"></div>
-
-                                        <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
-
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="father_name">Father's Name:</label>
-                                                <input type="text" name="father_name"
-                                                    value="{{ old('father_name') }}" class="form-control"
-                                                    id="father_name" placeholder="Enter Father's Name">
-                                                @error('father_name')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="father_phone">Father's Phone:</label>
-                                                <input type="text" name="father_phone"
-                                                    value="{{ old('father_phone') }}" class="form-control"
-                                                    id="father_phone" placeholder="Enter Father's Phone">
-                                                @error('father_phone')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="father_email">Father's Email:</label>
-                                                <input type="text" name="father_email"
-                                                    value="{{ old('father_email') }}" class="form-control"
-                                                    id="father_email" placeholder="Enter Father's Email">
-                                                @error('father_email')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="">Father's Occupation:</label>
-                                                <input type="text" name="father_occupation"
-                                                    value="{{ old('father_occupation') }}" class="form-control"
-                                                    id="father_occupation" placeholder="Enter Father's Occupation">
-                                                @error('father_occupation')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="mother_name">Mother's Name:</label>
-                                                <input type="text" name="mother_name"
-                                                    value="{{ old('mother_name') }}" class="form-control"
-                                                    id="mother_name" placeholder="Enter Mother's Name">
-                                                @error('mother_name')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="mother_phone">Mother's Phone:</label>
-                                                <input type="text" name="mother_phone"
-                                                    value="{{ old('mother_phone') }}" class="form-control"
-                                                    id="mother_phone" placeholder="Enter Mother's Phone">
-                                                @error('mother_phone')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                            
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="mother_email">Mother's Email:</label>
-                                                <input type="text" name="mother_email"
-                                                    value="{{ old('mother_email') }}" class="form-control"
-                                                    id="mother_email" placeholder="Enter Mother's Email">
-                                                @error('mother_email')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="mother_occupation">Mother's Occupation:</label>
-                                                <input type="text" name="mother_occupation"
-                                                    value="{{ old('mother_occupation') }}" class="form-control"
-                                                    id="mother_occupation" placeholder="Enter Mother's Occupation">
-                                                @error('mother_occupation')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                            
+                                   
+                                   
+                                    <div class="tab">
+                                        <div class="col-lg-12 col-md-12">
+                                            <div class="hr-line-dashed"></div>
+                                            <h5>Student's Parent Information:</h5>
+                                            <div class="hr-line-dashed"></div>
+                                   
+                                            <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
+                                   
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="father_name">Father's Name:</label>
+                                                    <input type="text" name="father_name"
+                                                        value="{{ old('father_name') }}" class="form-control"
+                                                        id="father_name" placeholder="Enter Father's Name">
+                                                    @error('father_name')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="father_contact_no">Father's Phone:</label>
+                                                    <input type="text" name="father_contact_no"
+                                                        value="{{ old('father_contact_no') }}" class="form-control"
+                                                        id="father_contact_no" placeholder="Enter Father's Phone">
+                                                    @error('father_contact_no')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                   
+                                   
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="father_occupation">Father's Occupation:</label>
+                                                    <input type="text" name="father_occupation"
+                                                        value="{{ old('father_occupation') }}" class="form-control"
+                                                        id="father_occupation" placeholder="Enter Father's Occupation">
+                                                    @error('father_occupation')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                   
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="mother_name">Mother's Name:</label>
+                                                    <input type="text" name="mother_name"
+                                                        value="{{ old('mother_name') }}" class="form-control"
+                                                        id="mother_name" placeholder="Enter Mother's Name">
+                                                    @error('mother_name')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="mother_contact_no">Mother's Phone:</label>
+                                                    <input type="text" name="mother_contact_no"
+                                                        value="{{ old('mother_contact_no') }}" class="form-control"
+                                                        id="mother_contact_no" placeholder="Enter Mother's Phone">
+                                                    @error('mother_contact_no')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                               
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="mother_occupation">Mother's Occupation:</label>
+                                                    <input type="text" name="mother_occupation"
+                                                        value="{{ old('mother_occupation') }}" class="form-control"
+                                                        id="mother_occupation" placeholder="Enter Mother's Occupation">
+                                                    @error('mother_occupation')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                               
                                             </div>
                                         </div>
                                     </div>
+                                   
 
-                                </div>
 
-                                <div class="tab">
-                                    <div class="col-lg-12 col-md-12">
-                                        <div class="hr-line-dashed"></div>
-                                        <h5>Student Enrollment & Academic Information:</h5>
-                                        <div class="hr-line-dashed"></div>
-                                
-                                        <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
+                                    <div class="tab">
+                                        <div class="col-lg-12 col-md-12">
+                                            <div class="hr-line-dashed"></div>
+                                            <h5>Student Enrollment & Academic Information:</h5>
+                                            <div class="hr-line-dashed"></div>
+                                   
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="level_of_study">Level of Study:</label>
                                                 <select name="level_of_study" class="form-control" id="level_of_study">
                                                     <option value="" selected disabled>Select Level of Study</option>
+                                                    @foreach($classes as $class)
+                                                        <option value="{{ $class->id }}">{{ $class->class }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                             
@@ -501,109 +473,119 @@
                                                 <select name="program" class="form-control" id="program" disabled>
                                                     <option value="" selected disabled>Select Program</option>
                                                 </select>
-                                            </div>
-                                            
-                                
+                                            </div>                                   
+
+
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="admission_year">Admission Year (Batch):</label>
+                                                <label for="admission_year">Admission Year:</label>
                                                 <input type="text" name="admission_year"
-                                                    value="{{ old('admission_year') }}"
-                                                    class="form-control" id="admission_year" placeholder="Enter Admission Year">
+                                                    value="{{ old('admission_year') }}" class="form-control"
+                                                    id="admission_year" placeholder="Enter Admission Year">
                                                 @error('admission_year')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                
+
+
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="date_of_admission">Date of Admission:</label>
-                                                <input type="date" name="date_of_admission"
-                                                    value="{{ old('date_of_admission') }}"
-                                                    class="form-control" id="date_of_admission">
+                                                <label for="mother_occupation">Date of Admission:</label>
+                                                <input type="text" name="date_of_admission"
+                                                    value="{{ old('date_of_admission') }}" class="form-control"
+                                                    id="date_of_admission" placeholder="Enter Date of Admission">
                                                 @error('date_of_admission')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="program_duration">Academic Program Duration:</label>
-                                                <input type="text" name="program_duration"
-                                                    value="{{ old('program_duration') }}"
-                                                    class="form-control" id="program_duration" placeholder="Enter Duration">
-                                                @error('program_duration')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
+
+
+                                                <!-- Academic Program Duration -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="academic_program_duration">Academic Program Duration:</label>
+                                                    <input type="text" name="academic_program_duration"
+                                                        value="{{ old('academic_program_duration') }}"
+                                                        class="form-control" id="academic_program_duration" placeholder="Enter Duration">
+                                                    @error('academic_program_duration')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                   
 
-                                <div class="tab">
-                                    <div class="col-lg-12 col-md-12">
-                                        <div class="hr-line-dashed"></div>
-                                        <h5>Student's Previous Academic Information:</h5>
-                                        <div class="hr-line-dashed"></div>
-                                
-                                        <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
-                                
-                                            <!-- Name of Level of Study -->
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="previous_level_of_study">Name of Level of Study:</label>
-                                                <input type="text" name="previous_level_of_study"
-                                                    value="{{ old('previous_level_of_study', $student->previousAcademic->level_of_study ?? '') }}"
-                                                    class="form-control" id="previous_level_of_study" placeholder="Enter Previous Level of Study">
-                                                @error('previous_level_of_study')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
+
+                                    <div class="tab">
+                                        <div class="col-lg-12 col-md-12">
+                                            <div class="hr-line-dashed"></div>
+                                            <h5>Student's Previous Academic Information:</h5>
+                                            <div class="hr-line-dashed"></div>
+                                   
+                                            <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
+                                   
+                                                <!-- Name of Level of Study -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="previous_level_of_study">Name of Level of Study:</label>
+                                                    <input type="text" name="previous_level_of_study"
+                                                        value="{{ old('previous_level_of_study', $student->previousAcademic->previous_level_of_study ?? '') }}"
+                                                        class="form-control" id="previous_level_of_study" placeholder="Enter Previous Level of Study">
+                                                    @error('previous_level_of_study')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                   
+                                                <!-- Board/University/College -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="previous_board_university_college">Board/University/College:</label>
+                                                    <input type="text" name="previous_board_university_college"
+                                                        value="{{ old('previous_board_university_college', $student->previousAcademic->previous_board_university_college ?? '') }}"
+                                                        class="form-control" id="previous_board_university_college" placeholder="Enter Board/University/College">
+                                                    @error('previous_board_university_college')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                   
+                                                <!-- Registration Number -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="previous_registration_no">Registration Number:</label>
+                                                    <input type="text" name="previous_registration_no"
+                                                        value="{{ old('previous_registration_no', $student->previousAcademic->previous_registration_no ?? '') }}"
+                                                        class="form-control" id="previous_registration_no" placeholder="Enter Registration Number">
+                                                    @error('previous_registration_no')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                   
+                                                <!-- Name of Institution -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="previous_institution_name">Name of Institution:</label>
+                                                    <input type="text" name="previous_institution_name"
+                                                        value="{{ old('previous_institution_name', $student->previousAcademic->previous_institution_name ?? '') }}"
+                                                        class="form-control" id="previous_institution_name" placeholder="Enter Name of Institution">
+                                                    @error('previous_institution_name')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                   
+                                                <!-- Attachment of Previous Studies Records -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="previous_study_records_attachment">Attachment of Previous Studies Records:</label>
+                                                    <input type="file" name="previous_study_records_attachment" class="form-control" id="previous_study_records_attachment">
+                                                    @error('previous_study_records_attachment')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                   
+                                                    @if(!empty($student->previousAcademic->previous_study_records_attachment))
+                                                        <p class="mt-2">
+                                                            <a href="{{ asset('uploads/previous_records/' . $student->previousAcademic->previous_study_records_attachment) }}" target="_blank">View Uploaded Document</a>
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                   
                                             </div>
-                                
-                                            <!-- Board/University/College -->
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="previous_board">Board/University/College:</label>
-                                                <input type="text" name="previous_board"
-                                                    value="{{ old('previous_board', $student->previousAcademic->board ?? '') }}"
-                                                    class="form-control" id="previous_board" placeholder="Enter Board/University/College">
-                                                @error('previous_board')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                
-                                            <!-- Registration Number -->
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="previous_registration">Registration Number:</label>
-                                                <input type="text" name="previous_registration"
-                                                    value="{{ old('previous_registration', $student->previousAcademic->registration ?? '') }}"
-                                                    class="form-control" id="previous_registration" placeholder="Enter Registration Number">
-                                                @error('previous_registration')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                
-                                            <!-- Name of Institution -->
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="previous_institution">Name of Institution:</label>
-                                                <input type="text" name="previous_institution"
-                                                    value="{{ old('previous_institution', $student->previousAcademic->institution ?? '') }}"
-                                                    class="form-control" id="previous_institution" placeholder="Enter Name of Institution">
-                                                @error('previous_institution')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-                                
-                                            <!-- Attachment of Previous Studies Records -->
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="previous_records_attachment">Attachment of Previous Studies Records:</label>
-                                                <input type="file" name="previous_records_attachment" class="form-control" id="previous_records_attachment">
-                                                @error('previous_records_attachment')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                
-                                                @if(!empty($student->previousAcademic->records_attachment))
-                                                    <p class="mt-2">
-                                                        <a href="{{ asset('uploads/previous_records/' . $student->previousAcademic->records_attachment) }}" target="_blank">View Uploaded Document</a>
-                                                    </p>
-                                                @endif
-                                            </div>
-                                
+                                        </div>
+                                    </div>
+                                   
+                               
                                         </div>
                                     </div>
                                 </div>
@@ -615,6 +597,7 @@
                                     <p><input placeholder="Password..." oninput="this.className = ''"></p>
                                 </div> --}}
 
+
                                 <div class=" d-flex justify-content-end mt-4">
                                     <div style="">
                                         <button class="btn btn-secondary" type="button" id="prevBtn"
@@ -622,10 +605,12 @@
                                         <button class="btn btn-primary" id="submitBtn" type="submit"
                                             style="display: none;">Submit</button>
 
+
                                         <button class="btn btn-primary" type="button" id="nextBtn"
                                             onclick="nextPrev(1)">Next</button>
                                     </div>
                                 </div>
+
 
                                 {{-- <!--This indicates the steps of the form: -->
                                 <div style="text-align:center;margin-top:40px;">
@@ -635,9 +620,11 @@
                                     <span class="step"></span>
                                 </div> --}}
 
+
                             </form>
 
-                                
+
+                               
                         </div>
                     </div>
                 </div>
@@ -650,84 +637,79 @@
 @include('backend.includes.nepalidate')
 @include('backend.includes.cropperjs')
 
-<script>
-$(document).ready(function() {
-    // Load levels of study (classes) on page load
-    $.ajax({
-        url: '{{ route("admin.get.classes") }}',
-        type: 'GET',
-        success: function(data) {
-            $('#level_of_study').empty();
-            $('#level_of_study').append('<option value="" selected disabled>Select Level of Study</option>');
-            $.each(data, function(key, value) {
-                $('#level_of_study').append('<option value="' + key + '">' + value + '</option>');
-            });
-        },
-        error: function(xhr, status, error) {
-            console.error("Error loading classes:", error);
-        }
-    });
 
-    // When level of study changes, load faculties (sections)
-    $('#level_of_study').change(function() {
-        var classId = $(this).val();
-        
-        if (classId) {
-            $('#faculty').prop('disabled', false);
-            $('#program').prop('disabled', true).empty().append('<option value="" selected disabled>Select Program</option>');
-            
-            $.ajax({
-                url: '{{ route("admin.get.sections", "") }}/' + classId,
-                type: 'GET',
-                success: function(data) {
-                    $('#faculty').empty();
-                    $('#faculty').append('<option value="" selected disabled>Select Faculty</option>');
-                    $.each(data, function(key, value) {
-                        $('#faculty').append('<option value="' + key + '">' + value + '</option>');
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error loading sections:", error);
-                }
-            });
-        } else {
+<script>
+    $(document).ready(function() {
+        // When level of study changes
+        $('#level_of_study').on('change', function() {
+            let classId = $(this).val();
             $('#faculty').prop('disabled', true);
             $('#program').prop('disabled', true);
-        }
-    });
-
-    // When faculty changes, load programs
-    $('#faculty').change(function() {
-        var sectionId = $(this).val();
-        
-        if (sectionId) {
-            $('#program').prop('disabled', false);
             
-            $.ajax({
-                url: '{{ route("admin.get.programs", "") }}/' + sectionId,
-                type: 'GET',
-                success: function(data) {
-                    $('#program').empty();
-                    $('#program').append('<option value="" selected disabled>Select Program</option>');
-                    $.each(data, function(key, value) {
-                        $('#program').append('<option value="' + key + '">' + value + '</option>');
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error loading programs:", error);
-                }
-            });
-        } else {
-            $('#program').prop('disabled', true);
-        }
-    });
-});
-    </script>
+            if(classId) {
+                // Enable faculty dropdown and fetch related sections
+                $('#faculty').prop('disabled', false);
+                
+                $.ajax({
+                    url: "{{ route('admin.get.sections') }}",
+                    type: "GET",
+                    data: {
+                        class_id: classId
+                    },
+                    success: function(data) {
+                        $('#faculty').empty();
+                        $('#faculty').append('<option value="" selected disabled>Select Faculty</option>');
+                        
+                        $.each(data, function(key, value) {
+                            $('#faculty').append('<option value="' + value.id + '">' + value.section_name + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#faculty').empty();
+                $('#faculty').append('<option value="" selected disabled>Select Faculty</option>');
+                $('#program').empty();
+                $('#program').append('<option value="" selected disabled>Select Program</option>');
+            }
+        });
     
-
+        // When faculty changes
+        $('#faculty').on('change', function() {
+            let sectionId = $(this).val();
+            let classId = $('#level_of_study').val();
+            $('#program').prop('disabled', true);
+            
+            if(sectionId) {
+                // Enable program dropdown and fetch related programs
+                $('#program').prop('disabled', false);
+                
+                $.ajax({
+                    url: "{{ route('admin.get.programs') }}",
+                    type: "GET",
+                    data: {
+                        section_id: sectionId,
+                        class_id: classId
+                    },
+                    success: function(data) {
+                        $('#program').empty();
+                        $('#program').append('<option value="" selected disabled>Select Program</option>');
+                        
+                        $.each(data, function(key, value) {
+                            $('#program').append('<option value="' + value.id + '">' + value.title + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#program').empty();
+                $('#program').append('<option value="" selected disabled>Select Program</option>');
+            }
+        });
+    });
+    </script>
     <script>
         var currentTab = 0; // Current tab is set to be the first tab (0)
         showTab(currentTab); // Display the current tab
+
 
         function showTab(n) {
             // This function will display the specified tab of the form ...
@@ -748,6 +730,7 @@ $(document).ready(function() {
             fixStepIndicator(n)
         }
 
+
         function nextPrev(n) {
             // This function will figure out which tab to display
             var x = document.getElementsByClassName("tab");
@@ -766,6 +749,7 @@ $(document).ready(function() {
             // Otherwise, display the correct tab:
             showTab(currentTab);
         }
+
 
         function validateForm() {
             // This function deals with validation of the form fields
@@ -789,6 +773,7 @@ $(document).ready(function() {
             return valid; // return the valid status
         }
 
+
         function fixStepIndicator(n) {
             // This function removes the "active" class of all steps...
             var i, x = document.getElementsByClassName("step");
@@ -800,11 +785,13 @@ $(document).ready(function() {
         }
     </script>
 
+
     <script>
-        $(document).ready(function() {
+    $(document).ready(function() {
     var preselectedStateId = '{{ $adminStateId }}';
     var preselectedDistrictId = '{{ $adminDistrictId }}';
     var preselectedMunicipalityId = '{{ $adminMunicipalityId }}';
+
 
     // Function to load districts for both permanent and temporary addresses
     function loadDistricts(state_id, district_id = null, isTemporary = false) {
@@ -813,11 +800,13 @@ $(document).ready(function() {
             url: '/admin/get-district-by-state/' + state_id,
             type: 'GET',
             success: function(response) {
+                console.log(response); // Debug response
                 var options = '<option disabled value>Choose District</option>';
                 response.forEach(function(district) {
                     options += `<option value="${district.id}" ${district_id == district.id ? 'selected' : ''}>${district.name}</option>`;
                 });
                 $('#' + append_to).html(options);
+
 
                 // Load municipalities for the preselected or first loaded district
                 if (district_id) {
@@ -829,18 +818,21 @@ $(document).ready(function() {
         });
     }
 
+
     // Function to load municipalities for both addresses
     function loadMunicipalities(district_id, municipality_id = null, isTemporary = false) {
-        var append_to = isTemporary ? 'temp_municipality_id' : 'municipalitiy_id';
+        var append_to = isTemporary ? 'temp_municipality_id' : 'municipality_id';  // Fixed typo here
         $.ajax({
             url: '/admin/get-municipality-by-district/' + district_id,
             type: 'GET',
             success: function(response) {
+                console.log(response); // Debug response
                 var options = '<option disabled selected value>Choose Municipality</option>';
                 response.forEach(function(municipality) {
                     options += `<option value="${municipality.id}" ${municipality_id == municipality.id ? 'selected' : ''}>${municipality.name}</option>`;
                 });
                 $('#' + append_to).html(options);
+
 
                 // Load wards for the preselected or first loaded municipality
                 if (municipality_id) {
@@ -851,6 +843,7 @@ $(document).ready(function() {
             }
         });
     }
+
 
     // Function to load wards for both addresses
     function loadWards(municipality_id, isTemporary = false) {
@@ -868,42 +861,54 @@ $(document).ready(function() {
         });
     }
 
+
     // Event listeners for permanent address
     $('.state_id').change(function() {
         loadDistricts($(this).val(), null, false);
     });
 
+
     $('.district_id').change(function() {
         loadMunicipalities($(this).val(), null, false);
     });
 
+
     $('.municipality_id').change(function() {
         loadWards($(this).val(), false);
     });
+
 
     // Event listeners for temporary address
     $('.temp_state_id').change(function() {
         loadDistricts($(this).val(), null, true);
     });
 
+
     $('.temp_district_id').change(function() {
         loadMunicipalities($(this).val(), null, true);
     });
 
+
     $('.temp_municipality_id').change(function() {
         loadWards($(this).val(), true);
     });
+
 
     // Initial load for permanent address
     if (preselectedStateId) {
         loadDistricts(preselectedStateId, preselectedDistrictId, false);
     }
 
+
     // Initial load for temporary address
     if (preselectedStateId) {
         loadDistricts(preselectedStateId, preselectedDistrictId, true);
     }
 });
+
+
+
+
   // Function to generate a random 3-digit number
   function generateRandomNumber() {
         const length = 3;
@@ -916,11 +921,13 @@ $(document).ready(function() {
         return randomNumber;
     }
 
+
     // Function to generate the admission number based on municipality ID and school ID
     function generateAdmissionNumber(municipalityId, schoolId) {
         const randomNumber = generateRandomNumber();
         return `${municipalityId}${schoolId}${randomNumber}`;
     }
+
 
     // Set the generated admission number to the input field
     function updateAdmissionNumber() {
@@ -932,6 +939,7 @@ $(document).ready(function() {
         }
     }
 
+
     // Event listener for DOM content loaded
     document.addEventListener('DOMContentLoaded', function () {
         // Update admission number on page load if not set
@@ -939,6 +947,7 @@ $(document).ready(function() {
         if (admissionNoInput && !admissionNoInput.value) {
             updateAdmissionNumber();
         }
+
 
         // Update admission number when municipality selection changes
         const municipalitySelect = document.getElementById('municipalitiy_id');
@@ -948,14 +957,19 @@ $(document).ready(function() {
     });
 
 
+
+
 </script>
 
-    
+
+   
+
 
     <script>
         function toggleGuardianFields() {
             var otherFieldsContainer = document.getElementById('otherGuardianFields');
             var guardianOtherRadio = document.getElementById('guardian_other');
+
 
             if (guardianOtherRadio.checked) {
                 otherFieldsContainer.style.display = 'flex'; // Show the additional fields
@@ -969,5 +983,6 @@ $(document).ready(function() {
     </script>
 
 
-@endsection
 
+
+@endsection
