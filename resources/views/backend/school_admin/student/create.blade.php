@@ -190,19 +190,44 @@
                                        
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="citizenship_front">Citizenship Front:</label>
-                                                <input type="file" name="citizenship_front" class="form-control" id="citizenship_front" accept="image/*">
+                                                <input type="file" name="citizenship_front" class="form-control" id="citizenship_front" accept="image/*" onchange="previewImage(this, 'citizenship_front_preview')">
+                                                <div class="mt-2">
+                                                    <img id="citizenship_front_preview" src="" alt="Citizenship Front Preview" class="img-thumbnail" width="150" style="display: none;">
+                                                </div>
                                                 @error('citizenship_front')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
-                                       
+                                            
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="citizenship_back">Citizenship Back:</label>
-                                                <input type="file" name="citizenship_back" class="form-control" id="citizenship_back" accept="image/*">
+                                                <input type="file" name="citizenship_back" class="form-control" id="citizenship_back" accept="image/*" onchange="previewImage(this, 'citizenship_back_preview')">
+                                                <div class="mt-2">
+                                                    <img id="citizenship_back_preview" src="" alt="Citizenship Back Preview" class="img-thumbnail" width="150" style="display: none;">
+                                                </div>
                                                 @error('citizenship_back')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
+                                            
+                                            <script>
+                                            function previewImage(input, previewId) {
+                                                const preview = document.getElementById(previewId);
+                                                if (input.files && input.files[0]) {
+                                                    const reader = new FileReader();
+                                                    
+                                                    reader.onload = function(e) {
+                                                        preview.src = e.target.result;
+                                                        preview.style.display = 'block';
+                                                    }
+                                                    
+                                                    reader.readAsDataURL(input.files[0]);
+                                                } else {
+                                                    preview.src = '';
+                                                    preview.style.display = 'none';
+                                                }
+                                            }
+                                            </script>
                                         </div>                                        
                                     </div>
                                     <div class="hr-line-dashed mt-4"></div>
@@ -580,17 +605,43 @@
                                                 <!-- Attachment of Previous Studies Records -->
                                                 <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                     <label for="previous_study_records_attachment">Attachment of Previous Studies Records:</label>
-                                                    <input type="file" name="previous_study_records_attachment" class="form-control" id="previous_study_records_attachment">
+                                                    <input type="file" name="previous_study_records_attachment" class="form-control" id="previous_study_records_attachment" onchange="previewDocument(this, 'document_preview_container')">
                                                     @error('previous_study_records_attachment')
                                                         <strong class="text-danger">{{ $message }}</strong>
                                                     @enderror
-                                   
+                                                
+                                                    <!-- Preview Container -->
+                                                    <div id="document_preview_container" class="mt-2" style="display: none;">
+                                                        <p class="mb-0">
+                                                            <i class="fas fa-file"></i> 
+                                                            <span id="document_name"></span>
+                                                        </p>
+                                                    </div>
+                                                
                                                     @if(!empty($student->previousAcademic->previous_study_records_attachment))
                                                         <p class="mt-2">
-                                                            <a href="{{ asset('uploads/previous_records/' . $student->previousAcademic->previous_study_records_attachment) }}" target="_blank">View Uploaded Document</a>
+                                                            <a href="{{ asset('uploads/previous_records/' . $student->previousAcademic->previous_study_records_attachment) }}" target="_blank">
+                                                                <i class="fas fa-file"></i> View Uploaded Document
+                                                            </a>
                                                         </p>
                                                     @endif
                                                 </div>
+                                                
+                                                <script>
+                                                function previewDocument(input, containerId) {
+                                                    const container = document.getElementById(containerId);
+                                                    const nameSpan = document.getElementById('document_name');
+                                                    
+                                                    if (input.files && input.files[0]) {
+                                                        const fileName = input.files[0].name;
+                                                        nameSpan.textContent = fileName;
+                                                        container.style.display = 'block';
+                                                    } else {
+                                                        container.style.display = 'none';
+                                                        nameSpan.textContent = '';
+                                                    }
+                                                }
+                                                </script>
                                    
                                             </div>
                                         </div>

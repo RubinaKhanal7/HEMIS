@@ -217,9 +217,9 @@
                                                 <label for="citizenship_front">Citizenship Front:</label>
                                                 <input type="file" name="citizenship_front" class="form-control" id="citizenship_front" accept="image/*">
                                                 
-                                                @if (!empty($student->user->citizenship_front))
+                                                @if (!empty($student->citizenship_front))
                                                     <div class="mt-2">
-                                                        <img src="{{ asset('uploads/citizenship_docs/' . $student->user->citizenship_front) }}" 
+                                                        <img src="{{ asset('uploads/citizenship_docs/' . $student->citizenship_front) }}" 
                                                             alt="Citizenship Front Image" class="img-thumbnail" width="150">
                                                     </div>
                                                 @endif

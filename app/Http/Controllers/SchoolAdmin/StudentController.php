@@ -397,9 +397,9 @@ public function getPrograms($sectionId)
             'date_of_birth' => 'required|date',
             'gender' => 'required|in:Male,Female',
             'ethnicity' => 'required|string',
-            'student_photo' => 'nullable|image|mimes:jpeg,png,jpg',
-            'citizenship_front' => 'nullable|image|mimes:jpeg,png,jpg',
-            'citizenship_back' => 'nullable|image|mimes:jpeg,png,jpg',
+            'student_photo' => 'nullable|image|mimes:jpeg,png,jpg,wepb',
+            'citizenship_front' => 'nullable|image|mimes:jpeg,png,jpg,wepb',
+            'citizenship_back' => 'nullable|image|mimes:jpeg,png,jpg,wepb',
     
             // Address Information
             'permanent_province' => 'required|string',
@@ -423,22 +423,27 @@ public function getPrograms($sectionId)
             'previous_study_records_attachment' => 'nullable|file',
         ]);
     
-        // Handle file uploads
-        if ($request->hasFile('student_photo')) {
-            $photoPath = $request->file('student_photo')->store('student_photos', 'public');
-        }
-    
-        if ($request->hasFile('citizenship_front')) {
-            $citizenshipFrontPath = $request->file('citizenship_front')->store('citizenship', 'public');
-        }
-    
-        if ($request->hasFile('citizenship_back')) {
-            $citizenshipBackPath = $request->file('citizenship_back')->store('citizenship', 'public');
-        }
-    
-        if ($request->hasFile('previous_study_records_attachment')) {
-            $recordsPath = $request->file('previous_study_records_attachment')->store('previous_records', 'public');
-        }
+        
+    $photoPath = null;
+    $citizenshipFrontPath = null;
+    $citizenshipBackPath = null;
+    $recordsPath = null;
+
+    if ($request->hasFile('student_photo')) {
+        $photoPath = $this->uploadFile($request->file('student_photo'), 'students');
+    }
+
+    if ($request->hasFile('citizenship_front')) {
+        $citizenshipFrontPath = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
+    }
+
+    if ($request->hasFile('citizenship_back')) {
+        $citizenshipBackPath = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
+    }
+
+    if ($request->hasFile('previous_study_records_attachment')) {
+        $recordsPath = $this->uploadFile($request->file('previous_study_records_attachment'), 'previous_records');
+    }
     
         $student = Student::create([
             // Personal Information
@@ -457,9 +462,10 @@ public function getPrograms($sectionId)
             'disability_status' => $request->disability_status,
             'citizenship_id' => $request->citizenship_id,
             'national_id' => $request->national_id,
-            'student_photo' => $photoPath ?? null,
-            'citizenship_front' => $citizenshipFrontPath ?? null,
-            'citizenship_back' => $citizenshipBackPath ?? null,
+            'student_photo' => $photoPath,
+            'citizenship_front' => $citizenshipFrontPath,
+            'citizenship_back' => $citizenshipBackPath,
+        
     
             // Address Information
             'permanent_province' => $request->permanent_province,
@@ -497,7 +503,7 @@ public function getPrograms($sectionId)
             'previous_board_university_college' => $request->previous_board_university_college,
             'previous_registration_no' => $request->previous_registration_no,
             'previous_institution_name' => $request->previous_institution_name,
-            'previous_study_records_attachment' => $recordsPath ?? null,
+            'previous_study_records_attachment' => $recordsPath,
     
             // Additional fields
             'school_id' => auth()->user()->school_id,
@@ -596,36 +602,26 @@ public function getPrograms($sectionId)
             'mother_occupation' => 'nullable|string|max:255',
         ]);
 
-        // Handle file uploads
         if ($request->hasFile('student_photo')) {
             // Delete old photo if exists
-            if ($student->student_photo) {
-                Storage::delete($student->student_photo);
-            }
-            $validated['student_photo'] = $request->file('student_photo')->store('student-photos');
+            $this->deleteOldFile($student->student_photo, 'students');
+            $validated['student_photo'] = $this->uploadFile($request->file('student_photo'), 'students');
         }
-
+    
         if ($request->hasFile('citizenship_front')) {
-            if ($student->citizenship_front) {
-                Storage::delete($student->citizenship_front);
-            }
-            $validated['citizenship_front'] = $request->file('citizenship_front')->store('citizenship-documents');
+            $this->deleteOldFile($student->citizenship_front, 'citizenship_docs');
+            $validated['citizenship_front'] = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
         }
-
+    
         if ($request->hasFile('citizenship_back')) {
-            if ($student->citizenship_back) {
-                Storage::delete($student->citizenship_back);
-            }
-            $validated['citizenship_back'] = $request->file('citizenship_back')->store('citizenship-documents');
+            $this->deleteOldFile($student->citizenship_back, 'citizenship_docs');
+            $validated['citizenship_back'] = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
         }
-
+    
         if ($request->hasFile('previous_study_records_attachment')) {
-            if ($student->previous_study_records_attachment) {
-                Storage::delete($student->previous_study_records_attachment);
-            }
-            $validated['previous_study_records_attachment'] = $request->file('previous_study_records_attachment')->store('study-records');
+            $this->deleteOldFile($student->previous_study_records_attachment, 'previous_records');
+            $validated['previous_study_records_attachment'] = $this->uploadFile($request->file('previous_study_records_attachment'), 'previous_records');
         }
-
         // Update the student record
         $student->update($validated);
 
@@ -633,6 +629,29 @@ public function getPrograms($sectionId)
             ->with('success', 'Student information updated successfully');
     }
 
+    private function uploadFile($file, $directory)
+{
+    // Create directory if it doesn't exist
+    $path = public_path('uploads/' . $directory);
+    if (!file_exists($path)) {
+        mkdir($path, 0777, true);
+    }
+
+    $fileName = time() . '_' . $file->getClientOriginalName();
+    $file->move($path, $fileName);
+    
+    return $fileName;
+}
+
+private function deleteOldFile($fileName, $directory)
+{
+    if ($fileName) {
+        $filePath = public_path('uploads/' . $directory . '/' . $fileName);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+    }
+}
 
     public function destroy($id)
 {
