@@ -34,14 +34,14 @@
                                        
                                         <div class="col-md-12 col-lg-12 d-flex flex-wrap justify-content-between gap-1">
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="first_name_en">First Name (English):</label>
+                                                <label for="first_name_en">First Name (English): <span class="text-danger">*</span></label>
                                                 <input type="text" name="first_name_en" value="{{ old('first_name_en') }}" class="form-control" id="first_name_en" placeholder="Enter First Name">
                                                 @error('first_name_en')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="first_name_np">First Name (Nepali):</label>
+                                                <label for="first_name_np">First Name (Nepali): <span class="text-danger">*</span></label>
                                                 <input type="text" name="first_name_np" value="{{ old('first_name_np') }}" class="form-control" id="first_name_np" placeholder="Enter First Name">
                                                 @error('first_name_np')
                                                     <strong class="text-danger">{{ $message }}</strong>
@@ -62,14 +62,14 @@
                                                 @enderror
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="last_name_en">Last Name (English):</label>
+                                                <label for="last_name_en">Last Name (English): <span class="text-danger">*</span></label>
                                                 <input type="text" name="last_name_en" value="{{ old('last_name_en') }}" class="form-control" id="last_name_en" placeholder="Enter Last Name">
                                                 @error('last_name_en')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3">
-                                                <label for="last_name_np">Last Name (Nepali):</label>
+                                                <label for="last_name_np">Last Name (Nepali): <span class="text-danger">*</span></label>
                                                 <input type="text" name="last_name_np" value="{{ old('last_name_np') }}" class="form-control" id="last_name_np" placeholder="Enter Last Name">
                                                 @error('last_name_np')
                                                     <strong class="text-danger">{{ $message }}</strong>
@@ -77,14 +77,14 @@
                                             </div>
                                        
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="mobile_number">Mobile No. :</label>
+                                                <label for="mobile_number">Mobile No. : <span class="text-danger">*</span></label>
                                                 <input type="text" name="mobile_number" value="{{ old('mobile_number') }}" class="form-control" id="mobile_number" placeholder="Enter Mobile Number">
                                                 @error('mobile_number')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="dob">Date of Birth:</label>
+                                                <label for="dob">Date of Birth: <span class="text-danger">*</span></label>
                                                 <input type="text" name="date_of_birth" value="{{ old('date_of_birth') }}" class="form-control" id="dob-datepicker" placeholder="Enter DOB">
                                                 @error('date_of_birth')
                                                     <strong class="text-danger">{{ $message }}</strong>
@@ -92,7 +92,7 @@
                                             </div>
                                        
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="gender">Gender:</label><br>
+                                                <label for="gender">Gender: <span class="text-danger">*</span></label><br>
                                                 <label for="gender_male" class="l-radio">
                                                     <input type="radio" name="gender" value="Male" id="gender_male" {{ old('gender') == 'Male' ? 'checked' : '' }}>
                                                     <span>Male</span>
@@ -115,12 +115,22 @@
                                             </div>
                                        
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="ethnicity">Ethnicity:</label>
-                                                <input type="text" name="ethnicity" value="{{ old('ethnicity') }}" class="form-control" id="ethnicity" placeholder="Enter Ethnicity">
+                                                <label for="ethnicity">Ethnicity: <span class="text-danger">*</span></label>
+                                                <select name="ethnicity" class="form-control" id="ethnicity">
+                                                    <option value="" disabled selected>Select Ethnicity</option>
+                                                    <option value="Dalit" {{ old('ethnicity') == 'Dalit' ? 'selected' : '' }}>Dalit</option>
+                                                    <option value="Janajati" {{ old('ethnicity') == 'Janajati' ? 'selected' : '' }}>Janajati</option>
+                                                    <option value="Madhesi" {{ old('ethnicity') == 'Madhesi' ? 'selected' : '' }}>Madhesi</option>
+                                                    <option value="Muslim" {{ old('ethnicity') == 'Muslim' ? 'selected' : '' }}>Muslim</option>
+                                                    <option value="Tharu" {{ old('ethnicity') == 'Tharu' ? 'selected' : '' }}>Tharu</option>
+                                                    <option value="Brahmin" {{ old('ethnicity') == 'Brahmin' ? 'selected' : '' }}>Brahmin</option>
+                                                    <option value="Chhetri" {{ old('ethnicity') == 'Chhetri' ? 'selected' : '' }}>Chhetri</option>
+                                                </select>
                                                 @error('ethnicity')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
                                             </div>
+                                            
                                        
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="edj">EDJ:</label>
@@ -203,7 +213,7 @@
                                    
                                         <div class="col-md-6 col-lg-6 col-sm-6 pt-4 pb-4 d-flex gap-3">
                                             <div class="">
-                                                <label for="state_id">Choose State</label>
+                                                <label for="state_id">Choose State <span class="text-danger">*</span></label>
                                                 <div class="select">
                                                     <select id="state_id" name="permanent_province" class="state_id" required>
                                                         <option disabled value="">Choose State</option>
@@ -220,7 +230,7 @@
                                                 @enderror
                                             </div>
                                             <div class="">
-                                                <label for="district_id">Choose District</label>
+                                                <label for="district_id">Choose District <span class="text-danger">*</span></label>
                                                 <div class="select">
                                                     <select id="district_id" name="permanent_district" class="district_id" required>
                                                         <option value="{{ $adminDistrictId }}" selected>
@@ -238,7 +248,7 @@
                                    
                                         <div class="col-md-6 col-lg-6 pt-4 pb-4 d-flex gap-3">
                                             <div>
-                                                <label for="municipality_id">Choose Municipality</label>
+                                                <label for="municipality_id">Choose Municipality <span class="text-danger">*</span></label>
                                                 <div class="select">
                                                     <select id="municipality_id" name="permanent_local_level" class="municipality_id" required>
                                                         <option value="{{ $adminMunicipalityId }}" selected>
@@ -254,7 +264,7 @@
                                             </div>
                                    
                                             <div class="">
-                                                <label for="ward_id">Choose Ward</label>
+                                                <label for="ward_id">Choose Ward <span class="text-danger">*</span></label>
                                                 <div class="select">
                                                     <select id="ward_id" name="permanent_ward_no" class="ward_id" required>
                                                         <option value="{{ old('ward_id') }}">Choose Ward</option>
@@ -443,67 +453,69 @@
                                         </div>
                                     </div>
                                    
-
-
                                     <div class="tab">
                                         <div class="col-lg-12 col-md-12">
                                             <div class="hr-line-dashed"></div>
                                             <h5>Student Enrollment & Academic Information:</h5>
                                             <div class="hr-line-dashed"></div>
-                                   
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="level_of_study">Level of Study:</label>
-                                                <select name="level_of_study" class="form-control" id="level_of_study">
-                                                    <option value="" selected disabled>Select Level of Study</option>
-                                                    @foreach($classes as $class)
-                                                        <option value="{{ $class->id }}">{{ $class->class }}</option>
-                                                    @endforeach
-                                                </select>
+                                    
+                                            <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
+                                                <!-- Level of Study -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="level_of_study">Level of Study: <span class="text-danger">*</span></label>
+                                                    <select name="class_id" required class="form-control">
+                                                        <option value="">Select Level of Study</option>
+                                                        @foreach ($classes as $class)
+                                                            <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>
+                                                                {{ $class->class }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                
+                                    
+                                                <!-- Faculty -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="faculty">Faculty: <span class="text-danger">*</span></label>
+                                                    <select name="section_id" required class="form-control">
+                                                        <option value="">Select Faculty</option>
+                                                        <!-- Add options dynamically here based on level of study -->
+                                                    </select>
+                                                </div>
+                                    
+                                                <!-- Program -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="program">Program: <span class="text-danger">*</span></label>
+                                                    <select name="program_id" class="form-control">
+                                                        <option value="">Select Program</option>
+                                                        <!-- Add options dynamically here based on faculty -->
+                                                    </select>
+                                                </div>
                                             </div>
-                                            
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="faculty">Faculty:</label>
-                                                <select name="faculty" class="form-control" id="faculty" disabled>
-                                                    <option value="" selected disabled>Select Faculty</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="program">Program:</label>
-                                                <select name="program" class="form-control" id="program" disabled>
-                                                    <option value="" selected disabled>Select Program</option>
-                                                </select>
-                                            </div>                                   
-
-
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="admission_year">Admission Year:</label>
-                                                <input type="text" name="admission_year"
-                                                    value="{{ old('admission_year') }}" class="form-control"
-                                                    id="admission_year" placeholder="Enter Admission Year">
-                                                @error('admission_year')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-
-
-                                            <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                <label for="mother_occupation">Date of Admission:</label>
-                                                <input type="text" name="date_of_admission"
-                                                    value="{{ old('date_of_admission') }}" class="form-control"
-                                                    id="date_of_admission" placeholder="Enter Date of Admission">
-                                                @error('date_of_admission')
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                @enderror
-                                            </div>
-
-
+                                    
+                                            <div class="col-lg-12 col-md-12 d-flex gap-3 flex-wrap justify-content-between">
+                                                <!-- Admission Year -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="admission_year">Admission Year: <span class="text-danger">*</span></label>
+                                                    <input type="text" name="admission_year" value="{{ old('admission_year') }}" class="form-control" id="admission_year" placeholder="Enter Admission Year">
+                                                    @error('admission_year')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                    
+                                                <!-- Date of Admission -->
+                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
+                                                    <label for="date_of_admission">Date of Admission: <span class="text-danger">*</span></label>
+                                                    <input type="text" name="date_of_admission" value="{{ old('date_of_admission') }}" class="form-control" id="admission-datepicker" placeholder="Enter Date of Admission">
+                                                    @error('date_of_admission')
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    @enderror
+                                                </div>
+                                    
                                                 <!-- Academic Program Duration -->
                                                 <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                    <label for="academic_program_duration">Academic Program Duration:</label>
-                                                    <input type="text" name="academic_program_duration"
-                                                        value="{{ old('academic_program_duration') }}"
-                                                        class="form-control" id="academic_program_duration" placeholder="Enter Duration">
+                                                    <label for="academic_program_duration">Academic Program Duration: <span class="text-danger">*</span></label>
+                                                    <input type="text" name="academic_program_duration" value="{{ old('academic_program_duration') }}" class="form-control" id="academic_program_duration" placeholder="Enter Duration">
                                                     @error('academic_program_duration')
                                                         <strong class="text-danger">{{ $message }}</strong>
                                                     @enderror
@@ -511,9 +523,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                   
-
-
+                                    
+                                    
                                     <div class="tab">
                                         <div class="col-lg-12 col-md-12">
                                             <div class="hr-line-dashed"></div>
@@ -524,7 +535,7 @@
                                    
                                                 <!-- Name of Level of Study -->
                                                 <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                    <label for="previous_level_of_study">Name of Level of Study:</label>
+                                                    <label for="previous_level_of_study">Name of Level of Study: <span class="text-danger">*</span></label>
                                                     <input type="text" name="previous_level_of_study"
                                                         value="{{ old('previous_level_of_study', $student->previousAcademic->previous_level_of_study ?? '') }}"
                                                         class="form-control" id="previous_level_of_study" placeholder="Enter Previous Level of Study">
@@ -535,7 +546,7 @@
                                    
                                                 <!-- Board/University/College -->
                                                 <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                    <label for="previous_board_university_college">Board/University/College:</label>
+                                                    <label for="previous_board_university_college">Board/University/College: <span class="text-danger">*</span></label>
                                                     <input type="text" name="previous_board_university_college"
                                                         value="{{ old('previous_board_university_college', $student->previousAcademic->previous_board_university_college ?? '') }}"
                                                         class="form-control" id="previous_board_university_college" placeholder="Enter Board/University/College">
@@ -546,7 +557,7 @@
                                    
                                                 <!-- Registration Number -->
                                                 <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                    <label for="previous_registration_no">Registration Number:</label>
+                                                    <label for="previous_registration_no">Registration Number: <span class="text-danger">*</span></label>
                                                     <input type="text" name="previous_registration_no"
                                                         value="{{ old('previous_registration_no', $student->previousAcademic->previous_registration_no ?? '') }}"
                                                         class="form-control" id="previous_registration_no" placeholder="Enter Registration Number">
@@ -557,7 +568,7 @@
                                    
                                                 <!-- Name of Institution -->
                                                 <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                    <label for="previous_institution_name">Name of Institution:</label>
+                                                    <label for="previous_institution_name">Name of Institution: <span class="text-danger">*</span></label>
                                                     <input type="text" name="previous_institution_name"
                                                         value="{{ old('previous_institution_name', $student->previousAcademic->previous_institution_name ?? '') }}"
                                                         class="form-control" id="previous_institution_name" placeholder="Enter Name of Institution">
@@ -637,75 +648,6 @@
 @include('backend.includes.nepalidate')
 @include('backend.includes.cropperjs')
 
-
-<script>
-    $(document).ready(function() {
-        // When level of study changes
-        $('#level_of_study').on('change', function() {
-            let classId = $(this).val();
-            $('#faculty').prop('disabled', true);
-            $('#program').prop('disabled', true);
-            
-            if(classId) {
-                // Enable faculty dropdown and fetch related sections
-                $('#faculty').prop('disabled', false);
-                
-                $.ajax({
-                    url: "{{ route('admin.get.sections') }}",
-                    type: "GET",
-                    data: {
-                        class_id: classId
-                    },
-                    success: function(data) {
-                        $('#faculty').empty();
-                        $('#faculty').append('<option value="" selected disabled>Select Faculty</option>');
-                        
-                        $.each(data, function(key, value) {
-                            $('#faculty').append('<option value="' + value.id + '">' + value.section_name + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#faculty').empty();
-                $('#faculty').append('<option value="" selected disabled>Select Faculty</option>');
-                $('#program').empty();
-                $('#program').append('<option value="" selected disabled>Select Program</option>');
-            }
-        });
-    
-        // When faculty changes
-        $('#faculty').on('change', function() {
-            let sectionId = $(this).val();
-            let classId = $('#level_of_study').val();
-            $('#program').prop('disabled', true);
-            
-            if(sectionId) {
-                // Enable program dropdown and fetch related programs
-                $('#program').prop('disabled', false);
-                
-                $.ajax({
-                    url: "{{ route('admin.get.programs') }}",
-                    type: "GET",
-                    data: {
-                        section_id: sectionId,
-                        class_id: classId
-                    },
-                    success: function(data) {
-                        $('#program').empty();
-                        $('#program').append('<option value="" selected disabled>Select Program</option>');
-                        
-                        $.each(data, function(key, value) {
-                            $('#program').append('<option value="' + value.id + '">' + value.title + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#program').empty();
-                $('#program').append('<option value="" selected disabled>Select Program</option>');
-            }
-        });
-    });
-    </script>
     <script>
         var currentTab = 0; // Current tab is set to be the first tab (0)
         showTab(currentTab); // Display the current tab
@@ -966,20 +908,56 @@
 
 
     <script>
-        function toggleGuardianFields() {
-            var otherFieldsContainer = document.getElementById('otherGuardianFields');
-            var guardianOtherRadio = document.getElementById('guardian_other');
-
-
-            if (guardianOtherRadio.checked) {
-                otherFieldsContainer.style.display = 'flex'; // Show the additional fields
-                otherFieldsContainer.style.flexWrap = 'wrap'; // Show the additional fields
-                otherFieldsContainer.style.justifyContent = 'space-between'; // Show the additional fields
-                otherFieldsContainer.style.gap = '3px'; // Show the additional fields
-            } else {
-                otherFieldsContainer.style.display = 'none'; // Hide the additional fields
-            }
+        $(document).ready(function() {
+    // Setup CSRF token for all AJAX requests
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
+    });
+ $('select[name="class_id"]').change(function() {
+        var classId = $(this).val();
+        
+        // Reset dependent dropdowns
+        $('select[name="section_id"]').empty().append('<option value="">Select Faculty</option>');
+        $('select[name="program_id"]').empty().append('<option value="">Select Program</option>');
+        
+        if (classId) {
+            // Fetch sections (faculties)
+            $.ajax({
+                url: '/admin/get-section-by-class/' + classId,
+                type: 'GET',
+                success: function(data) {
+                    $.each(data, function(key, value) {
+                        $('select[name="section_id"]').append(
+                            '<option value="' + key + '">' + value + '</option>'
+                        );
+                    });
+                },
+                error: function(xhr) {
+                    console.error('Error fetching sections:', xhr);
+                }
+            });
+
+            // Fetch programs
+            $.ajax({
+                url: '/admin/get-programs-by-class/' + classId,
+                type: 'GET',
+                success: function(data) {
+                    $.each(data, function(key, value) {
+                        $('select[name="program_id"]').append(
+                            '<option value="' + key + '">' + value + '</option>'
+                        );
+                    });
+                },
+                error: function(xhr) {
+                    console.error('Error fetching programs:', xhr);
+                }
+            });
+        }
+    });
+      
+    });
     </script>
 
 

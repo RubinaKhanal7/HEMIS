@@ -47,6 +47,16 @@ src="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/js/nepali.d
             });
         }
 
+        var admissionInput = document.getElementById("admission-datepicker");
+        if (admissionInput) {
+            admissionInput.nepaliDatePicker({
+                dateFormat: "YYYY-MM-DD",
+                ndpYear: true,
+                ndpMonth: true,
+                ndpYearCount: 200
+            });
+        }
+
         //initialize depali datepicker for model
         $("#model-nepali-datepicker").nepaliDatePicker();
         $("#model-nepali-datepicker2").nepaliDatePicker();

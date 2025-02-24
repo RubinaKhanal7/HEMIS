@@ -4,17 +4,16 @@ use App\Http\Controllers\SchoolAdmin\StudentController;
 
 
 Route::resource('students', StudentController::class);
-Route::post('student/get', [StudentController::class, 'getAllStudent'])->name('students.get');
+Route::post('/admin/student/get', [StudentController::class, 'getData'])->name('student.get');
 
 
 Route::get('students-additionalinformations/{student_id}', [StudentController::class, 'additionalInformationStudents'])->name('students.additionalinformations_create');
-
+Route::get('get-programs-by-class/{classId}', 'StudentController@getProgramsByClass');
 Route::post('students/{student_id}/additional-information', [StudentController::class, 'updateAdditionalInformation'])->name('students.additionalInformation.update');
 
 
-Route::get('/get-sections', [StudentController::class, 'getSections'])->name('get.sections');
-Route::get('/get-programs', [StudentController::class, 'getPrograms'])->name('get.programs');
-
+Route::get('admin/get-faculties/{classId}', [StudentController::class, 'getFaculties']);
+Route::get('admin/get-programs/{sectionId}', [StudentController::class, 'getPrograms']);;
 
 Route::get('/get-district-by-state/{state_id}', [StudentController::class, 'getDistrict'])->name('get-districts');
 Route::get('student/import/index', [StudentController::class, 'importAllStudentIndex'])->name('students.import');

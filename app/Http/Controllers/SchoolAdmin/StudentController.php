@@ -10,6 +10,7 @@ use App\Models\Classg;
 use App\Models\Program;
 use App\Models\Section;
 use App\Models\Student;
+use App\Models\School;
 use App\Models\SchoolUser;
 use App\Models\SchoolHouse;
 use Illuminate\Http\Request;
@@ -27,8 +28,11 @@ use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Services\StudentUserService;
 use App\Models\Municipality;
+use App\Models\District;
+use App\Models\State;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 use App\Exports\StudentsExport;
 
@@ -55,18 +59,6 @@ class StudentController extends Controller
 }
 
 
-public function getFaculties($classId)
-{
-    $sections = Section::select('sections.id', 'sections.section_name as name')
-        ->join('class_sections', 'sections.id', '=', 'class_sections.section_id')
-        ->where('class_sections.class_id', $classId)
-        ->where('sections.is_active', 1)
-        ->get();
-    
-    return response()->json($sections);
-}
-
-
     public function getDistrict($province_id)
     {
 
@@ -74,22 +66,84 @@ public function getFaculties($classId)
         return response()->json($districts);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $page_title = 'Student List';
-        $schoolId = session('school_id');
-        $classes = Classg::where('school_id', $schoolId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-         // Retrieve only students whose associated users are active
-         $students = Student::whereHas('user', function ($query) {
-            $query->where('is_active', 1); // Ensure '1' matches the active status
-        })->where('school_id', $schoolId)->latest()->get();
-
-        return view('backend.school_admin.student.index', compact('students', 'page_title', 'classes'));
+        $classes = Classg::where('school_id', session('school_id'))->get();
+        
+        // Get the search parameters from the URL
+        $selectedClass = $request->query('class_id');
+        $selectedSection = $request->query('section_id');
+        $selectedProgram = $request->query('program_id');
+        $shouldSearch = $request->query('search');
+        
+        return view('backend.school_admin.student.index', compact(
+            'page_title', 
+            'classes',
+            'selectedClass',
+            'selectedSection',
+            'selectedProgram',
+            'shouldSearch'
+        ));
+    }
+    public function getData(Request $request)
+    {
+        try {
+            $query = Student::with(['class', 'section', 'program'])
+                ->when(session('school_id'), function($q) {
+                    return $q->where('school_id', session('school_id'));
+                })
+                ->when($request->filled('class_id'), function($q) use ($request) {
+                    return $q->where('class_id', $request->class_id);
+                })
+                ->when($request->filled('section_id'), function($q) use ($request) {
+                    return $q->where('section_id', $request->section_id);
+                })
+                ->when($request->filled('program_id'), function($q) use ($request) {
+                    return $q->where('program_id', $request->program_id);
+                });
+    
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('checkbox', function($row) {
+                    return '<input type="checkbox" class="student-checkbox" data-student-id="'.$row->id.'">';
+                })
+                ->addColumn('action', function($row) {
+                    return view('backend.school_admin.student.partials.controller_action', compact('row'))->render();
+                })
+                ->rawColumns(['checkbox', 'action'])
+                ->make(true);
+        } catch (\Exception $e) {
+            Log::error('Student DataTable Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching student data'], 500);
+        }
     }
 
+public function getProgramsByClass($classId)
+{
+    $programs = Program::where('class_id', $classId)->pluck('title', 'id');
+    return response()->json($programs);
+}
+
+
+// Add these new methods for dependent dropdowns
+public function getFaculties($classId)
+{
+    $sections = Section::where('class_id', $classId)
+        ->orderBy('section_name')
+        ->get();
+    
+    return response()->json($sections);
+}
+
+public function getPrograms($sectionId)
+{
+    $programs = Program::where('section_id', $sectionId)
+        ->orderBy('title')
+        ->get();
+    
+    return response()->json($programs);
+}
     public function create()
     {
         $page_title = 'Create Student';
@@ -99,6 +153,7 @@ public function getFaculties($classId)
         $classes = Classg::where('school_id', $schoolId)
         ->orderBy('created_at', 'desc')
         ->get();
+        
     
         $school_houses = SchoolHouse::all();
         $bloodGroups = BloodGroupType::pluck('type', 'id');
@@ -329,24 +384,7 @@ public function getFaculties($classId)
             ]);
         }
     }
-
-    public function getSections(Request $request)
-{
-    $sections = Section::where('class_id', $request->class_id)
-        ->get();
     
-    return response()->json($sections);
-}
-
-public function getPrograms(Request $request)
-{
-    $programs = Program::where('section_id', $request->section_id)
-        ->where('class_id', $request->class_id)
-        ->get();
-    
-    return response()->json($programs);
-}
-
     public function store(Request $request)
     {
         $request->validate([
@@ -370,9 +408,9 @@ public function getPrograms(Request $request)
             'permanent_ward_no' => 'required|string',
     
             // Academic Information
-            'level_of_study' => 'required|exists:classes,id', // This maps to class_id
-            'faculty' => 'required|exists:sections,id', // This maps to section_id
-            'program' => 'required|exists:programs,id',
+            'class_id' => 'required|exists:classes,id',
+            'section_id' => 'required|exists:sections,id',
+            'program_id' => 'required|exists:programs,id',
             'admission_year' => 'required|digits:4',
             'date_of_admission' => 'required|date',
             'academic_program_duration' => 'required|string',
@@ -447,9 +485,9 @@ public function getPrograms(Request $request)
             'mother_occupation' => $request->mother_occupation,
     
             // Academic Information
-            'class_id' => $request->level_of_study,
-            'section_id' => $request->faculty,
-            'program_id' => $request->program,
+            'class_id' => $request->class_id,
+            'section_id' => $request->section_id,
+            'program_id' => $request->program_id,
             'admission_year' => $request->admission_year,
             'date_of_admission' => $request->date_of_admission,
             'academic_program_duration' => $request->academic_program_duration,
@@ -474,153 +512,127 @@ public function getPrograms(Request $request)
     {
     }
 
-    public function edit(string $id)
-{
-    try {
-        $student = Student::findOrFail($id);
-        $page_title = "Edit Student";
-
-        // Fetching necessary data for the form
-        $states = $this->formService->getProvinces();
-        $schoolId = session('school_id');
-
-        // Fetching classes for the school
-        $classes = Classg::where('school_id', $schoolId) 
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Fetching school houses
-        $school_houses = SchoolHouse::all();
-
-        // Fetching blood groups
-        $bloodGroups = BloodGroupType::pluck('type', 'id');
-
-        // Fetching sections for the first class
-        $firstClassId = $classes->first()->id ?? null;
-        $sections = $firstClassId ? $this->getSections($firstClassId)->original : [];
-
-        // Fetching districts for selected state
-        $districts = $student->user->district_bystate($student->user->state_id);
-
-        // Fetching municipalities for selected district
-        $municipalities = $student->user->municipalities_bydistrict($student->user->district_id);
-
-        // Fetching wards by municipality
-        $wards = User::getWards($student->user->municipality_id);
-        
-
-
-        return view('backend.school_admin.student.update', compact('student', 'page_title', 'states', 'classes', 'school_houses', 'sections', 'districts', 'municipalities', 'wards', 'bloodGroups'));
-    } catch (\Exception $e) {
-        return back()->withToastError($e->getMessage());
-    }
-}
-
-    public function update(Request $request, $id)
+    public function edit(Student $student)
     {
-        try {
+        // Load necessary relationships and data for dropdowns
+        $page_title = 'Edit Student Data';
+        $schools = School::all();
+        $sections = Section::all();
+        $classes = Classg::all();
+        $programs = Program::all();
+        $municipalities = Municipality::all();
+        $districts = District::all();
+        $states = State::all();
+        $wards = User::getWards($student->municipality_id);
+        $adminStateId = Auth::user()->state_id;
+        $adminDistrictId = Auth::user()->district_id;
+        $adminMunicipalityId = Auth::user()->municipality_id;
+        $adminSchoolId = Auth::user()->school_id;
+        
+        return view('backend.school_admin.student.update', compact('page_title','student', 'schools', 'sections', 'classes', 'programs',
+    'adminStateId','adminDistrictId','adminMunicipalityId','adminSchoolId','municipalities','districts','states','wards'
+    ));
+    }
 
-            // $validatedData = Validator::make($request->all(), [
-            $validatedData = $request->validate([
-                'state_id' => 'required',
-                'district_id' => 'required',
-                'municipality_id' => 'required',
-                'ward_id' => 'required',
-                'local_address' => 'nullable',
-                'permanent_address' => 'nullable',
-                'f_name' => 'required',
-                'l_name' => 'required',
-                'email' => 'required',
-                'religion' => 'nullable',
-                'mobile_number' => 'required',
-                'gender' => 'required',
-                'dob' => 'required',
-                'blood_group' => 'nullable',
-                // 'image' => 'required',
-                'father_name' => 'nullable',
-                'father_phone' => 'nullable',
-                'father_occupation' => 'nullable',
-                'mother_name' => 'nullable',
-                'mother_phone' => 'nullable',
-                'mother_occupation' => 'nullable',
-                'emergency_contact_person' => 'required',
-                'emergency_contact_phone' => 'required',
-                'username' => 'nullable',
-                // 'password' => 'required',
-                'facebook' => 'nullable',
-                'twitter' => 'nullable',
-                'linkedin' => 'nullable',
-                'instagram' => 'nullable',
-                'bank_name' => 'nullable',
-                'bank_account_no' => 'nullable',
-                'bank_branch' => 'nullable',
-                'note' => 'nullable',
-                'is_active' => 'boolean',
-                'guardian_is' => 'nullable',
+    public function update(Request $request, Student $student)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'first_name_np' => 'required|string|max:255',
+            'last_name_np' => 'required|string|max:255',
+            'first_name_en' => 'required|string|max:255',
+            'last_name_en' => 'required|string|max:255',
+            'mobile_number' => 'required|string|max:15',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|string',
+            'ethnicity' => 'required|string',
+            'permanent_district' => 'required|string',
+            'permanent_province' => 'required|string',
+            'permanent_local_level' => 'required|string',
+            'permanent_ward_no' => 'required|string',
+            'admission_year' => 'required|digits:4',
+            'date_of_admission' => 'required|date',
+            'academic_program_duration' => 'required|string',
+            'previous_level_of_study' => 'required|string',
+            'previous_board_university_college' => 'required|string',
+            'previous_registration_no' => 'required|string',
+            'previous_institution_name' => 'required|string',
+            'section_id' => 'required|exists:sections,id',
+            'class_id' => 'required|exists:classes,id',
+            'program_id' => 'required|exists:programs,id',
+            
+            // Optional fields
+            'middle_name_np' => 'nullable|string|max:255',
+            'middle_name_en' => 'nullable|string|max:255',
+            'caste' => 'nullable|string|max:255',
+            'edj' => 'nullable|string|max:255',
+            'disability_status' => 'nullable|string|max:255',
+            'citizenship_id' => 'nullable|string|max:255',
+            'national_id' => 'nullable|string|max:255',
+            'permanent_tole' => 'nullable|string|max:255',
+            'permanent_house_no' => 'nullable|string|max:255',
+            'school_id' => 'nullable|exists:schools,id',
+            
+            // File uploads
+            'student_photo' => 'nullable|image|max:2048',
+            'citizenship_front' => 'nullable|image|max:2048',
+            'citizenship_back' => 'nullable|image|max:2048',
+            'previous_study_records_attachment' => 'nullable|file|max:2048',
+            
+            // Temporary address fields
+            'temporary_district' => 'nullable|string|max:255',
+            'temporary_province' => 'nullable|string|max:255',
+            'temporary_local_level' => 'nullable|string|max:255',
+            'temporary_ward_no' => 'nullable|string|max:255',
+            'temporary_tole' => 'nullable|string|max:255',
+            'temporary_house_no' => 'nullable|string|max:255',
+            
+            // Guardian information
+            'father_name' => 'nullable|string|max:255',
+            'father_contact_no' => 'nullable|string|max:15',
+            'father_occupation' => 'nullable|string|max:255',
+            'mother_name' => 'nullable|string|max:255',
+            'mother_contact_no' => 'nullable|string|max:15',
+            'mother_occupation' => 'nullable|string|max:255',
+        ]);
 
-                'admission_no' => 'nullable',
-                'roll_no' => 'nullable',
-                'admission_date' => 'nullable',
-                'reservation_quota_id' => 'nullable',
-                'class_id' => 'nullable',
-                'section_id' => 'nullable',
-                'school_house_id' => 'nullable',
-                'guardian_name' => 'nullable',
-                'guardian_relation' => 'nullable',
-                'guardian_phone' => 'nullable',
-                'guardian_email' => 'nullable'
-            ]);
-            // Validate user and student data
-            // $validatedUserData = $this->validateUserData($request);
-            // $validatedStudentData = $this->validateUserData($request, true);
-
-          // Retrieve the student by ID
-        $student = Student::findOrFail($id);
-
-        // Check if the user already exists for the student
-        if ($student->user) {
-            // Update existing user data
-            $userInput = $validatedData;
-
-            // Add conditional fields based on guardian_is value
-            if ($request->input('guardian_is') == 'other') {
-                $userInput['guardian_name'] = $request->input('guardian_name');
-                $userInput['guardian_relation'] = $request->input('guardian_relation');
-                $userInput['guardian_phone'] = $request->input('guardian_phone');
+        // Handle file uploads
+        if ($request->hasFile('student_photo')) {
+            // Delete old photo if exists
+            if ($student->student_photo) {
+                Storage::delete($student->student_photo);
             }
-
-            // Check if a new photo is selected
-            if ($request->has('inputCroppedPic') && !is_null($request->inputCroppedPic)) {
-                $userInput['image'] = $this->saveUserImage($request->input('inputCroppedPic'));
-            }
-
-            // Update the existing user
-            $student->user->update($userInput);
+            $validated['student_photo'] = $request->file('student_photo')->store('student-photos');
         }
 
-        // Update the student data
-        $student->update($validatedData);
+        if ($request->hasFile('citizenship_front')) {
+            if ($student->citizenship_front) {
+                Storage::delete($student->citizenship_front);
+            }
+            $validated['citizenship_front'] = $request->file('citizenship_front')->store('citizenship-documents');
+        }
 
-        // Manually assign additional fields if they are not in the validated data
-        $student->admission_no = $request->input('admission_no') ?? $student->admission_no;
-        $student->roll_no = $request->input('roll_no') ?? $student->roll_no;
-        $student->admission_date = $request->input('admission_date') ?? $student->admission_date;
-        $student->reservation_quota_id = $request->input('reservation_quota_id') ?? $student->reservation_quota_id;
-        $student->class_id = $request->input('class_id') ?? $student->class_id;
-        $student->section_id = $request->input('section_id') ?? $student->section_id;
-        $student->school_house_id = $request->input('school_house_id') ?? $student->school_house_id;
-        $student->guardian_name = $request->input('guardian_name') ?? $student->guardian_name;
-        $student->guardian_relation = $request->input('guardian_relation') ?? $student->guardian_relation;
-        $student->guardian_phone = $request->input('guardian_phone') ?? $student->guardian_phone;
-        $student->guardian_email = $request->input('guardian_email') ?? $student->guardian_email;
-        
-        $student->save(); // Save the changes
+        if ($request->hasFile('citizenship_back')) {
+            if ($student->citizenship_back) {
+                Storage::delete($student->citizenship_back);
+            }
+            $validated['citizenship_back'] = $request->file('citizenship_back')->store('citizenship-documents');
+        }
 
-        return redirect()->route('admin.students.index')->withToastSuccess('Student successfully updated');
-    } catch (\Exception $e) {
-        return back()->withToastError($e->getMessage())->withInput();
+        if ($request->hasFile('previous_study_records_attachment')) {
+            if ($student->previous_study_records_attachment) {
+                Storage::delete($student->previous_study_records_attachment);
+            }
+            $validated['previous_study_records_attachment'] = $request->file('previous_study_records_attachment')->store('study-records');
+        }
+
+        // Update the student record
+        $student->update($validated);
+
+        return redirect()->route('admin.students.index', $student)
+            ->with('success', 'Student information updated successfully');
     }
-    }
+
 
     public function destroy($id)
 {
@@ -633,17 +645,6 @@ public function getPrograms(Request $request)
 
         // Delete related records first to avoid foreign key constraint violation
 
-        // 1. Delete related student attendances (if any)
-        $studentSessions = $student->studentSessions()->pluck('id'); // Get all student sessions related to the student
-        StudentAttendance::whereIn('student_session_id', $studentSessions)->delete();
-
-        // 2. Delete the associated User (if needed)
-        $user = User::find($student->user_id);
-        if ($user) {
-            $user->delete();
-        }
-
-        // 3. Now delete the student record itself
         $student->delete();
 
         // Commit the transaction if all actions succeed
@@ -708,120 +709,6 @@ public function saveRollNumber(Request $request)
 
     return response()->json(['success' => 'Roll numbers saved successfully.']);
 }
-
-    
-
-
-
-public function getAllStudent(Request $request)
-{
-    if ($request->has('class_id') && $request->has('section_id')) {
-        $classId = $request->input('class_id');
-        $sectionId = $request->input('section_id');
-
-        $students = Student::with(['classes', 'user'])
-            ->where('class_id', $classId)
-            ->where('section_id', $sectionId)
-            ->get();
-
-        return Datatables::of($students)
-            ->escapeColumns([])
-            ->addColumn('checkbox', function($student) {
-                return '<input type="checkbox" class="student-checkbox" data-student-id="' . $student->id . '">';
-            })
-            ->editColumn('f_name', function ($row) {
-                return $row->user->f_name;
-            })
-            ->editColumn('l_name', function ($row) {
-                return $row->user->l_name;
-            })
-            ->editColumn('class', function ($row) {
-                return $row->classes->class;
-            })
-            ->editColumn('roll_no', function ($row) {
-                return $row->roll_no;
-            })
-            ->editColumn('father_name', function ($row) {
-                return $row->user->father_name;
-            })
-            ->editColumn('mother_name', function ($row) {
-                return $row->user->mother_name;
-            })
-            ->editColumn('guardian_is', function ($row) {
-                return $row->guardian_is;
-            })
-            ->addColumn('created_at', function ($row) {
-                return $row->created_at->diffForHumans();
-            })
-            ->addColumn('status', function ($row) {
-                return $row->user->is_active == 1 ? '<span class="btn-sm btn-success">Active</span>' : '<span class="btn-sm btn-danger">Inactive</span>';
-            })
-            ->addColumn('actions', function ($row) {
-                return view('backend.school_admin.student.partials.controller_action', ['student' => $row])->render();
-            })
-            ->make(true);
-    }
-
-    return Datatables::of([])->escapeColumns([])->make(true);
-}
-
-    
-
-    // public function getAllStudent(Request $request)
-    // {
-    //     if ($request->has('class_id') && $request->has('section_id')) {
-    //         $classId = $request->input('class_id');
-    //         $sectionId = $request->input('section_id');
-
-    //         // Pass only necessary parameters to getStudentsForDataTable
-    //         $students = $this->studentUserService->getStudentsForDataTable($request)
-    //             ->where('class_id', $classId)
-    //             ->where('section_id', $sectionId);
-    //         // ->get();
-
-    //         // You don't need to check if $students is an instance of \Illuminate\Database\Query\Builder
-    //         // because it's not possible for it to be anything else at this point.
-
-    //         // You can remove the dd($students) line if you don't need it for debugging purposes.
-
-    //         // Return the data using DataTables
-    //         return Datatables::of($students)
-    //             ->escapeColumns([])
-    //             ->editColumn('f_name', function ($row) {
-    //                 return $row->f_name;
-    //             })
-    //             ->editColumn('l_name', function ($row) {
-    //                 return $row->l_name;
-    //             })
-    //             ->editColumn('roll_no', function ($row) {
-    //                 return $row->roll_no;
-    //             })
-    //             ->editColumn('father_name', function ($row) {
-    //                 return $row->father_name;
-    //             })
-    //             ->editColumn('mother_name', function ($row) {
-    //                 return $row->mother_name;
-    //             })
-    //             ->editColumn('guardian_is', function ($row) {
-    //                 return $row->guardian_is;
-    //             })
-    //             ->addColumn('created_at', function ($user) {
-    //                 return $user->created_at->diffForHumans();
-    //             })
-    //             ->addColumn('status', function ($student) {
-    //                 return $student->is_active == 1 ? '<span class="btn-sm btn-success">Active</span>' : '<span class="btn-sm btn-danger">Inactive</span>';
-    //             })
-    //             ->addColumn('actions', function ($student) {
-    //                 return view(
-    //                     'backend.school_admin.student.partials.controller_action',
-    //                     ['student' => $student]
-    //                 )->render();
-    //             })
-    //             ->make(true);
-    //     }
-    // }
-
-
 
     public function importAllStudentIndex()
     {
