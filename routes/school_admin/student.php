@@ -12,8 +12,8 @@ Route::get('get-programs-by-class/{classId}', 'StudentController@getProgramsByCl
 Route::post('students/{student_id}/additional-information', [StudentController::class, 'updateAdditionalInformation'])->name('students.additionalInformation.update');
 
 
-Route::get('admin/get-faculties/{classId}', [StudentController::class, 'getFaculties']);
-Route::get('admin/get-programs/{sectionId}', [StudentController::class, 'getPrograms']);;
+Route::get('admin/get-faculties/{classId}', [StudentController::class, 'getFaculties'])->name('student.get-faculties');
+Route::get('admin/get-programs/{sectionId}', [StudentController::class, 'getPrograms'])->name('student.get-programs');
 
 Route::get('/get-district-by-state/{state_id}', [StudentController::class, 'getDistrict'])->name('get-districts');
 Route::get('student/import/index', [StudentController::class, 'importAllStudentIndex'])->name('students.import');

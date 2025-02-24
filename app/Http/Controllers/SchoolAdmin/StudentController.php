@@ -33,6 +33,7 @@ use App\Models\State;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Imports\StudentsImport;
 
 use App\Exports\StudentsExport;
 
@@ -729,212 +730,82 @@ public function saveRollNumber(Request $request)
     return response()->json(['success' => 'Roll numbers saved successfully.']);
 }
 
-    public function importAllStudentIndex()
-    {
-        $page_title = "Import Student";
-        $schoolId = session('school_id');
-        $classes = Classg::where('school_id', $schoolId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+public function importAllStudentIndex()
+{
+    $page_title = "Import Students";
+    $schoolId = session('school_id');
+    $classes = Classg::where('school_id', $schoolId)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-        return view('backend.school_admin.student.importindex', compact('page_title', 'classes'));
-    }
+    return view('backend.school_admin.student.importindex', compact('page_title', 'classes'));
+}
 
-    public function downloadSampleFile()
-    {
-        $filePath = public_path('sample-files/sample.csv');
+public function import(Request $request)
+{
+    try {
+        $request->validate([
+            'file' => 'required|file|max:2048|mimes:csv,xlsx,xls', 
+            'class_id' => 'required|exists:classes,id',
+            'section_id' => 'required|exists:sections,id',
+            'program_id' => 'required|exists:programs,id',
+        ]);
 
-        // Check if the file exists
-        if (file_exists($filePath)) {
-            return response()->download($filePath, 'sample.csv');
-        } else {
-            abort(404, 'Sample file not found');
-        }
-    }
+        DB::beginTransaction();
 
-    public function import(Request $request)
-    {
-        try {
-            // Begin a database transaction
-            DB::beginTransaction();
-            $array1 = Excel::toCollection(new CombinedImport, $request->file('file'));
-            // Access the outer collection
-            foreach ($array1 as $outerCollection) {
-                // Iterate through the inner collections
-                foreach ($outerCollection as $row) {
+        $import = new StudentsImport(
+            $request->class_id,
+            $request->section_id,
+            $request->program_id
+        );
 
-
-
-                    $email = strtolower($row['f_name'] . '.' . $row['l_name'] . '.' . $row['admission_no'] . '@gmail.com');
-
-
-                    // Check if the generated email already exists
-                    $count = User::where('email', $email)->count();
-                    if ($count > 0) {
-                        // If the email already exists, append a number to make it unique
-                        $email = strtolower($row['f_name'] . '.' . $row['l_name'] . '.' . $row['admission_no'] . $count . '@gmail.com');
-                    }
-
-
-                    $validator = Validator::make($row->toArray(), [
-
-                        'state_id' => 'required',
-                        'district_id' => 'required',
-                        'municipality_id' => 'required',
-                        'ward_id' => 'required',
-                        'local_address' => 'nullable',
-                        'permanent_address' => 'nullable',
-                        'f_name' => 'required',
-                        'l_name' => 'required',
-
-                        'religion' => 'nullable',
-                        'mobile_number' => 'nullable',
-                        'gender' => 'required',
-                        'dob' => 'required',
-                        'blood_group' => 'nullable',
-                        // 'image' => 'required',
-                        'father_name' => 'nullable',
-                        'father_phone' => 'nullable',
-                        'father_occupation' => 'nullable',
-                        'mother_name' => 'nullable',
-                        'mother_phone' => 'nullable',
-                        'mother_occupation' => 'nullable',
-                        'emergency_contact_person' => 'nullable',
-                        'emergency_contact_phone' => 'nullable',
-                        'username' => 'nullable',
-                        // 'password' => 'required',
-                        'is_active' => 'boolean',
-                        'guardian_is' => 'nullable',
-                        'guardian_name' => 'nullable',
-                        'guardian_phone' => 'nullable',
-                        'guardian_relation' => 'nullable',
-                        'guardian_email' => 'nullable',
-
-
-                    ]);
-
-                    if ($validator->fails()) {
-                        // Redirect back with validation errors
-                        return redirect()->back()->withErrors($validator)->withInput();
-                    }
-                    // Validate user data
-                    // $this->validateUserData($request);
-                    $password = strtok($email, '@');
-                    $username = strtok($email, '@');
-
-
-                    $user_type_id = 8;
-                    $role_id = 11;
-                    $school_id = session('school_id');
-                    $state_id = $row['state_id'];
-                    $district_id = $row['district_id'];
-                    $municipality_id = $row['municipality_id'];
-                    $ward_id = $row['ward_id'];
-                    $f_name = $row['f_name'];
-                    $m_name = $row['m_name'];
-                    $l_name = $row['l_name'];
-                    // $email = 'email';
-                    // 'email' => $email;
-                    $local_address = $row['local_address'];
-                    $permanent_address = $row['permanent_address'];
-                    $gender = $row['gender'];
-                    $religion = $row['religion'];
-                    // $mobile_number = $row['mobile_number'];
-                    $dob = $row['dob'];
-                    $blood_group = $row['blood_group'];
-                    $father_name = $row['father_name'];
-                    $father_phone = $row['father_phone'];
-                    $father_occupation = $row['father_occupation'];
-                    $mother_name = $row['mother_name'];
-                    $mother_phone = $row['mother_phone'];
-                    $mother_occupation = $row['mother_occupation'];
-                    $emergency_contact_person = $row['emergency_contact_person'];
-                    $emergency_contact_phone = $row['emergency_contact_phone'];
-
-
-                    $studentUser = User::create([
-                        'user_type_id' => $user_type_id,
-                        'role_id' => $role_id,
-                        'school_id' => $school_id,
-                        'state_id' => $state_id,
-                        'district_id' => $district_id,
-                        'municipality_id' => $municipality_id,
-                        'ward_id' => $ward_id,
-                        'f_name' => $f_name,
-                        'm_name' => $m_name,
-                        'l_name' => $l_name,
-                        'email' => $email,
-                        'local_address' => $local_address,
-                        'permanent_address' => $permanent_address,
-                        'password' => bcrypt($password),
-                        'username' => $username,
-                        'gender' => $gender,
-                        'religion' => $religion,
-                        'dob' => $dob,
-                        'blood_group' => $blood_group,
-                        'father_name' => $father_name,
-                        'father_phone' => $father_phone,
-                        'father_occupation' => $father_occupation,
-                        'mother_name' => $mother_name,
-                        'mother_phone' => $mother_phone,
-                        'mother_occupation' => $mother_occupation,
-                        'emergency_contact_person' => $emergency_contact_person,
-                        'emergency_contact_phone' => $emergency_contact_phone,
-
-                    ]);
-
-                    $classId = $request->input('selected_class_id');
-                    $sectionId = $request->input('selected_section_id');
-
-                    // dd($sectionId);
-
-                  // Use the method to create a student session
-                  $this->createStudentSession($studentUser->id, $classId, $sectionId);
-
-             
-                    // CREATE STUDENT
-                    // $reservation_quota_id = 1;
-                    $admission_no = $row['admission_no'];
-                    $roll_no = $row['roll_no'];
-                    $admission_date = $row['admission_date'];
-                    $school_house_id = $row['school_house_id'];
-                    // $student_photo = $row['student_photo'];
-                    $guardian_is = $row['guardian_is'];
-                    $guardian_name = $row['guardian_name'];
-                    $guardian_phone = $row['guardian_phone'];
-                    $guardian_relation = $row['guardian_relation'];
-                    $guardian_email = $row['guardian_email'];
-                    // $transfer_certificate = $row['transfer_certificate'];
-
-                    $studentCreate = Student::create([
-                        'user_id' => $studentUser->id,
-                        'school_id' => session('school_id'),
-                        'class_id' => $classId,
-                        'section_id' => $sectionId,
-                        // 'reservation_quota_id' => $reservation_quota_id,
-                        'admission_no' => $admission_no,
-                        'roll_no' => $roll_no,
-                        'admission_date' => $admission_date,
-                        'school_house_id' => $school_house_id,
-                        // 'student_photo' => $student_photo,
-                        'guardian_is' => $guardian_is,
-                        'guardian_name' => $guardian_name,
-                        'guardian_phone' => $guardian_phone,
-                        'guardian_relation' => $guardian_relation,
-                        'guardian_email' => $guardian_email,
-                        // 'transfer_certificate' => $transfer_certificate,
-                    ]);
-                }
+        // Import the file
+        Excel::import($import, $request->file('file'));
+        
+        // Check for failures
+        if (count($import->failures()) > 0) {
+            $errors = [];
+            foreach ($import->failures() as $failure) {
+                $row = $failure->row();
+                $errors[] = "Row {$row}: " . implode(', ', $failure->errors());
             }
-            DB::commit();
-            return back()->with('success', 'Data has been uploaded');
-        } catch (\Exception $e) {
-            DB::rollback();
-            return redirect()->back()->with('error', $e->getMessage());
+            
+            // If we had partial success, commit those records
+            if ($import->getRowCount() > count($import->failures())) {
+                DB::commit();
+                $successCount = $import->getRowCount() - count($import->failures());
+                return back()->with('warning', "Partially successful import. {$successCount} records imported, " . count($import->failures()) . ' records failed.')
+                            ->with('import_errors', $errors);
+            } else {
+                DB::rollback();
+                return back()->with('error', 'Import failed. No records were imported.')
+                            ->with('import_errors', $errors);
+            }
         }
+        
+        DB::commit();
+        return back()->with('success', 'All students imported successfully');
+    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        DB::rollback();
+        
+        $failures = $e->failures();
+        $errors = [];
+        foreach ($failures as $failure) {
+            $row = $failure->row();
+            $errors[] = "Row {$row}: " . implode(', ', $failure->errors());
+        }
+        
+        return back()->with('error', 'Validation failed during import.')
+                    ->with('import_errors', $errors);
+    } catch (\Exception $e) {
+        DB::rollback();
+        Log::error('Student Import Error: ' . $e->getMessage());
+        Log::error('Exception class: ' . get_class($e));
+        Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return back()->with('error', 'Error importing students: ' . $e->getMessage());
     }
-
-
+}
     public function exportSelected(Request $request)
     {
         $classId = $request->input('class_id');
