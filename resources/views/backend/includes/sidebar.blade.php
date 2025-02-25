@@ -34,7 +34,7 @@
                 @include('backend.includes.sidebar.school_management')
                 @include('backend.includes.sidebar.attendance_management')
                 @include('backend.includes.sidebar.examination_management')
-                @include('backend.includes.sidebar.primaryclass_settings')
+                {{-- @include('backend.includes.sidebar.primaryclass_settings') --}}
 
                 @include('backend.includes.sidebar.account_management')
                 @include('backend.includes.sidebar.certificate_management')

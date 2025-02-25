@@ -12,7 +12,7 @@
         <a class="nav-link dropdown-indicator" href="#dashboard5" role="button" data-bs-toggle="collapse" aria-expanded="true"
             aria-controls="dashboard">
             <div class="d-flex align-items-center"><span class="nav-link-icon"><i
-                        class="fas fa-credit-card"></i></span><span class="nav-link-text ps-1">{{ __('Examination (4-8)') }}
+                        class="fas fa-credit-card"></i></span><span class="nav-link-text ps-1">{{ __('Examination') }}
                 </span></div>
         </a>
         <ul class="nav collapse  {{ Request::segment(2) == 'marks_grades' || Request::segment(2) == 'marks_division' || Request::segment(2) == 'admit_card_design' || Request::segment(2) == 'mark_sheet_design' || Request::segment(2) == 'examinations' || Request::segment(2) == 'exam_schedules' || Request::segment(2) == 'exam_student' || Request::segment(2) == 'admit_card_designsprint' || Request::segment(2) == 'mark-sheetdesigns' || Request::segment(2) == 'generate-marksheets' || Request::segment(2) == 'exam-results' || Request::segment(2) == 'generate-results-marksheetdesigns' ? 'show' : '' }}"

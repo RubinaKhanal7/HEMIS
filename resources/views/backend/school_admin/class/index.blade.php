@@ -22,8 +22,8 @@
                                             <tr>
                                                 <th>Id</th>
                                                 {{-- <th>School ID</th> --}}
-                                                <th>Class</th>
-                                                <th>Section</th>
+                                                <th>Academic Level</th>
+                                                <th>Faculty</th>
                                                 <th>Status</th>
                                                 <th>Created At</th>
                                                 <th>Action</th>
@@ -43,7 +43,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Add Class</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Academic Level</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="">
@@ -70,7 +70,7 @@
                                     </div>
                                 </div>
                                 <div class="p-2 label-input">
-                                    <label>Available Sections<span class="must"> *</span></label>
+                                    <label>Available Faculties<span class="must"> *</span></label>
                                     <div class="checkbox-container">
                                         @foreach ($sectionmgt as $section)
                                             <label class="l-checkbox">

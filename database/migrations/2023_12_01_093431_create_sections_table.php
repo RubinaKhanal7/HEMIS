@@ -17,7 +17,7 @@ return new class extends Migration
             // $table->foreign('school_id')->references('id')->on('schools');
 
             $table->string('section_name')->unique();
-            $table->boolean('is_active')->default(0)->comment('0=>no, 1=>yes');
+            $table->boolean('is_active')->default(1)->comment('0=>no, 1=>yes');
             $table->timestamps();
         });
     }

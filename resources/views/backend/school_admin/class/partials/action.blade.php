@@ -11,7 +11,7 @@
         <a href="#">
             <button type="button" class="btn btn-block btn-success btn-sm" data-bs-toggle="modal"
                 data-bs-target="#createClass">
-                Add Class <i class="fas fa-plus"></i>
+                Add <i class="fas fa-plus"></i>
             </button>
         </a>
     @endcan

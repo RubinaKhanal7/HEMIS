@@ -9,7 +9,7 @@
         <a href="#">
             <button type="button" class="btn btn-block btn-success btn-sm" data-bs-toggle="modal"
                 data-bs-target="#createSection">
-                Add Section <i class="fas fa-plus"></i>
+                Add <i class="fas fa-plus"></i>
             </button>
         </a>
     @endcan

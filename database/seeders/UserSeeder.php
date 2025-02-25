@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
         $districtAdminUserType = UserType::where('title', 'district')->first();
         $municipalityAdminUserType = UserType::where('title', 'municipality')->first();
         $headSchoolAdminUserType = UserType::where('title', 'head_school')->first();
-        $schoolAdminUserType = UserType::where('title', 'school_admin')->first();
+        $schoolAdminUserType = UserType::where('title', 'college_admin')->first();
 
         // CREATING SUPER ADMIN USER
         $superAdminUser = User::create([
@@ -77,7 +77,7 @@ class UserSeeder extends Seeder
 
         $schoolAdminUser = User::create([
             'username' => "schooladmin",
-            'email' => 'schooladmin@mail.com',
+            'email' => 'collegeadmin@mail.com',
             'password' => 'password',
             'user_type_id' => $schoolAdminUserType->id,
             'role_id' => 5,
