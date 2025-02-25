@@ -39,9 +39,9 @@
 
             @can('list_admit_carddesigns')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'admit-carddesigns' ? 'active' : '' }}"
-                        href="{{ route('admin.admit-carddesigns.index') }}">
+                        href="{{ route('admin.id-carddesigns.index') }}">
                         <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>
-                            {{ __('Admit Card Design') }}
+                            {{ __('Id Card Design') }}
 
                         </div>
                     </a>
