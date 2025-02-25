@@ -7,8 +7,10 @@ use Image, View;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Classg;
+use App\Models\Program;
 use App\Models\Section;
 use App\Models\Student;
+use App\Models\School;
 use App\Models\SchoolUser;
 use App\Models\SchoolHouse;
 use Illuminate\Http\Request;
@@ -26,7 +28,12 @@ use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Services\StudentUserService;
 use App\Models\Municipality;
+use App\Models\District;
+use App\Models\State;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use App\Imports\StudentsImport;
 
 use App\Exports\StudentsExport;
 
@@ -44,6 +51,15 @@ class StudentController extends Controller
         $this->studentUserService = $studentUserService;
     }
 
+    public function loadFormData(Request $request) 
+{
+    $classes = Classg::select('id', 'class')
+                     ->where('is_active', 1)
+                     ->get();
+    return view('backend.school_admin.student.index', compact('classes'));
+}
+
+
     public function getDistrict($province_id)
     {
 
@@ -51,40 +67,104 @@ class StudentController extends Controller
         return response()->json($districts);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $page_title = 'Student List';
-        $schoolId = session('school_id');
-        $classes = Classg::where('school_id', $schoolId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-         // Retrieve only students whose associated users are active
-         $students = Student::whereHas('user', function ($query) {
-            $query->where('is_active', 1); // Ensure '1' matches the active status
-        })->where('school_id', $schoolId)->latest()->get();
-
-        return view('backend.school_admin.student.index', compact('students', 'page_title', 'classes'));
+        $classes = Classg::where('school_id', session('school_id'))->get();
+        
+        // Get the search parameters from the URL
+        $selectedClass = $request->query('class_id');
+        $selectedSection = $request->query('section_id');
+        $selectedProgram = $request->query('program_id');
+        $shouldSearch = $request->query('search');
+        
+        return view('backend.school_admin.student.index', compact(
+            'page_title', 
+            'classes',
+            'selectedClass',
+            'selectedSection',
+            'selectedProgram',
+            'shouldSearch'
+        ));
+    }
+    public function getData(Request $request)
+    {
+        try {
+            $query = Student::with(['class', 'section', 'program'])
+                ->when(session('school_id'), function($q) {
+                    return $q->where('school_id', session('school_id'));
+                })
+                ->when($request->filled('class_id'), function($q) use ($request) {
+                    return $q->where('class_id', $request->class_id);
+                })
+                ->when($request->filled('section_id'), function($q) use ($request) {
+                    return $q->where('section_id', $request->section_id);
+                })
+                ->when($request->filled('program_id'), function($q) use ($request) {
+                    return $q->where('program_id', $request->program_id);
+                });
+    
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('checkbox', function($row) {
+                    return '<input type="checkbox" class="student-checkbox" data-student-id="'.$row->id.'">';
+                })
+                ->addColumn('action', function($row) {
+                    return view('backend.school_admin.student.partials.controller_action', compact('row'))->render();
+                })
+                ->rawColumns(['checkbox', 'action'])
+                ->make(true);
+        } catch (\Exception $e) {
+            Log::error('Student DataTable Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching student data'], 500);
+        }
     }
 
+public function getProgramsByClass($classId)
+{
+    $programs = Program::where('class_id', $classId)->pluck('title', 'id');
+    return response()->json($programs);
+}
+
+
+// Add these new methods for dependent dropdowns
+public function getFaculties($classId)
+{
+    $sections = Section::where('class_id', $classId)
+        ->orderBy('section_name')
+        ->get();
+    
+    return response()->json($sections);
+}
+
+public function getPrograms($sectionId)
+{
+    $programs = Program::where('section_id', $sectionId)
+        ->orderBy('title')
+        ->get();
+    
+    return response()->json($programs);
+}
     public function create()
     {
         $page_title = 'Create Student';
         $states = $this->formService->getProvinces();
         $schoolId = session('school_id');
+        
         $classes = Classg::where('school_id', $schoolId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        ->orderBy('created_at', 'desc')
+        ->get();
+        
+    
         $school_houses = SchoolHouse::all();
         $bloodGroups = BloodGroupType::pluck('type', 'id');
-        // $bloodGroups = BloodGroupType::all();
-        // dd($bloodGroups);
-
+        
         $adminStateId = Auth::user()->state_id;
         $adminDistrictId = Auth::user()->district_id;
         $adminMunicipalityId = Auth::user()->municipality_id;
         $adminSchoolId = Auth::user()->school_id;
 
+    
         return view(
             'backend.school_admin.student.create',
             compact(
@@ -96,10 +176,12 @@ class StudentController extends Controller
                 'adminDistrictId',
                 'adminMunicipalityId',
                 'adminSchoolId',
-                'bloodGroups'
+                'bloodGroups',
             )
         );
     }
+    
+    
 
     public function additionalInformationStudents($student_id, Request $request)
     {
@@ -135,19 +217,6 @@ class StudentController extends Controller
         } catch (\Exception $e) {
             return back()->withToastError($e->getMessage())->withInput();
         }
-    }
-
-
-
-
-
-
-
-    // RETRIVING SECTIONS OF THE RESPECTIVE CLASS
-    public function getSections($classId)
-    {
-        $sections = Classg::find($classId)->sections()->pluck('sections.section_name', 'sections.id');
-        return response()->json($sections);
     }
 
     // CREATE STUDENT
@@ -282,233 +351,274 @@ class StudentController extends Controller
             ]);
         }
     }
-
+    
     public function store(Request $request)
     {
-        try {
-            DB::beginTransaction();
+        $request->validate([
+            // Personal Information
+            'first_name_np' => 'required|string',
+            'last_name_np' => 'required|string',
+            'first_name_en' => 'required|string',
+            'last_name_en' => 'required|string',
+            'mobile_number' => 'required|string',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|in:Male,Female',
+            'ethnicity' => 'required|string',
+            'student_photo' => 'nullable|image|mimes:jpeg,png,jpg,wepb',
+            'citizenship_front' => 'nullable|image|mimes:jpeg,png,jpg,wepb',
+            'citizenship_back' => 'nullable|image|mimes:jpeg,png,jpg,wepb',
     
-            // CREATING USER WITH ITS RESPECTIVE VALIDATION FUNCTION
-            $userInput = $this->validateUserData($request, true);
+            // Address Information
+            'permanent_province' => 'required|string',
+            'permanent_district' => 'required|string',
+            'permanent_local_level' => 'required|string',
+            'permanent_ward_no' => 'required|string',
     
-            // Generate username based on first letter of f_name, first letter of l_name, and admission number
-            $admissionNumber = $request->input('admission_no') ?? '';
-            $username = strtolower(substr($userInput['f_name'], 0, 1) . substr($userInput['l_name'], 0, 1) . '-' . $admissionNumber);
-            $userInput['username'] = $username;
+            // Academic Information
+            'class_id' => 'required|exists:classes,id',
+            'section_id' => 'required|exists:sections,id',
+            'program_id' => 'required|exists:programs,id',
+            'admission_year' => 'required|digits:4',
+            'date_of_admission' => 'required|date',
+            'academic_program_duration' => 'required|string',
     
-            // Generate email dynamically if not provided
-            if (!$request->filled('email')) {
-                $email = strtolower($userInput['f_name'] . '.' . $userInput['l_name'] . '.' . $admissionNumber . '@gmail.com');
-                $count = User::where('email', $email)->count();
-                if ($count > 0) {
-                    // If the email already exists, append a number to make it unique
-                    $email = strtolower($userInput['f_name'] . '.' . $userInput['l_name'] . '.' . $admissionNumber . $count . '@gmail.com');
-                }
-                $userInput['email'] = $email;
-            } else {
-                $userInput['email'] = $request->input('email');
-            }
+            // Previous Academic Information
+            'previous_level_of_study' => 'required|string',
+            'previous_board_university_college' => 'required|string',
+            'previous_registration_no' => 'required|string',
+            'previous_institution_name' => 'required|string',
+            'previous_study_records_attachment' => 'nullable|file',
+        ]);
     
-            if ($request->has('inputCroppedPic') && !is_null($request->inputCroppedPic)) {
-                $userInput['image'] = $this->saveUserImage($request->input('inputCroppedPic'));
-            }
-    
-            // STUDENT USER CREATED AND ASSIGNED
-            $studentUser = $this->createUser($userInput);
-            $studentUser->assignRole(11);
-    
-            // Create student_sessions record
-            $this->createStudentSession($studentUser->id, $request->input('class_id'), $request->input('section_id'));
-    
-            // CREATING STUDENT WITH ITS RESPECTIVE VALIDATION
-            $studentInput = $userInput;
-            $studentInput['user_id'] = $studentUser->id;
-            $studentInput['school_id'] = session('school_id');
-            $studentInput['reservation_quota_id'] = $request->input('reservation_quota_id') ?? "";
-            $studentInput['class_id'] = $request->input('class_id') ?? "";
-            $studentInput['section_id'] = $request->input('section_id') ?? "";
-            $studentInput['admission_no'] = $request->input('admission_no') ?? "";
-            $studentInput['admission_date'] = $request->input('admission_date') ?? "";
-            $studentInput['roll_no'] = $request->input('roll_no') ?? "";
-            $studentInput['school_house_id'] = $request->input('school_house_id');
-            $studentInput['student_photo'] = $studentUser->image;
-            $studentInput['guardian_name'] = $request->input('guardian_name') ?? "";
-            $studentInput['guardian_relation'] = $request->input('guardian_relation') ?? "";
-            $studentInput['guardian_phone'] = $request->input('guardian_phone') ?? "";
-            $studentInput['guardian_email'] = $request->input('guardian_email') ?? "";
-    
-            // Add transfer_certificate if a file is present
-            $transferCertificatePath = $this->saveTransferCertificate($request);
-            if (!is_null($transferCertificatePath)) {
-                $studentInput['transfer_certificate'] = $transferCertificatePath;
-            }
-    
-            $this->saveStudent($studentInput);
-    
-            // Create entry in the SchoolUser pivot table
-            $this->createSchoolUserEntry($studentInput['school_id'], $studentUser->id);
-    
-            DB::commit();
-    
-            return redirect()->route('admin.students.index')->withToastSuccess('Student successfully created');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withToastError($e->getMessage())->withInput();
-        }
+        
+    $photoPath = null;
+    $citizenshipFrontPath = null;
+    $citizenshipBackPath = null;
+    $recordsPath = null;
+
+    if ($request->hasFile('student_photo')) {
+        $photoPath = $this->uploadFile($request->file('student_photo'), 'students');
+    }
+
+    if ($request->hasFile('citizenship_front')) {
+        $citizenshipFrontPath = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
+    }
+
+    if ($request->hasFile('citizenship_back')) {
+        $citizenshipBackPath = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
+    }
+
+    if ($request->hasFile('previous_study_records_attachment')) {
+        $recordsPath = $this->uploadFile($request->file('previous_study_records_attachment'), 'previous_records');
     }
     
+        $student = Student::create([
+            // Personal Information
+            'first_name_np' => $request->first_name_np,
+            'middle_name_np' => $request->middle_name_np,
+            'last_name_np' => $request->last_name_np,
+            'first_name_en' => $request->first_name_en,
+            'middle_name_en' => $request->middle_name_en,
+            'last_name_en' => $request->last_name_en,
+            'mobile_number' => $request->mobile_number,
+            'date_of_birth' => $request->date_of_birth,
+            'gender' => $request->gender,
+            'caste' => $request->caste,
+            'ethnicity' => $request->ethnicity,
+            'edj' => $request->edj,
+            'disability_status' => $request->disability_status,
+            'citizenship_id' => $request->citizenship_id,
+            'national_id' => $request->national_id,
+            'student_photo' => $photoPath,
+            'citizenship_front' => $citizenshipFrontPath,
+            'citizenship_back' => $citizenshipBackPath,
+        
+    
+            // Address Information
+            'permanent_province' => $request->permanent_province,
+            'permanent_district' => $request->permanent_district,
+            'permanent_local_level' => $request->permanent_local_level,
+            'permanent_ward_no' => $request->permanent_ward_no,
+            'permanent_tole' => $request->tole,
+            'permanent_house_no' => $request->house_number,
+            
+            'temporary_province' => $request->temp_state_id,
+            'temporary_district' => $request->temp_district_id,
+            'temporary_local_level' => $request->temp_municipality_id,
+            'temporary_ward_no' => $request->temp_ward_id,
+            'temporary_tole' => $request->temp_tole,
+            'temporary_house_no' => $request->temp_house_number,
+    
+            // Guardian Information
+            'father_name' => $request->father_name,
+            'father_contact_no' => $request->father_contact_no,
+            'father_occupation' => $request->father_occupation,
+            'mother_name' => $request->mother_name,
+            'mother_contact_no' => $request->mother_contact_no,
+            'mother_occupation' => $request->mother_occupation,
+    
+            // Academic Information
+            'class_id' => $request->class_id,
+            'section_id' => $request->section_id,
+            'program_id' => $request->program_id,
+            'admission_year' => $request->admission_year,
+            'date_of_admission' => $request->date_of_admission,
+            'academic_program_duration' => $request->academic_program_duration,
+    
+            // Previous Academic Information
+            'previous_level_of_study' => $request->previous_level_of_study,
+            'previous_board_university_college' => $request->previous_board_university_college,
+            'previous_registration_no' => $request->previous_registration_no,
+            'previous_institution_name' => $request->previous_institution_name,
+            'previous_study_records_attachment' => $recordsPath,
+    
+            // Additional fields
+            'school_id' => auth()->user()->school_id,
+            'user_id' => auth()->id(),
+        ]);
+    
+        return redirect()->route('admin.students.index')
+            ->with('success', 'Student registered successfully');
+    }  
 
     public function show(Request $request)
     {
     }
 
-    public function edit(string $id)
-{
-    try {
-        $student = Student::findOrFail($id);
-        $page_title = "Edit Student";
-
-        // Fetching necessary data for the form
-        $states = $this->formService->getProvinces();
-        $schoolId = session('school_id');
-
-        // Fetching classes for the school
-        $classes = Classg::where('school_id', $schoolId) 
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Fetching school houses
-        $school_houses = SchoolHouse::all();
-
-        // Fetching blood groups
-        $bloodGroups = BloodGroupType::pluck('type', 'id');
-
-        // Fetching sections for the first class
-        $firstClassId = $classes->first()->id ?? null;
-        $sections = $firstClassId ? $this->getSections($firstClassId)->original : [];
-
-        // Fetching districts for selected state
-        $districts = $student->user->district_bystate($student->user->state_id);
-
-        // Fetching municipalities for selected district
-        $municipalities = $student->user->municipalities_bydistrict($student->user->district_id);
-
-        // Fetching wards by municipality
-        $wards = User::getWards($student->user->municipality_id);
+    public function edit(Student $student)
+    {
+        // Load necessary relationships and data for dropdowns
+        $page_title = 'Edit Student Data';
+        $schools = School::all();
+        $sections = Section::all();
+        $classes = Classg::all();
+        $programs = Program::all();
+        $municipalities = Municipality::all();
+        $districts = District::all();
+        $states = State::all();
+        $wards = User::getWards($student->municipality_id);
+        $adminStateId = Auth::user()->state_id;
+        $adminDistrictId = Auth::user()->district_id;
+        $adminMunicipalityId = Auth::user()->municipality_id;
+        $adminSchoolId = Auth::user()->school_id;
         
-
-
-        return view('backend.school_admin.student.update', compact('student', 'page_title', 'states', 'classes', 'school_houses', 'sections', 'districts', 'municipalities', 'wards', 'bloodGroups'));
-    } catch (\Exception $e) {
-        return back()->withToastError($e->getMessage());
+        return view('backend.school_admin.student.update', compact('page_title','student', 'schools', 'sections', 'classes', 'programs',
+    'adminStateId','adminDistrictId','adminMunicipalityId','adminSchoolId','municipalities','districts','states','wards'
+    ));
     }
+
+    public function update(Request $request, Student $student)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'first_name_np' => 'required|string|max:255',
+            'last_name_np' => 'required|string|max:255',
+            'first_name_en' => 'required|string|max:255',
+            'last_name_en' => 'required|string|max:255',
+            'mobile_number' => 'required|string|max:15',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|string',
+            'ethnicity' => 'required|string',
+            'permanent_district' => 'required|string',
+            'permanent_province' => 'required|string',
+            'permanent_local_level' => 'required|string',
+            'permanent_ward_no' => 'required|string',
+            'admission_year' => 'required|digits:4',
+            'date_of_admission' => 'required|date',
+            'academic_program_duration' => 'required|string',
+            'previous_level_of_study' => 'required|string',
+            'previous_board_university_college' => 'required|string',
+            'previous_registration_no' => 'required|string',
+            'previous_institution_name' => 'required|string',
+            'section_id' => 'required|exists:sections,id',
+            'class_id' => 'required|exists:classes,id',
+            'program_id' => 'required|exists:programs,id',
+            
+            // Optional fields
+            'middle_name_np' => 'nullable|string|max:255',
+            'middle_name_en' => 'nullable|string|max:255',
+            'caste' => 'nullable|string|max:255',
+            'edj' => 'nullable|string|max:255',
+            'disability_status' => 'nullable|string|max:255',
+            'citizenship_id' => 'nullable|string|max:255',
+            'national_id' => 'nullable|string|max:255',
+            'permanent_tole' => 'nullable|string|max:255',
+            'permanent_house_no' => 'nullable|string|max:255',
+            'school_id' => 'nullable|exists:schools,id',
+            
+            // File uploads
+            'student_photo' => 'nullable|image|max:2048',
+            'citizenship_front' => 'nullable|image|max:2048',
+            'citizenship_back' => 'nullable|image|max:2048',
+            'previous_study_records_attachment' => 'nullable|file|max:2048',
+            
+            // Temporary address fields
+            'temporary_district' => 'nullable|string|max:255',
+            'temporary_province' => 'nullable|string|max:255',
+            'temporary_local_level' => 'nullable|string|max:255',
+            'temporary_ward_no' => 'nullable|string|max:255',
+            'temporary_tole' => 'nullable|string|max:255',
+            'temporary_house_no' => 'nullable|string|max:255',
+            
+            // Guardian information
+            'father_name' => 'nullable|string|max:255',
+            'father_contact_no' => 'nullable|string|max:15',
+            'father_occupation' => 'nullable|string|max:255',
+            'mother_name' => 'nullable|string|max:255',
+            'mother_contact_no' => 'nullable|string|max:15',
+            'mother_occupation' => 'nullable|string|max:255',
+        ]);
+
+        if ($request->hasFile('student_photo')) {
+            // Delete old photo if exists
+            $this->deleteOldFile($student->student_photo, 'students');
+            $validated['student_photo'] = $this->uploadFile($request->file('student_photo'), 'students');
+        }
+    
+        if ($request->hasFile('citizenship_front')) {
+            $this->deleteOldFile($student->citizenship_front, 'citizenship_docs');
+            $validated['citizenship_front'] = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
+        }
+    
+        if ($request->hasFile('citizenship_back')) {
+            $this->deleteOldFile($student->citizenship_back, 'citizenship_docs');
+            $validated['citizenship_back'] = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
+        }
+    
+        if ($request->hasFile('previous_study_records_attachment')) {
+            $this->deleteOldFile($student->previous_study_records_attachment, 'previous_records');
+            $validated['previous_study_records_attachment'] = $this->uploadFile($request->file('previous_study_records_attachment'), 'previous_records');
+        }
+        // Update the student record
+        $student->update($validated);
+
+        return redirect()->route('admin.students.index', $student)
+            ->with('success', 'Student information updated successfully');
+    }
+
+    private function uploadFile($file, $directory)
+{
+    // Create directory if it doesn't exist
+    $path = public_path('uploads/' . $directory);
+    if (!file_exists($path)) {
+        mkdir($path, 0777, true);
+    }
+
+    $fileName = time() . '_' . $file->getClientOriginalName();
+    $file->move($path, $fileName);
+    
+    return $fileName;
 }
 
-    public function update(Request $request, $id)
-    {
-        try {
-
-            // $validatedData = Validator::make($request->all(), [
-            $validatedData = $request->validate([
-                'state_id' => 'required',
-                'district_id' => 'required',
-                'municipality_id' => 'required',
-                'ward_id' => 'required',
-                'local_address' => 'nullable',
-                'permanent_address' => 'nullable',
-                'f_name' => 'required',
-                'l_name' => 'required',
-                'email' => 'required',
-                'religion' => 'nullable',
-                'mobile_number' => 'required',
-                'gender' => 'required',
-                'dob' => 'required',
-                'blood_group' => 'nullable',
-                // 'image' => 'required',
-                'father_name' => 'nullable',
-                'father_phone' => 'nullable',
-                'father_occupation' => 'nullable',
-                'mother_name' => 'nullable',
-                'mother_phone' => 'nullable',
-                'mother_occupation' => 'nullable',
-                'emergency_contact_person' => 'required',
-                'emergency_contact_phone' => 'required',
-                'username' => 'nullable',
-                // 'password' => 'required',
-                'facebook' => 'nullable',
-                'twitter' => 'nullable',
-                'linkedin' => 'nullable',
-                'instagram' => 'nullable',
-                'bank_name' => 'nullable',
-                'bank_account_no' => 'nullable',
-                'bank_branch' => 'nullable',
-                'note' => 'nullable',
-                'is_active' => 'boolean',
-                'guardian_is' => 'nullable',
-
-                'admission_no' => 'nullable',
-                'roll_no' => 'nullable',
-                'admission_date' => 'nullable',
-                'reservation_quota_id' => 'nullable',
-                'class_id' => 'nullable',
-                'section_id' => 'nullable',
-                'school_house_id' => 'nullable',
-                'guardian_name' => 'nullable',
-                'guardian_relation' => 'nullable',
-                'guardian_phone' => 'nullable',
-                'guardian_email' => 'nullable'
-            ]);
-            // Validate user and student data
-            // $validatedUserData = $this->validateUserData($request);
-            // $validatedStudentData = $this->validateUserData($request, true);
-
-          // Retrieve the student by ID
-        $student = Student::findOrFail($id);
-
-        // Check if the user already exists for the student
-        if ($student->user) {
-            // Update existing user data
-            $userInput = $validatedData;
-
-            // Add conditional fields based on guardian_is value
-            if ($request->input('guardian_is') == 'other') {
-                $userInput['guardian_name'] = $request->input('guardian_name');
-                $userInput['guardian_relation'] = $request->input('guardian_relation');
-                $userInput['guardian_phone'] = $request->input('guardian_phone');
-            }
-
-            // Check if a new photo is selected
-            if ($request->has('inputCroppedPic') && !is_null($request->inputCroppedPic)) {
-                $userInput['image'] = $this->saveUserImage($request->input('inputCroppedPic'));
-            }
-
-            // Update the existing user
-            $student->user->update($userInput);
+private function deleteOldFile($fileName, $directory)
+{
+    if ($fileName) {
+        $filePath = public_path('uploads/' . $directory . '/' . $fileName);
+        if (file_exists($filePath)) {
+            unlink($filePath);
         }
-
-        // Update the student data
-        $student->update($validatedData);
-
-        // Manually assign additional fields if they are not in the validated data
-        $student->admission_no = $request->input('admission_no') ?? $student->admission_no;
-        $student->roll_no = $request->input('roll_no') ?? $student->roll_no;
-        $student->admission_date = $request->input('admission_date') ?? $student->admission_date;
-        $student->reservation_quota_id = $request->input('reservation_quota_id') ?? $student->reservation_quota_id;
-        $student->class_id = $request->input('class_id') ?? $student->class_id;
-        $student->section_id = $request->input('section_id') ?? $student->section_id;
-        $student->school_house_id = $request->input('school_house_id') ?? $student->school_house_id;
-        $student->guardian_name = $request->input('guardian_name') ?? $student->guardian_name;
-        $student->guardian_relation = $request->input('guardian_relation') ?? $student->guardian_relation;
-        $student->guardian_phone = $request->input('guardian_phone') ?? $student->guardian_phone;
-        $student->guardian_email = $request->input('guardian_email') ?? $student->guardian_email;
-        
-        $student->save(); // Save the changes
-
-        return redirect()->route('admin.students.index')->withToastSuccess('Student successfully updated');
-    } catch (\Exception $e) {
-        return back()->withToastError($e->getMessage())->withInput();
     }
-    }
+}
 
     public function destroy($id)
 {
@@ -521,17 +631,6 @@ class StudentController extends Controller
 
         // Delete related records first to avoid foreign key constraint violation
 
-        // 1. Delete related student attendances (if any)
-        $studentSessions = $student->studentSessions()->pluck('id'); // Get all student sessions related to the student
-        StudentAttendance::whereIn('student_session_id', $studentSessions)->delete();
-
-        // 2. Delete the associated User (if needed)
-        $user = User::find($student->user_id);
-        if ($user) {
-            $user->delete();
-        }
-
-        // 3. Now delete the student record itself
         $student->delete();
 
         // Commit the transaction if all actions succeed
@@ -597,326 +696,82 @@ public function saveRollNumber(Request $request)
     return response()->json(['success' => 'Roll numbers saved successfully.']);
 }
 
-    
-
-
-
-public function getAllStudent(Request $request)
+public function importAllStudentIndex()
 {
-    if ($request->has('class_id') && $request->has('section_id')) {
-        $classId = $request->input('class_id');
-        $sectionId = $request->input('section_id');
+    $page_title = "Import Students";
+    $schoolId = session('school_id');
+    $classes = Classg::where('school_id', $schoolId)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-        $students = Student::with(['classes', 'user'])
-            ->where('class_id', $classId)
-            ->where('section_id', $sectionId)
-            ->get();
-
-        return Datatables::of($students)
-            ->escapeColumns([])
-            ->addColumn('checkbox', function($student) {
-                return '<input type="checkbox" class="student-checkbox" data-student-id="' . $student->id . '">';
-            })
-            ->editColumn('f_name', function ($row) {
-                return $row->user->f_name;
-            })
-            ->editColumn('l_name', function ($row) {
-                return $row->user->l_name;
-            })
-            ->editColumn('class', function ($row) {
-                return $row->classes->class;
-            })
-            ->editColumn('roll_no', function ($row) {
-                return $row->roll_no;
-            })
-            ->editColumn('father_name', function ($row) {
-                return $row->user->father_name;
-            })
-            ->editColumn('mother_name', function ($row) {
-                return $row->user->mother_name;
-            })
-            ->editColumn('guardian_is', function ($row) {
-                return $row->guardian_is;
-            })
-            ->addColumn('created_at', function ($row) {
-                return $row->created_at->diffForHumans();
-            })
-            ->addColumn('status', function ($row) {
-                return $row->user->is_active == 1 ? '<span class="btn-sm btn-success">Active</span>' : '<span class="btn-sm btn-danger">Inactive</span>';
-            })
-            ->addColumn('actions', function ($row) {
-                return view('backend.school_admin.student.partials.controller_action', ['student' => $row])->render();
-            })
-            ->make(true);
-    }
-
-    return Datatables::of([])->escapeColumns([])->make(true);
+    return view('backend.school_admin.student.importindex', compact('page_title', 'classes'));
 }
 
-    
+public function import(Request $request)
+{
+    try {
+        $request->validate([
+            'file' => 'required|file|max:2048|mimes:csv,xlsx,xls', 
+            'class_id' => 'required|exists:classes,id',
+            'section_id' => 'required|exists:sections,id',
+            'program_id' => 'required|exists:programs,id',
+        ]);
 
-    // public function getAllStudent(Request $request)
-    // {
-    //     if ($request->has('class_id') && $request->has('section_id')) {
-    //         $classId = $request->input('class_id');
-    //         $sectionId = $request->input('section_id');
+        DB::beginTransaction();
 
-    //         // Pass only necessary parameters to getStudentsForDataTable
-    //         $students = $this->studentUserService->getStudentsForDataTable($request)
-    //             ->where('class_id', $classId)
-    //             ->where('section_id', $sectionId);
-    //         // ->get();
+        $import = new StudentsImport(
+            $request->class_id,
+            $request->section_id,
+            $request->program_id
+        );
 
-    //         // You don't need to check if $students is an instance of \Illuminate\Database\Query\Builder
-    //         // because it's not possible for it to be anything else at this point.
-
-    //         // You can remove the dd($students) line if you don't need it for debugging purposes.
-
-    //         // Return the data using DataTables
-    //         return Datatables::of($students)
-    //             ->escapeColumns([])
-    //             ->editColumn('f_name', function ($row) {
-    //                 return $row->f_name;
-    //             })
-    //             ->editColumn('l_name', function ($row) {
-    //                 return $row->l_name;
-    //             })
-    //             ->editColumn('roll_no', function ($row) {
-    //                 return $row->roll_no;
-    //             })
-    //             ->editColumn('father_name', function ($row) {
-    //                 return $row->father_name;
-    //             })
-    //             ->editColumn('mother_name', function ($row) {
-    //                 return $row->mother_name;
-    //             })
-    //             ->editColumn('guardian_is', function ($row) {
-    //                 return $row->guardian_is;
-    //             })
-    //             ->addColumn('created_at', function ($user) {
-    //                 return $user->created_at->diffForHumans();
-    //             })
-    //             ->addColumn('status', function ($student) {
-    //                 return $student->is_active == 1 ? '<span class="btn-sm btn-success">Active</span>' : '<span class="btn-sm btn-danger">Inactive</span>';
-    //             })
-    //             ->addColumn('actions', function ($student) {
-    //                 return view(
-    //                     'backend.school_admin.student.partials.controller_action',
-    //                     ['student' => $student]
-    //                 )->render();
-    //             })
-    //             ->make(true);
-    //     }
-    // }
-
-
-
-    public function importAllStudentIndex()
-    {
-        $page_title = "Import Student";
-        $schoolId = session('school_id');
-        $classes = Classg::where('school_id', $schoolId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('backend.school_admin.student.importindex', compact('page_title', 'classes'));
-    }
-
-    public function downloadSampleFile()
-    {
-        $filePath = public_path('sample-files/sample.csv');
-
-        // Check if the file exists
-        if (file_exists($filePath)) {
-            return response()->download($filePath, 'sample.csv');
-        } else {
-            abort(404, 'Sample file not found');
-        }
-    }
-
-    public function import(Request $request)
-    {
-        try {
-            // Begin a database transaction
-            DB::beginTransaction();
-            $array1 = Excel::toCollection(new CombinedImport, $request->file('file'));
-            // Access the outer collection
-            foreach ($array1 as $outerCollection) {
-                // Iterate through the inner collections
-                foreach ($outerCollection as $row) {
-
-
-
-                    $email = strtolower($row['f_name'] . '.' . $row['l_name'] . '.' . $row['admission_no'] . '@gmail.com');
-
-
-                    // Check if the generated email already exists
-                    $count = User::where('email', $email)->count();
-                    if ($count > 0) {
-                        // If the email already exists, append a number to make it unique
-                        $email = strtolower($row['f_name'] . '.' . $row['l_name'] . '.' . $row['admission_no'] . $count . '@gmail.com');
-                    }
-
-
-                    $validator = Validator::make($row->toArray(), [
-
-                        'state_id' => 'required',
-                        'district_id' => 'required',
-                        'municipality_id' => 'required',
-                        'ward_id' => 'required',
-                        'local_address' => 'nullable',
-                        'permanent_address' => 'nullable',
-                        'f_name' => 'required',
-                        'l_name' => 'required',
-
-                        'religion' => 'nullable',
-                        'mobile_number' => 'nullable',
-                        'gender' => 'required',
-                        'dob' => 'required',
-                        'blood_group' => 'nullable',
-                        // 'image' => 'required',
-                        'father_name' => 'nullable',
-                        'father_phone' => 'nullable',
-                        'father_occupation' => 'nullable',
-                        'mother_name' => 'nullable',
-                        'mother_phone' => 'nullable',
-                        'mother_occupation' => 'nullable',
-                        'emergency_contact_person' => 'nullable',
-                        'emergency_contact_phone' => 'nullable',
-                        'username' => 'nullable',
-                        // 'password' => 'required',
-                        'is_active' => 'boolean',
-                        'guardian_is' => 'nullable',
-                        'guardian_name' => 'nullable',
-                        'guardian_phone' => 'nullable',
-                        'guardian_relation' => 'nullable',
-                        'guardian_email' => 'nullable',
-
-
-                    ]);
-
-                    if ($validator->fails()) {
-                        // Redirect back with validation errors
-                        return redirect()->back()->withErrors($validator)->withInput();
-                    }
-                    // Validate user data
-                    // $this->validateUserData($request);
-                    $password = strtok($email, '@');
-                    $username = strtok($email, '@');
-
-
-                    $user_type_id = 8;
-                    $role_id = 11;
-                    $school_id = session('school_id');
-                    $state_id = $row['state_id'];
-                    $district_id = $row['district_id'];
-                    $municipality_id = $row['municipality_id'];
-                    $ward_id = $row['ward_id'];
-                    $f_name = $row['f_name'];
-                    $m_name = $row['m_name'];
-                    $l_name = $row['l_name'];
-                    // $email = 'email';
-                    // 'email' => $email;
-                    $local_address = $row['local_address'];
-                    $permanent_address = $row['permanent_address'];
-                    $gender = $row['gender'];
-                    $religion = $row['religion'];
-                    // $mobile_number = $row['mobile_number'];
-                    $dob = $row['dob'];
-                    $blood_group = $row['blood_group'];
-                    $father_name = $row['father_name'];
-                    $father_phone = $row['father_phone'];
-                    $father_occupation = $row['father_occupation'];
-                    $mother_name = $row['mother_name'];
-                    $mother_phone = $row['mother_phone'];
-                    $mother_occupation = $row['mother_occupation'];
-                    $emergency_contact_person = $row['emergency_contact_person'];
-                    $emergency_contact_phone = $row['emergency_contact_phone'];
-
-
-                    $studentUser = User::create([
-                        'user_type_id' => $user_type_id,
-                        'role_id' => $role_id,
-                        'school_id' => $school_id,
-                        'state_id' => $state_id,
-                        'district_id' => $district_id,
-                        'municipality_id' => $municipality_id,
-                        'ward_id' => $ward_id,
-                        'f_name' => $f_name,
-                        'm_name' => $m_name,
-                        'l_name' => $l_name,
-                        'email' => $email,
-                        'local_address' => $local_address,
-                        'permanent_address' => $permanent_address,
-                        'password' => bcrypt($password),
-                        'username' => $username,
-                        'gender' => $gender,
-                        'religion' => $religion,
-                        'dob' => $dob,
-                        'blood_group' => $blood_group,
-                        'father_name' => $father_name,
-                        'father_phone' => $father_phone,
-                        'father_occupation' => $father_occupation,
-                        'mother_name' => $mother_name,
-                        'mother_phone' => $mother_phone,
-                        'mother_occupation' => $mother_occupation,
-                        'emergency_contact_person' => $emergency_contact_person,
-                        'emergency_contact_phone' => $emergency_contact_phone,
-
-                    ]);
-
-                    $classId = $request->input('selected_class_id');
-                    $sectionId = $request->input('selected_section_id');
-
-                    // dd($sectionId);
-
-                  // Use the method to create a student session
-                  $this->createStudentSession($studentUser->id, $classId, $sectionId);
-
-             
-                    // CREATE STUDENT
-                    // $reservation_quota_id = 1;
-                    $admission_no = $row['admission_no'];
-                    $roll_no = $row['roll_no'];
-                    $admission_date = $row['admission_date'];
-                    $school_house_id = $row['school_house_id'];
-                    // $student_photo = $row['student_photo'];
-                    $guardian_is = $row['guardian_is'];
-                    $guardian_name = $row['guardian_name'];
-                    $guardian_phone = $row['guardian_phone'];
-                    $guardian_relation = $row['guardian_relation'];
-                    $guardian_email = $row['guardian_email'];
-                    // $transfer_certificate = $row['transfer_certificate'];
-
-                    $studentCreate = Student::create([
-                        'user_id' => $studentUser->id,
-                        'school_id' => session('school_id'),
-                        'class_id' => $classId,
-                        'section_id' => $sectionId,
-                        // 'reservation_quota_id' => $reservation_quota_id,
-                        'admission_no' => $admission_no,
-                        'roll_no' => $roll_no,
-                        'admission_date' => $admission_date,
-                        'school_house_id' => $school_house_id,
-                        // 'student_photo' => $student_photo,
-                        'guardian_is' => $guardian_is,
-                        'guardian_name' => $guardian_name,
-                        'guardian_phone' => $guardian_phone,
-                        'guardian_relation' => $guardian_relation,
-                        'guardian_email' => $guardian_email,
-                        // 'transfer_certificate' => $transfer_certificate,
-                    ]);
-                }
+        // Import the file
+        Excel::import($import, $request->file('file'));
+        
+        // Check for failures
+        if (count($import->failures()) > 0) {
+            $errors = [];
+            foreach ($import->failures() as $failure) {
+                $row = $failure->row();
+                $errors[] = "Row {$row}: " . implode(', ', $failure->errors());
             }
-            DB::commit();
-            return back()->with('success', 'Data has been uploaded');
-        } catch (\Exception $e) {
-            DB::rollback();
-            return redirect()->back()->with('error', $e->getMessage());
+            
+            // If we had partial success, commit those records
+            if ($import->getRowCount() > count($import->failures())) {
+                DB::commit();
+                $successCount = $import->getRowCount() - count($import->failures());
+                return back()->with('warning', "Partially successful import. {$successCount} records imported, " . count($import->failures()) . ' records failed.')
+                            ->with('import_errors', $errors);
+            } else {
+                DB::rollback();
+                return back()->with('error', 'Import failed. No records were imported.')
+                            ->with('import_errors', $errors);
+            }
         }
+        
+        DB::commit();
+        return back()->with('success', 'All students imported successfully');
+    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        DB::rollback();
+        
+        $failures = $e->failures();
+        $errors = [];
+        foreach ($failures as $failure) {
+            $row = $failure->row();
+            $errors[] = "Row {$row}: " . implode(', ', $failure->errors());
+        }
+        
+        return back()->with('error', 'Validation failed during import.')
+                    ->with('import_errors', $errors);
+    } catch (\Exception $e) {
+        DB::rollback();
+        Log::error('Student Import Error: ' . $e->getMessage());
+        Log::error('Exception class: ' . get_class($e));
+        Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return back()->with('error', 'Error importing students: ' . $e->getMessage());
     }
-
-
+}
     public function exportSelected(Request $request)
     {
         $classId = $request->input('class_id');

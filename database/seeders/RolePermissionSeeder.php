@@ -382,6 +382,10 @@ class RolePermissionSeeder extends Seeder
             'view_ledger',
             'edit_ledger',
             'delete_ledger',
+            'create_programs',
+            'edit_programs',
+            'delete_programs',
+            'list_programs',
 
         ];
 
@@ -455,6 +459,10 @@ class RolePermissionSeeder extends Seeder
             'list_school_groups',
             'edit_school_groups',
             'delete_school_groups',
+            'create_programs',
+            'edit_programs',
+            'delete_programs',
+            'list_programs',
 
         ];
 
@@ -536,6 +544,10 @@ class RolePermissionSeeder extends Seeder
             'list_school_groups',
             'edit_school_groups',
             'delete_school_groups',
+            'create_programs',
+            'edit_programs',
+            'delete_programs',
+            'list_programs',
 
 
         ];
@@ -647,6 +659,10 @@ class RolePermissionSeeder extends Seeder
             'create_sources',
             'edit_sources',
             'delete_sources',
+            'create_programs',
+            'edit_programs',
+            'delete_programs',
+            'list_programs',
 
         ];
 
@@ -738,6 +754,10 @@ class RolePermissionSeeder extends Seeder
             'delete_student_certificates',
             'create_student_certificates',
             'list_extracurricular_head',
+            'create_programs',
+            'edit_programs',
+            'delete_programs',
+            'list_programs',
         ];
 
         //define permission for School  Admin
@@ -1008,6 +1028,10 @@ class RolePermissionSeeder extends Seeder
             'view_ledger',
             'edit_ledger',
             'delete_ledger',
+            'create_programs',
+            'edit_programs',
+            'delete_programs',
+            'list_programs',
 
     //define permission for School Teacher
         $permissionForTeacher = [

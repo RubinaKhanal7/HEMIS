@@ -1,7 +1,6 @@
 <div>
-    {{-- import student --}}
     <a href="{{ route('admin.students.import') }}" style="text-decoration: none;">
-        <button type="button" class="btn btn-block btn-success btn-sm" data-bs-toggle="modal" data-bs-target="">
+        <button type="button" class="btn btn-block btn-success btn-sm">
             Import Student <i class="fas fa-plus"></i>
         </button>
     </a>

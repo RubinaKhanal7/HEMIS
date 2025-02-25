@@ -18,7 +18,7 @@ class UserTypeSeeder extends Seeder
             'district',
             'municipality',
             'head_school',
-            'school_admin',
+            'college_admin',
             'staffs',
             'parents',
             'students'

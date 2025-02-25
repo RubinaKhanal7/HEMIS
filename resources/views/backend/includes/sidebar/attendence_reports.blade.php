@@ -56,7 +56,7 @@
         @can('school_attendance_report')
             <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'notice-head' ? 'active' : '' }}"
                     href="{{ route('admin.school_attendance_reports.index') }}">
-                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i> {{ __('Attendance Report')}}
+                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i> {{ __('Student Report')}}
                     </div>
                 </a>
             </li>
@@ -65,7 +65,7 @@
         @can('list_headteacherlog_reports')
             <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'headteacherlog-reports' ? 'active' : '' }}"
                     href="{{ route('admin.headteacherlog-reports.index') }}">
-                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{__('Head Teacher Log Report')}}
+                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{__('Staff Report')}}
                     </div>
                 </a>
             </li>
@@ -74,7 +74,7 @@
         @can('view_student_profile')
             <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'notice-head' ? 'active' : '' }}"
                     href="{{ route('admin.student-profile.index') }}">
-                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i> {{ __('Student Profile')}}
+                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i> {{ __('Other Count Report')}}
                     </div>
                 </a>
             </li>

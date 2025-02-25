@@ -1,186 +1,291 @@
 @extends('backend.layouts.master')
+
+
 @section('content')
-<style>
-    .container-fluid {
-        padding-left: 0;
-        padding-right: 0;
-    }
-    #table-container {
-        width: 100%;
-        overflow-x: auto;
-    }
-    #buttons-container {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    #buttons-container .dt-buttons {
-        display: flex;
-        flex-direction: row;
-    }
-    #buttons-container .dt-buttons button {
-        margin-right: 5px;
-    }
-    .dataTables_wrapper .dataTables_filter {
-        float: right;
-        text-align: right;
-    }
-    #attendanceTable {
-        width: 100% !important;
-    }
-</style>
-<div class="container-fluid">
-    <h1>Attendance Report</h1>
-    <form action="{{ route('admin.school_attendance_reports.report') }}" method="GET">
-        <div class="row align-items-end">
-            <div class="col-lg-3 col-sm-3 mt-2">
-                <div class="p-2 label-input">
-                    <label for="nepali-datepicker">Date:</label>
-                    <div class="form-group">
-                        <div class="input-group date" id="admission-datetimepicker" data-target-input="nearest">
-                            <input id="nepali-datepicker" name="date" type="text" class="form-control datetimepicker-input" />
+<div class="container-fluid px-4">
+    <h1 class="mt-4 mb-4">Student Reports</h1>
+   
+    <!-- Add total student count display -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">Total Students</h5>
+                           
                         </div>
-                        @error('date')
-                            <strong class="text-danger">{{ $message }}</strong>
-                        @enderror
+                        <div>
+                            <h3 class="mb-0">{{ $totalStudentsCount ?? 0 }}</h3>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-lg-3 col-sm-3">
-                <div class="form-group">
-                    <label for="class_id">Class:</label>
-                    <select name="class_id" id="class_id" class="form-control" required>
-                        <option value="">Select Class</option>
-                        @foreach($classes as $class)
-                            <option value="{{ $class->id }}" {{ (request('class_id') == $class->id) ? 'selected' : '' }}
-                                data-sections='@json($class->sections)'>
-                                {{ $class->class }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            
-            <div class="col-lg-3 col-sm-3">
-                <div class="form-group">
-                    <label for="section_id">Section:</label>
-                    <select name="section_id" id="section_id" class="form-control" required>
-                        <option value="">Select Section</option>
-                    </select>
-                </div>
-            </div>
-                             
-            <div class="col-lg-3 col-sm-3 mt-2">
-                <div class="search-button-container d-flex align-items-end">
-                    <button type="submit" class="btn btn-sm btn-primary">Search</button>
+        </div>
+       
+        @if(request()->has('admission_year') || request()->has('program_id') || request()->has('class_id') ||
+            request()->has('gender') || request()->has('ethnicity') ||
+            request()->has('permanent_province') || request()->has('permanent_district'))
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">Filtered Students</h5>
+                           
+                        </div>
+                        <div>
+                            <h3 class="mb-0">{{ $filteredCount ?? 0 }}</h3>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </form>
-    
-    <div id="table-container" class="mt-4">
-        <div id="buttons-container"></div>
-        <table id="attendanceTable" class="table table-striped table-bordered w-100">
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Attendance Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be populated by DataTables -->
-            </tbody>
-        </table>
+        @endif
     </div>
+   
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ route('admin.school_attendance_reports.index') }}" method="GET" id="filterForm">
+                <div class="row g-3">
+                    <!-- Admission Year -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label" for="admission_year">Fiscal Year</label>
+                            <select name="admission_year" id="admission_year" class="form-select select2">
+                                <option value="">Select Year</option>
+                                @foreach($admissionYears as $year)
+                                    <option value="{{ $year }}" {{ request('admission_year') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!-- Class -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label" for="class_id">Academic Level</label>
+                            <select name="class_id" id="class_id" class="form-select select2">
+                                <option value="">Select Academic Level</option>
+                                @foreach($classes as $class)
+                                    <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>{{ $class->class }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!-- Section -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label" for="class_id">Faculty</label>
+                            <select name="class_id" id="class_id" class="form-select select2">
+                                <option value="">Select Faculty</option>
+                                @foreach($sections as $section)
+                                <option value="{{ $section->id }}" {{ request('section_id') == $section->id ? 'selected' : '' }}>{{ $section->section_name }}</option>
+
+
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+
+
+
+                    <!-- Program -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label" for="program_id">Program</label>
+                            <select name="program_id" id="program_id" class="form-select select2">
+                                <option value="">Select Program</option>
+                                @foreach($programs as $program)
+                                    <option value="{{ $program->id }}" {{ request('program_id') == $program->id ? 'selected' : '' }}>{{ $program->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!-- Gender -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label" for="gender">Gender</label>
+                            <select name="gender" id="gender" class="form-select select2">
+                                <option value="">Select Gender</option>
+                                @foreach(['Male', 'Female', 'Other'] as $gender)
+                                    <option value="{{ $gender }}" {{ request('gender') == $gender ? 'selected' : '' }}>{{ $gender }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!-- Ethnicity -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label" for="ethnicity">Ethnicity</label>
+                            <select name="ethnicity" id="ethnicity" class="form-select select2">
+                                <option value="">Select Ethnicity</option>
+                                @foreach($ethnicities as $ethnicity)
+                                    <option value="{{ $ethnicity }}" {{ request('ethnicity') == $ethnicity ? 'selected' : '' }}>{{ $ethnicity }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!-- Province -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label" for="permanent_province">Province</label>
+                            <select name="permanent_province" id="permanent_province" class="form-select select2">
+                                <option value="">Select Province</option>
+                                @foreach($provinces as $province)
+                                    <option value="{{ $province->id }}" {{ request('permanent_province') == $province->id ? 'selected' : '' }}>{{ $province->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!-- District -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label" for="permanent_district">District</label>
+                            <select name="permanent_district" id="permanent_district" class="form-select select2">
+                                <option value="">Select District</option>
+                                @if(request('permanent_province'))
+                                    @foreach($districts as $district)
+                                        <option value="{{ $district->id }}" {{ request('permanent_district') == $district->id ? 'selected' : '' }}>{{ $district->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!-- Search Button -->
+                    <div class="col-md-3 d-flex align-items-end">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary me-2">Search</button>
+                            <a href="{{ route('admin.school_attendance_reports.index') }}" class="btn btn-secondary">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Results Table -->
+    @if($students->isNotEmpty())
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Student List</h5>
+        </div>
+        <div class="card-body">
+            <div id="table-container">
+                <div class="table-responsive">
+                    <table id="studentTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Program</th>
+                                <th>Class</th>
+                                <th>Ethnicity</th>
+                                <th>Province</th>
+                                <th>District</th>
+                                <th>Mobile</th>
+                                <th>Admission Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($students as $student)
+                                <tr>
+                                    <td>{{ $student->id }}</td>
+                                    <td>{{ $student->first_name_en }}</td>
+                                    <td>{{ $student->gender }}</td>
+                                    <td>{{ $student->program->title }}</td>
+                                    <td>{{ $student->class->class }}</td>
+                                    <td>{{ $student->ethnicity }}</td>
+                                    <td>{{ $student->permanent_province }}</td>
+                                    <td>{{ $student->permanent_district }}</td>
+                                    <td>{{ $student->mobile_number }}</td>
+                                    <td>{{ $student->admission_year }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    @else
+    <div class="alert alert-info mt-4">No data found. Please apply filters and search.</div>
+    @endif
 </div>
-<script type="text/javascript">
+
+
+@push('scripts')
+<script>
     $(document).ready(function() {
-        // Initialize nepali-datepicker
-        $('#nepali-datepicker').nepaliDatePicker({
-            dateFormat: 'YYYY-MM-DD',
-            closeOnDateSelect: true
+        // Initialize DataTable without export buttons
+        var table = $('#studentTable').DataTable();
+       
+        // Initialize select2
+        $('.select2').select2({
+            width: '100%'
         });
-    
-        var currentDate = NepaliFunctions.GetCurrentBsDate();
-        var padZero = function (num) {
-            return num < 10 ? '0' + num : num;
-        };
-        var formattedDate = currentDate.year + '-' + padZero(currentDate.month) + '-' + padZero(currentDate.day);
-        $('#nepali-datepicker').val(formattedDate);
-    
-        var table = $('#attendanceTable').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '{{ route("admin.school_attendance_reports.data") }}',
+       
+        // Make district dropdown dependent on province selection
+        $('#permanent_province').on('change', function() {
+            var provinceId = $(this).val();
+           
+            // Clear and disable district dropdown if no province selected
+            if (!provinceId) {
+                $('#permanent_district').empty();
+                $('#permanent_district').append('<option value="">Select District</option>');
+                return;
+            }
+           
+            // Make AJAX call to get districts for selected province
+            $.ajax({
+                url: '/get-districts/' + provinceId,
                 type: 'GET',
-                data: function (d) {
-                    d.date = $('#nepali-datepicker').val();
-                    d.class_id = $('#class_id').val();
-                    d.section_id = $('#section_id').val();
-                }
-            },
-            columns: [
-                { data: 'student_name', name: 'student_name' },
-                { data: 'attendance_type', name: 'attendance_type' }
-            ],
-            dom: '<"d-flex justify-content-between"lfB>rtip',
-            buttons: {
-                dom: {
-                    button: {
-                        className: 'btn btn-sm btn-primary'
+                dataType: 'json',
+                success: function(data) {
+                    $('#permanent_district').empty();
+                    $('#permanent_district').append('<option value="">Select District</option>');
+                   
+                    if (data && data.length > 0) {
+                        $.each(data, function(key, district) {
+                            $('#permanent_district').append('<option value="' + district.id + '">' + district.name + '</option>');
+                        });
+                    } else {
+                        $('#permanent_district').append('<option value="">No districts found</option>');
                     }
                 },
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ],
-                container: '#buttons-container'
-            },
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            ordering: false,
-            language: {
-                emptyTable: "No matching records found"
-            }
+                error: function(xhr, status, error) {
+                    console.error('Error fetching districts:', error);
+                    console.log('Status:', status);
+                    console.log('Response:', xhr.responseText);
+                   
+                    $('#permanent_district').empty();
+                    $('#permanent_district').append('<option value="">Error loading districts</option>');
+                }
+            });
         });
-
-        function updateSections() {
-            var selectedOption = $('#class_id option:selected');
-            var sections = selectedOption.data('sections');
-            var sectionSelect = $('#section_id');
-            
-            sectionSelect.empty().append('<option value="">Select Section</option>');
-            
-            if (sections) {
-                sections.forEach(function(section) {
-                    sectionSelect.append($('<option>', {
-                        value: section.id,
-                        text: section.section_name
-                    }));
-                });
-            }
+       
+        // Trigger change event if province is already selected (for page reload)
+        if ($('#permanent_province').val()) {
+            $('#permanent_province').trigger('change');
         }
-
-        $('#class_id').on('change', function() {
-            updateSections();
-        });
-
-        updateSections();
-    
-        $('form').on('submit', function(e) {
-            e.preventDefault();
-            var classId = $('#class_id').val();
-            var sectionId = $('#section_id').val();
-            var date = $('#nepali-datepicker').val();
-            if (classId && sectionId && date) {
-                $('#table-container').show();
-                table.ajax.reload();
-            } else {
-                $('#table-container').hide();
-                alert('Please select Class, Section, and Date to view the report.');
-            }
-        });
     });
 </script>
-
+@endpush
 @endsection
+
