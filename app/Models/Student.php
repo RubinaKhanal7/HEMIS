@@ -60,4 +60,9 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function idCard()
+{
+    return $this->hasOne(IdCardDesign::class);
+}
 }
