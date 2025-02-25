@@ -958,6 +958,63 @@
     });
 });
 
+
+// Function to preview image files
+function previewImage(input, previewElement) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Create image element if it doesn't exist
+            let imgElement = document.getElementById(previewElement);
+            if (!imgElement) {
+                imgElement = document.createElement('img');
+                imgElement.id = previewElement;
+                imgElement.className = 'img-thumbnail mt-2';
+                imgElement.style.width = previewElement === 'studentPhotoPreview' ? '20%' : '150px';
+                input.parentNode.appendChild(imgElement);
+            }
+            
+            // Set image source to the loaded file
+            imgElement.src = e.target.result;
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function previewDocument(input, previewElement) {
+    if (input.files && input.files[0]) {
+        const fileName = input.files[0].name;
+
+        let docPreview = document.getElementById(previewElement);
+        if (!docPreview) {
+            docPreview = document.createElement('div');
+            docPreview.id = previewElement;
+            docPreview.className = 'mt-2';
+            input.parentNode.appendChild(docPreview);
+        }
+        
+        docPreview.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fa fa-file-pdf-o"></i> ${fileName}
+            </div>
+        `;
+    }
+}
+
+document.getElementById('citizenship_front').addEventListener('change', function() {
+    previewImage(this, 'citizenshipFrontPreview');
+});
+
+document.getElementById('citizenship_back').addEventListener('change', function() {
+    previewImage(this, 'citizenshipBackPreview');
+});
+
+document.getElementById('previous_study_records_attachment').addEventListener('change', function() {
+    previewDocument(this, 'previousRecordsPreview');
+});
+
          });
     </script>
 @endsection

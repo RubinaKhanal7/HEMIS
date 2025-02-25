@@ -219,40 +219,6 @@ public function getPrograms($sectionId)
         }
     }
 
-
-
-
-
-
-
-    // RETRIVING SECTIONS OF THE RESPECTIVE CLASS
-//     public function getSections($classId)
-//     {
-
-//         $sections = DB::table('sections')
-//                     ->where('class_id', $classId)
-//                     ->pluck('section_name', 'id');
-//         return response()->json($sections);
-//     }
-//     public function getPrograms($sectionId)
-// {
-
-//     $programs = DB::table('programs')
-//                 ->where('section_id', $sectionId)
-//                 ->pluck('title', 'id');
-//     return response()->json($programs);
-// }
-
-// public function getClasses()
-// {
-//     $schoolId = session('school_id');
-//     $classes = Classg::where('school_id', $schoolId)
-//         ->orderBy('created_at', 'desc')
-//         ->pluck('class', 'id'); 
-    
-//     return response()->json($classes);
-// }
-
     // CREATE STUDENT
     protected function saveStudent(array $studentInput)
     {

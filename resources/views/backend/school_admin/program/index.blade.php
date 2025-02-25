@@ -155,26 +155,89 @@
         });
 
         $(document).on('click', '.edit-program', function() {
-            var id = $(this).data('id');
-            var class_id = $(this).data('class_id');
-            var section_id = $(this).data('section_id');
-            var title = $(this).data('title');
-            var is_active = $(this).data('is_active');
+    var id = $(this).data('id');
+    var class_id = $(this).data('class_id');
+    var section_id = $(this).data('section_id');
+    var title = $(this).data('title');
+    var is_active = $(this).data('is_active');
 
-            $('#dynamic_id').val(id);
-            $('#dynamic_class_id').val(class_id);
-            $('#dynamic_section_id').val(section_id);
-            $('#dynamic_title').val(title);
-            
-            $('input[name="is_active"]').prop('checked', false);
-            $('input[name="is_active"][value="' + is_active + '"]').prop('checked', true);
+    $('#dynamic_id').val(id);
+    $('#dynamic_class_id').val(class_id);
 
-            $('#programForm').attr('action', '{{ route('admin.programs.update', '') }}' + '/' + id);
-            $('#methodField').val('PUT');
+    $('#dynamic_section_id').data('selected', section_id);
+    
+    $('#dynamic_title').val(title);
+    
+    $('input[name="is_active"]').prop('checked', false);
+    $('input[name="is_active"][value="' + is_active + '"]').prop('checked', true);
 
-            $('#createProgram').modal('show');
-            return false;
+    $('#programForm').attr('action', '{{ route('admin.programs.update', '') }}' + '/' + id);
+    $('#methodField').val('PUT');
+
+    $('#dynamic_class_id').trigger('change');
+
+    $('#createProgram').modal('show');
+    return false;
+});
+
+$(document).ready(function() {
+    function loadFaculties(classId) {
+        if (!classId) {
+            $('#dynamic_section_id').empty().append('<option value="">Select Faculty</option>').prop('disabled', true);
+            return;
+        }
+        
+        $('#dynamic_section_id').prop('disabled', true);
+        $.ajax({
+            url: '{{ route("admin.get-sections-by-class") }}',
+            type: 'POST',
+            data: {
+                class_id: classId
+            },
+            success: function(response) {
+                var $facultyDropdown = $('#dynamic_section_id');
+                $facultyDropdown.empty();
+                $facultyDropdown.append('<option value="">Select Faculty</option>');
+                $.each(response.sections, function(index, section) {
+                    $facultyDropdown.append(
+                        $('<option></option>')
+                            .attr('value', section.id)
+                            .text(section.section_name)
+                    );
+                });
+
+                $facultyDropdown.prop('disabled', false);
+                if ($('#dynamic_id').val() && $('#dynamic_section_id').data('selected')) {
+                    $('#dynamic_section_id').val($('#dynamic_section_id').data('selected'));
+                }
+            },
+            error: function(xhr) {
+                console.error('Error loading faculties:', xhr.responseText);
+                $('#dynamic_section_id').empty().append('<option value="">Error loading faculties</option>');
+                $('#dynamic_section_id').prop('disabled', false);
+            }
         });
+    }
+    $('#dynamic_section_id').prop('disabled', true);
+    $('#dynamic_class_id').on('change', function() {
+        var selectedClassId = $(this).val();
+        loadFaculties(selectedClassId);
+    });
+    if ($('#dynamic_id').val()) {
+        $('#dynamic_section_id').data('selected', $('#dynamic_section_id').val());
+    }
+    if ($('#dynamic_class_id').val()) {
+        loadFaculties($('#dynamic_class_id').val());
+    }
+    $('#programForm').on('submit', function(e) {
+        if (!$('#dynamic_class_id').val() || !$('#dynamic_section_id').val() || !$('#dynamic_title').val()) {
+            e.preventDefault();
+            alert('Please fill all required fields');
+            return false;
+        }
+    });
+});
+
     </script>
 @endsection
 @endsection

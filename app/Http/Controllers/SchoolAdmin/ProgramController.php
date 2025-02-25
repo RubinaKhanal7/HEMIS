@@ -124,4 +124,21 @@ class ProgramController extends Controller
 
         return $dataTableQuery;
     }
+
+
+public function getSectionsByClass(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'class_id' => 'required|exists:classes,id',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()->first()], 422);
+    }
+    $sections = Section::whereHas('classes', function($query) use ($request) {
+        $query->where('class_id', $request->class_id);
+    })->where('is_active', 1)->get();
+
+    return response()->json(['sections' => $sections]);
+}
 }
