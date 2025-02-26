@@ -1,24 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student ID Card</title>
     <style>
+        @page { size: A4; margin: 0; }
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
             margin: 0;
             padding: 0;
         }
-        .id-card {
-            width: 3.37in;
-            height: 2.125in;
+        .id-card-container {
+            width: 400px;
             position: relative;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-            overflow: hidden;
-            box-sizing: border-box;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .id-card-background {
+        .background-image {
             position: absolute;
             top: 0;
             left: 0;
@@ -26,107 +35,132 @@
             height: 100%;
             z-index: -1;
         }
-        .id-card-content {
-            position: relative;
-            padding: 10px;
-            z-index: 1;
-            background-color: rgba(255, 255, 255, 0.8);
+        .background-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-        .college-name {
+        .header {
             text-align: center;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .middle-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            position: relative;
         }
         .student-photo {
-            width: 0.8in;
-            height: 0.95in;
-            border: 1px solid #ddd;
-            margin: 0 auto 10px auto;
+            margin-bottom: 15px;
             text-align: center;
+        }
+        .student-photo img {
+            width: 100px;
+            height: 120px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            margin: 0 auto;
+        }
+        .no-photo {
+            width: 100px;
+            height: 120px;
+            border: 1px dashed #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin: 0 auto;
         }
         .student-info {
-            font-size: 9px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            margin: 0 auto;
         }
         .info-row {
-            margin-bottom: 4px;
             display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            text-align: center;
+            width: 100%;
         }
-        .info-label {
-            font-weight: bold;
-            width: 40%;
-        }
-        .info-value {
-            width: 60%;
+        .header, .footer {
+            text-align: center;
+            position: relative;
+            width: 100%;
         }
         .signature {
-            margin: 5px auto;
             text-align: center;
+            margin: 15px auto;
+            display: flex;
+            justify-content: center;
         }
         .signature img {
-            max-height: 20px;
-            max-width: 80px;
+            margin: 0 auto;
         }
-        .footer {
-            text-align: center;
-            font-size: 8px;
-            margin-top: 5px;
+        h3 {
+            margin-top: 0;
         }
     </style>
 </head>
 <body>
-    <div class="id-card">
-        @if($design->background_img && file_exists($backgroundImgPath))
-        <div class="id-card-background">
-            <img src="{{ $backgroundImgPath }}" alt="Background" style="width: 100%; height: 100%; object-fit: cover;">
+    <div class="id-card-container">
+        @if($design->background_img)
+        <div class="background-image">
+            <img src="{{ public_path('uploads/id_cards/' . basename($design->background_img)) }}" alt="Background">
         </div>
         @endif
         
-        <div class="id-card-content">
-            <div class="college-name">
-                {{ $design->college_name }}
-            </div>
-            
+        <div class="header">
+            <h3>{{ $design->college_name }}</h3>
+        </div>
+
+        <div class="middle-content">
             <div class="student-photo">
-                @if($student->student_photo && file_exists($studentPhotoPath))
-                    <img src="{{ $studentPhotoPath }}" alt="Student Photo" style="width: 100%; height: 100%; object-fit: cover;">
+                @if($student->student_photo)
+                <img src="{{ public_path('uploads/students/' . $student->student_photo) }}" alt="Student Photo">
                 @else
-                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border: 1px dashed #999;">
-                        <span>No Photo</span>
-                    </div>
+                <div class="no-photo">
+                    <span>No Photo</span>
+                </div>
                 @endif
             </div>
-            
+        
             <div class="student-info">
                 <div class="info-row">
-                    <div class="info-label">Name:</div>
-                    <div class="info-value">{{ $student->first_name_en }} {{ $student->middle_name_en }} {{ $student->last_name_en }}</div>
+                    <strong>Name:</strong> {{ $student->first_name_en }} {{ $student->middle_name_en }} {{ $student->last_name_en }}
                 </div>
                 <div class="info-row">
-                    <div class="info-label">Academic Level:</div>
-                    <div class="info-value">{{ $student->class->class }}</div>
+                    <strong>Academic Level:</strong> {{ $student->class->class }}
                 </div>
                 <div class="info-row">
-                    <div class="info-label">Faculty:</div>
-                    <div class="info-value">{{ $student->section->section_name }}</div>
+                    <strong>Faculty:</strong> {{ $student->section->section_name }}
                 </div>
                 <div class="info-row">
-                    <div class="info-label">Program:</div>
-                    <div class="info-value">{{ $student->program->title }}</div>
+                    <strong>Program:</strong> {{ $student->program->title }}
                 </div>
             </div>
-            
-            <div class="signature">
-                @if($design->sign && file_exists($signPath))
-                <img src="{{ $signPath }}" alt="Signature">
-                @else
-                <div style="width: 80px; height: 20px; border-bottom: 1px solid #000; margin: 0 auto;"></div>
-                @endif
-            </div>
-            
-            <div class="footer">
-                {!! $design->content_footer !!}
-            </div>
+        </div>
+        
+        <div class="signature">
+            @if($design->sign)
+            <img src="{{ public_path('uploads/id_cards/' . basename($design->sign)) }}" alt="Signature" style="max-height: 50px; max-width: 150px;">
+            @else
+            <div style="width: 150px; height: 30px; border-bottom: 1px solid #000; margin: 0 auto;"></div>
+            @endif
+        </div>
+
+        <div class="footer">
+            <p>{!! $design->content_footer !!}</p>
         </div>
     </div>
 </body>

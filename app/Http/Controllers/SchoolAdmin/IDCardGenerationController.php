@@ -9,7 +9,7 @@ use App\Models\Student;
 use App\Models\Program;
 use App\Models\IDCardDesign;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
@@ -77,11 +77,11 @@ public function getProgram($sectionId)
                 $actions .= '<a href="javascript:void(0)" class="btn btn-sm btn-info show-id-card" 
                             data-student-id="'.$student->id.'" 
                             data-id-card-id="'.$idCardId.'">
-                            <i class="fa fa-eye"></i> Show</a>';
+                            <i class="fa fa-eye"></i></a>';
                 $actions .= '<a href="javascript:void(0)" class="btn btn-sm btn-success download-id-card" 
                             data-student-id="'.$student->id.'" 
                             data-id-card-id="'.$idCardId.'">
-                            <i class="fa fa-download"></i> Download</a>';
+                            <i class="fa fa-download"></i></a>';
                 $actions .= '</div>';
                 return $actions;
             })
@@ -99,55 +99,90 @@ public function getProgram($sectionId)
         
         return view('backend.school_admin.generate_id_card.show', compact('student', 'design'));
     }
+/**
+ * Download a single ID card for a specific student
+ */
+public function downloadIDCard($studentId, $idCardId)
+{
+    $student = Student::with(['class', 'section', 'program'])->findOrFail($studentId);
+    $design = IDCardDesign::findOrFail($idCardId);
+    $pdf = PDF::loadView('backend.school_admin.generate_id_card.pdf', compact('student', 'design'));
+    $pdf->setPaper($design->paper_size ?? 'a4', $design->orientation ?? 'portrait');
+
+    return $pdf->download('id_card_' . $student->id . '.pdf');
+}
+
+/**
+ * Bulk download ID cards as a ZIP file
+ */
+public function bulkDownload(Request $request)
+{
+    $request->validate([
+        'student_ids' => 'required|array',
+        'id_card_id' => 'required|exists:id_card_designs,id',
+    ]);
     
-    /**
-     * Download ID card for a specific student
-     */
-    public function downloadIDCard($studentId, $idCardId)
-    {
-        $student = Student::with(['class', 'section', 'program'])->findOrFail($studentId);
-        $design = IDCardDesign::findOrFail($idCardId);
-        
-        $pdf = PDF::loadView('backend.school_admin.generate_id_card.pdf', compact('student', 'design'));
-        
-        $filename = 'id_card_' . $student->first_name_en . '_' . $student->last_name_en . '.pdf';
-        
-        return $pdf->download($filename);
+    $studentIds = $request->student_ids;
+    $idCardId = $request->id_card_id;
+    $design = IDCardDesign::findOrFail($idCardId);
+    $tempPath = storage_path('app/temp/id_cards_' . time());
+    if (!file_exists($tempPath)) {
+        mkdir($tempPath, 0755, true);
     }
+
+    foreach ($studentIds as $studentId) {
+        $student = Student::with(['class', 'section', 'program'])->find($studentId);
+        
+        if ($student) {
+            $pdf = PDF::loadView('backend.school_admin.generate_id_card.pdf', compact('student', 'design'));
+            $pdf->setPaper($design->paper_size ?? 'a4', $design->orientation ?? 'portrait');
+            $pdf->save($tempPath . '/id_card_' . $student->id . '.pdf');
+        }
+    }
+
+    $zipFileName = 'id_cards_' . date('Y-m-d_H-i-s') . '.zip';
+    $zipFilePath = storage_path('app/temp/' . $zipFileName);
     
-    /**
-     * Bulk download ID cards
-     */
-    public function bulkDownload(Request $request)
-    {
-        $studentIds = $request->student_ids;
-        $idCardId = $request->id_card_id;
+    $zip = new ZipArchive();
+    if ($zip->open($zipFilePath, ZipArchive::CREATE) === TRUE) {
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($tempPath),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
         
-        $zipFileName = 'id_cards_' . date('Y-m-d') . '.zip';
-        $zipFilePath = storage_path('app/temp/' . $zipFileName);
-        
-        $zip = new ZipArchive();
-        
-        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-            foreach ($studentIds as $studentId) {
-                $student = Student::with(['class', 'section', 'program'])->findOrFail($studentId);
-                $design = IDCardDesign::findOrFail($idCardId);
-                
-                $pdf = PDF::loadView('backend.school_admin.generate_id_card.pdf', compact('student', 'design'));
-                $pdfContent = $pdf->output();
-                
-                $filename = 'id_card_' . $student->first_name_en . '_' . $student->last_name_en . '.pdf';
-                
-                $zip->addFromString($filename, $pdfContent);
+        foreach ($files as $name => $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = basename($filePath);
+                $zip->addFile($filePath, $relativePath);
             }
-            
-            $zip->close();
-            
-            return Response::download($zipFilePath, $zipFileName, [
-                'Content-Type' => 'application/zip',
-            ])->deleteFileAfterSend(true);
         }
         
-        return response()->json(['error' => 'Failed to create zip file'], 500);
+        $zip->close();
     }
+
+    $this->cleanTempDirectory($tempPath);
+    return response()->download($zipFilePath)->deleteFileAfterSend(true);
+}
+
+/**
+ * Helper method to clean temporary directory
+ */
+private function cleanTempDirectory($dir)
+{
+    $files = new \RecursiveIteratorIterator(
+        new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+        \RecursiveIteratorIterator::CHILD_FIRST
+    );
+    
+    foreach ($files as $file) {
+        if ($file->isDir()) {
+            rmdir($file->getRealPath());
+        } else {
+            unlink($file->getRealPath());
+        }
+    }
+    
+    rmdir($dir);
+}
 }

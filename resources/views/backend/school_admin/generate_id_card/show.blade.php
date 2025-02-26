@@ -22,13 +22,14 @@
                         
                         <div class="student-photo text-center mb-3">
                             @if($student->student_photo)
-                                <img src="{{ asset($student->student_photo) }}" alt="Student Photo" style="width: 100px; height: 120px; object-fit: cover; border: 1px solid #ddd;">
+                                <img src="{{ asset('uploads/students/' . $student->student_photo) }}" alt="Student Photo" style="width: 100px; height: 120px; object-fit: cover; border: 1px solid #ddd;">
                             @else
                                 <div style="width: 100px; height: 120px; border: 1px dashed #999; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
                                     <span>No Photo</span>
                                 </div>
                             @endif
                         </div>
+                        
                         
                         <div class="student-info mb-3">
                             <div class="row mb-2">

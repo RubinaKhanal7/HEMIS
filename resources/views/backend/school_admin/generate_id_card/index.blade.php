@@ -157,7 +157,7 @@
         name: 'student_photo',
         render: function(data) {
             if (data) {
-                return '<img src="' + data + '" alt="Student Photo" width="50">';
+                return '<img src="' + "{{ asset('uploads/students') }}/" + data + '" alt="Student Photo" width="50">';
             }
             return 'No Photo';
         }
@@ -332,13 +332,18 @@
             });
         });
 
-        // Download ID Card
-        $(document).on('click', '.download-id-card', function() {
-            var studentId = $(this).data('student-id');
-            var idCardId = $(this).data('id-card-id');
-
-            window.location.href = '/admin/generate-idcards/download-id-card/' + studentId + '/' + idCardId;
-        });
+       // Download ID Card
+$(document).on('click', '.download-id-card', function() {
+    var studentId = $(this).data('student-id');
+    var idCardId = $('select[name="id_card_id"]').val();
+    
+    if (!idCardId) {
+        alert('Please select ID Card Design');
+        return;
+    }
+    
+    window.location.href = '/admin/generate-idcards/download-id-card/' + studentId + '/' + idCardId;
+});
     });
 </script>
 @endsection
