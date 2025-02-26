@@ -387,30 +387,34 @@ public function getPrograms($sectionId)
             'previous_board_university_college' => 'required|string',
             'previous_registration_no' => 'required|string',
             'previous_institution_name' => 'required|string',
-            'previous_study_records_attachment' => 'nullable|file',
+            'previous_study_records_attachment' => 'nullable|array',
+            'previous_study_records_attachment.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png',
         ]);
     
-        
-    $photoPath = null;
-    $citizenshipFrontPath = null;
-    $citizenshipBackPath = null;
-    $recordsPath = null;
-
-    if ($request->hasFile('student_photo')) {
-        $photoPath = $this->uploadFile($request->file('student_photo'), 'students');
-    }
-
-    if ($request->hasFile('citizenship_front')) {
-        $citizenshipFrontPath = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
-    }
-
-    if ($request->hasFile('citizenship_back')) {
-        $citizenshipBackPath = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
-    }
-
-    if ($request->hasFile('previous_study_records_attachment')) {
-        $recordsPath = $this->uploadFile($request->file('previous_study_records_attachment'), 'previous_records');
-    }
+    
+        $photoPath = null;
+        $citizenshipFrontPath = null;
+        $citizenshipBackPath = null;
+        $recordsPaths = [];
+    
+        if ($request->hasFile('student_photo')) {
+            $photoPath = $this->uploadFile($request->file('student_photo'), 'students');
+        }
+    
+        if ($request->hasFile('citizenship_front')) {
+            $citizenshipFrontPath = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
+        }
+    
+        if ($request->hasFile('citizenship_back')) {
+            $citizenshipBackPath = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
+        }
+    
+        // Handle multiple file uploads
+        if ($request->hasFile('previous_study_records_attachment')) {
+            foreach ($request->file('previous_study_records_attachment') as $file) {
+                $recordsPaths[] = $this->uploadFile($file, 'previous_records');
+            }
+        }
     
         $student = Student::create([
             // Personal Information
@@ -470,7 +474,7 @@ public function getPrograms($sectionId)
             'previous_board_university_college' => $request->previous_board_university_college,
             'previous_registration_no' => $request->previous_registration_no,
             'previous_institution_name' => $request->previous_institution_name,
-            'previous_study_records_attachment' => $recordsPath,
+            'previous_study_records_attachment' => $recordsPaths,
     
             // Additional fields
             'school_id' => auth()->user()->school_id,
@@ -479,7 +483,8 @@ public function getPrograms($sectionId)
     
         return redirect()->route('admin.students.index')
             ->with('success', 'Student registered successfully');
-    }  
+    }
+     
 
     public function show(Request $request)
     {
@@ -508,93 +513,122 @@ public function getPrograms($sectionId)
     }
 
     public function update(Request $request, Student $student)
-    {
-        // Validate the request
-        $validated = $request->validate([
-            'first_name_np' => 'required|string|max:255',
-            'last_name_np' => 'required|string|max:255',
-            'first_name_en' => 'required|string|max:255',
-            'last_name_en' => 'required|string|max:255',
-            'mobile_number' => 'required|string|max:15',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|string',
-            'ethnicity' => 'required|string',
-            'permanent_district' => 'required|string',
-            'permanent_province' => 'required|string',
-            'permanent_local_level' => 'required|string',
-            'permanent_ward_no' => 'required|string',
-            'admission_year' => 'required|digits:4',
-            'date_of_admission' => 'required|date',
-            'academic_program_duration' => 'required|string',
-            'previous_level_of_study' => 'required|string',
-            'previous_board_university_college' => 'required|string',
-            'previous_registration_no' => 'required|string',
-            'previous_institution_name' => 'required|string',
-            'section_id' => 'required|exists:sections,id',
-            'class_id' => 'required|exists:classes,id',
-            'program_id' => 'required|exists:programs,id',
-            
-            // Optional fields
-            'middle_name_np' => 'nullable|string|max:255',
-            'middle_name_en' => 'nullable|string|max:255',
-            'caste' => 'nullable|string|max:255',
-            'edj' => 'nullable|string|max:255',
-            'disability_status' => 'nullable|string|max:255',
-            'citizenship_id' => 'nullable|string|max:255',
-            'national_id' => 'nullable|string|max:255',
-            'permanent_tole' => 'nullable|string|max:255',
-            'permanent_house_no' => 'nullable|string|max:255',
-            'school_id' => 'nullable|exists:schools,id',
-            
-            // File uploads
-            'student_photo' => 'nullable|image|max:2048',
-            'citizenship_front' => 'nullable|image|max:2048',
-            'citizenship_back' => 'nullable|image|max:2048',
-            'previous_study_records_attachment' => 'nullable|file|max:2048',
-            
-            // Temporary address fields
-            'temporary_district' => 'nullable|string|max:255',
-            'temporary_province' => 'nullable|string|max:255',
-            'temporary_local_level' => 'nullable|string|max:255',
-            'temporary_ward_no' => 'nullable|string|max:255',
-            'temporary_tole' => 'nullable|string|max:255',
-            'temporary_house_no' => 'nullable|string|max:255',
-            
-            // Guardian information
-            'father_name' => 'nullable|string|max:255',
-            'father_contact_no' => 'nullable|string|max:15',
-            'father_occupation' => 'nullable|string|max:255',
-            'mother_name' => 'nullable|string|max:255',
-            'mother_contact_no' => 'nullable|string|max:15',
-            'mother_occupation' => 'nullable|string|max:255',
-        ]);
+{
+    // Validate the request
+    $validated = $request->validate([
+        'first_name_np' => 'required|string|max:255',
+        'last_name_np' => 'required|string|max:255',
+        'first_name_en' => 'required|string|max:255',
+        'last_name_en' => 'required|string|max:255',
+        'mobile_number' => 'required|string|max:15',
+        'date_of_birth' => 'required|date',
+        'gender' => 'required|string',
+        'ethnicity' => 'required|string',
+        'permanent_district' => 'required|string',
+        'permanent_province' => 'required|string',
+        'permanent_local_level' => 'required|string',
+        'permanent_ward_no' => 'required|string',
+        'admission_year' => 'required|digits:4',
+        'date_of_admission' => 'required|date',
+        'academic_program_duration' => 'required|string',
+        'previous_level_of_study' => 'required|string',
+        'previous_board_university_college' => 'required|string',
+        'previous_registration_no' => 'required|string',
+        'previous_institution_name' => 'required|string',
+        'section_id' => 'required|exists:sections,id',
+        'class_id' => 'required|exists:classes,id',
+        'program_id' => 'required|exists:programs,id',
+        
+        // Optional fields
+        'middle_name_np' => 'nullable|string|max:255',
+        'middle_name_en' => 'nullable|string|max:255',
+        'caste' => 'nullable|string|max:255',
+        'edj' => 'nullable|string|max:255',
+        'disability_status' => 'nullable|string|max:255',
+        'citizenship_id' => 'nullable|string|max:255',
+        'national_id' => 'nullable|string|max:255',
+        'permanent_tole' => 'nullable|string|max:255',
+        'permanent_house_no' => 'nullable|string|max:255',
+        'school_id' => 'nullable|exists:schools,id',
+        
+        // File uploads
+        'student_photo' => 'nullable|image|max:2048',
+        'citizenship_front' => 'nullable|image|max:2048',
+        'citizenship_back' => 'nullable|image|max:2048',
+        'previous_study_records_attachment' => 'nullable|array',
+        'previous_study_records_attachment.*' => 'file|max:2048',
+        'remove_attachments' => 'nullable|array',
+        'remove_attachments.*' => 'string',
+        
+        // Temporary address fields
+        'temporary_district' => 'nullable|string|max:255',
+        'temporary_province' => 'nullable|string|max:255',
+        'temporary_local_level' => 'nullable|string|max:255',
+        'temporary_ward_no' => 'nullable|string|max:255',
+        'temporary_tole' => 'nullable|string|max:255',
+        'temporary_house_no' => 'nullable|string|max:255',
+        
+        // Guardian information
+        'father_name' => 'nullable|string|max:255',
+        'father_contact_no' => 'nullable|string|max:15',
+        'father_occupation' => 'nullable|string|max:255',
+        'mother_name' => 'nullable|string|max:255',
+        'mother_contact_no' => 'nullable|string|max:15',
+        'mother_occupation' => 'nullable|string|max:255',
+    ]);
 
-        if ($request->hasFile('student_photo')) {
-            // Delete old photo if exists
-            $this->deleteOldFile($student->student_photo, 'students');
-            $validated['student_photo'] = $this->uploadFile($request->file('student_photo'), 'students');
-        }
-    
-        if ($request->hasFile('citizenship_front')) {
-            $this->deleteOldFile($student->citizenship_front, 'citizenship_docs');
-            $validated['citizenship_front'] = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
-        }
-    
-        if ($request->hasFile('citizenship_back')) {
-            $this->deleteOldFile($student->citizenship_back, 'citizenship_docs');
-            $validated['citizenship_back'] = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
-        }
-    
-        if ($request->hasFile('previous_study_records_attachment')) {
-            $this->deleteOldFile($student->previous_study_records_attachment, 'previous_records');
-            $validated['previous_study_records_attachment'] = $this->uploadFile($request->file('previous_study_records_attachment'), 'previous_records');
-        }
-        // Update the student record
-        $student->update($validated);
-
-        return redirect()->route('admin.students.index', $student)
-            ->with('success', 'Student information updated successfully');
+    if ($request->hasFile('student_photo')) {
+        // Delete old photo if exists
+        $this->deleteOldFile($student->student_photo, 'students');
+        $validated['student_photo'] = $this->uploadFile($request->file('student_photo'), 'students');
     }
+
+    if ($request->hasFile('citizenship_front')) {
+        $this->deleteOldFile($student->citizenship_front, 'citizenship_docs');
+        $validated['citizenship_front'] = $this->uploadFile($request->file('citizenship_front'), 'citizenship_docs');
+    }
+
+    if ($request->hasFile('citizenship_back')) {
+        $this->deleteOldFile($student->citizenship_back, 'citizenship_docs');
+        $validated['citizenship_back'] = $this->uploadFile($request->file('citizenship_back'), 'citizenship_docs');
+    }
+
+    // Handle multiple attachments
+    if ($request->hasFile('previous_study_records_attachment')) {
+        $currentAttachments = $student->previous_study_records_attachment ?? [];
+        
+        // Add new files
+        foreach ($request->file('previous_study_records_attachment') as $file) {
+            $currentAttachments[] = $this->uploadFile($file, 'previous_records');
+        }
+        
+        $validated['previous_study_records_attachment'] = $currentAttachments;
+    }
+    
+    // Handle attachment removals
+    if ($request->has('remove_attachments') && is_array($request->remove_attachments)) {
+        $currentAttachments = $student->previous_study_records_attachment ?? [];
+        $newAttachments = [];
+        
+        foreach ($currentAttachments as $attachment) {
+            if (!in_array($attachment, $request->remove_attachments)) {
+                $newAttachments[] = $attachment;
+            } else {
+                // Delete the removed file
+                $this->deleteOldFile($attachment, 'previous_records');
+            }
+        }
+        
+        $validated['previous_study_records_attachment'] = $newAttachments;
+    }
+
+    // Update the student record
+    $student->update($validated);
+
+    return redirect()->route('admin.students.index', $student)
+        ->with('success', 'Student information updated successfully');
+}
+
 
     private function uploadFile($file, $directory)
 {

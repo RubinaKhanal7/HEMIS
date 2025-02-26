@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
+    protected $guarded = [];
+
+    protected $casts = [
+        'previous_study_records_attachment' => 'array',
+    ];
+
     protected $fillable = [
         // Personal Information
         'first_name_np', 'middle_name_np', 'last_name_np',

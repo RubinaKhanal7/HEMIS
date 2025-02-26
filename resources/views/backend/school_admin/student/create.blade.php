@@ -601,47 +601,121 @@
                                                         <strong class="text-danger">{{ $message }}</strong>
                                                     @enderror
                                                 </div>
-                                   
-                                                <!-- Attachment of Previous Studies Records -->
-                                                <div class="form-group col-lg-3 col-sm-3 mt-2">
-                                                    <label for="previous_study_records_attachment">Attachment of Previous Studies Records:</label>
-                                                    <input type="file" name="previous_study_records_attachment" class="form-control" id="previous_study_records_attachment" onchange="previewDocument(this, 'document_preview_container')">
-                                                    @error('previous_study_records_attachment')
-                                                        <strong class="text-danger">{{ $message }}</strong>
-                                                    @enderror
-                                                
-                                                    <!-- Preview Container -->
-                                                    <div id="document_preview_container" class="mt-2" style="display: none;">
-                                                        <p class="mb-0">
-                                                            <i class="fas fa-file"></i> 
-                                                            <span id="document_name"></span>
-                                                        </p>
-                                                    </div>
-                                                
-                                                    @if(!empty($student->previousAcademic->previous_study_records_attachment))
-                                                        <p class="mt-2">
-                                                            <a href="{{ asset('uploads/previous_records/' . $student->previousAcademic->previous_study_records_attachment) }}" target="_blank">
-                                                                <i class="fas fa-file"></i> View Uploaded Document
-                                                            </a>
-                                                        </p>
-                                                    @endif
-                                                </div>
-                                                
-                                                <script>
-                                                function previewDocument(input, containerId) {
-                                                    const container = document.getElementById(containerId);
-                                                    const nameSpan = document.getElementById('document_name');
-                                                    
-                                                    if (input.files && input.files[0]) {
-                                                        const fileName = input.files[0].name;
-                                                        nameSpan.textContent = fileName;
-                                                        container.style.display = 'block';
-                                                    } else {
-                                                        container.style.display = 'none';
-                                                        nameSpan.textContent = '';
-                                                    }
-                                                }
-                                                </script>
+                                   <!-- Attachment of Previous Studies Records -->
+<div class="form-group col-lg-3 col-sm-3 mt-2">
+    <label for="previous_study_records_attachment">Attachment of Previous Studies Records:</label>
+    <div class="input-group">
+        <input type="file" name="previous_study_records_attachment[]" class="form-control attachment-input">
+        <button type="button" class="btn btn-primary" id="add-more-attachments">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+    @error('previous_study_records_attachment')
+        <strong class="text-danger">{{ $message }}</strong>
+    @enderror
+    @error('previous_study_records_attachment.*')
+        <strong class="text-danger">{{ $message }}</strong>
+    @enderror
+
+    <!-- Container for additional attachment fields -->
+    <div id="attachments-container" class="mt-2"></div>
+
+    <!-- Preview Container -->
+    <div id="document_preview_container" class="mt-2" style="display: none;">
+        <div id="file_previews"></div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if jQuery is available
+    if (typeof jQuery === 'undefined') {
+        console.error('jQuery is not loaded. Please include jQuery before this script.');
+        return;
+    }
+
+    // Add more attachments
+    document.getElementById('add-more-attachments').addEventListener('click', function() {
+        let container = document.getElementById('attachments-container');
+        let div = document.createElement('div');
+        div.className = 'input-group mt-2 attachment-field';
+        div.innerHTML = `
+            <input type="file" name="previous_study_records_attachment[]" class="form-control attachment-input">
+            <button type="button" class="btn btn-danger remove-attachment">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-primary add-attachment">
+                <i class="fas fa-plus"></i>
+            </button>
+        `;
+        container.appendChild(div);
+
+        // Add event listener to the new file input
+        div.querySelector('.attachment-input').addEventListener('change', handleFileSelection);
+    });
+
+    // Initial file input event
+    document.querySelector('.attachment-input').addEventListener('change', handleFileSelection);
+
+    // Function to handle file selection
+    function handleFileSelection(event) {
+        if (event.target.files && event.target.files[0]) {
+            let fileName = event.target.files[0].name;
+            let previewContainer = document.getElementById('document_preview_container');
+            let filePreviews = document.getElementById('file_previews');
+            
+            // Create a preview element
+            let previewElement = document.createElement('p');
+            previewElement.className = 'mb-1';
+            previewElement.innerHTML = `<i class="fas fa-file"></i> ${fileName}`;
+            
+            filePreviews.appendChild(previewElement);
+            previewContainer.style.display = 'block';
+        }
+    }
+
+    // Using event delegation for dynamically added elements
+    document.getElementById('attachments-container').addEventListener('click', function(event) {
+        // Handle remove button clicks
+        if (event.target.classList.contains('remove-attachment') || 
+            (event.target.parentElement && event.target.parentElement.classList.contains('remove-attachment'))) {
+            const button = event.target.classList.contains('remove-attachment') ? 
+                            event.target : event.target.parentElement;
+            const fieldToRemove = button.closest('.attachment-field');
+            if (fieldToRemove) {
+                fieldToRemove.remove();
+            }
+        }
+        
+        // Handle add button clicks
+        if (event.target.classList.contains('add-attachment') || 
+            (event.target.parentElement && event.target.parentElement.classList.contains('add-attachment'))) {
+            const button = event.target.classList.contains('add-attachment') ? 
+                            event.target : event.target.parentElement;
+            const currentField = button.closest('.attachment-field');
+            
+            if (currentField) {
+                let newDiv = document.createElement('div');
+                newDiv.className = 'input-group mt-2 attachment-field';
+                newDiv.innerHTML = `
+                    <input type="file" name="previous_study_records_attachment[]" class="form-control attachment-input">
+                    <button type="button" class="btn btn-danger remove-attachment">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary add-attachment">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                `;
+                
+                // Add new field after the current one
+                currentField.after(newDiv);
+                
+                // Add event listener to the new file input
+                newDiv.querySelector('.attachment-input').addEventListener('change', handleFileSelection);
+            }
+        }
+    });
+});
+</script>
                                    
                                             </div>
                                         </div>
