@@ -658,21 +658,65 @@
                                                 @enderror
                                             </div>
                                 
-                                            <!-- Attachment of Previous Studies Records -->
                                             <div class="form-group col-lg-3 col-sm-3 mt-2">
                                                 <label for="previous_study_records_attachment">Attachment of Previous Studies Records:</label>
-                                                <input type="file" name="previous_study_records_attachment" class="form-control" id="previous_study_records_attachment">
+                                                <div class="input-group">
+                                                    <input type="file" name="previous_study_records_attachment[]" class="form-control" id="previous_study_records_attachment">
+                                                    <button type="button" class="btn btn-primary add-more-attachments">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
                                                 @error('previous_study_records_attachment')
                                                     <strong class="text-danger">{{ $message }}</strong>
                                                 @enderror
-                                
-                                                @if(!empty($student->previous_study_records_attachment))
-                                                    <p class="mt-2">
-                                                        <a href="{{ asset('uploads/previous_records/' . $student->previous_study_records_attachment) }}" target="_blank">View Uploaded Document</a>
-                                                    </p>
+                                                @error('previous_study_records_attachment.*')
+                                                    <strong class="text-danger">{{ $message }}</strong>
+                                                @enderror
+                                            
+                                                <!-- Container for additional attachment fields -->
+                                                <div class="attachments-container mt-2"></div>
+                                                
+                                                <!-- Display existing attachments -->
+                                                @if(!empty($student->previous_study_records_attachment) && is_array($student->previous_study_records_attachment))
+                                                    <div class="mt-3">
+                                                        <label>Current Attachments:</label>
+                                                        <div class="list-group">
+                                                            @foreach($student->previous_study_records_attachment as $index => $attachment)
+                                                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                    <a href="{{ asset('uploads/previous_records/' . $attachment) }}" target="_blank">
+                                                                        <i class="fas fa-file"></i> Document #{{ $index + 1 }}
+                                                                    </a>
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="checkbox" name="remove_attachments[]" value="{{ $attachment }}" id="remove_{{ $index }}">
+                                                                        <label class="form-check-label" for="remove_{{ $index }}">Remove</label>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
                                                 @endif
                                             </div>
-                                
+                                            <script>
+                                                $(document).ready(function() {
+                                                    // Add more attachments
+                                                    $('.add-more-attachments').click(function() {
+                                                        let newField = `
+                                                            <div class="input-group mt-2 attachment-field">
+                                                                <input type="file" name="previous_study_records_attachment[]" class="form-control">
+                                                                <button type="button" class="btn btn-danger remove-attachment">
+                                                                    <i class="fas fa-minus"></i>
+                                                                </button>
+                                                            </div>
+                                                        `;
+                                                        $('.attachments-container').append(newField);
+                                                    });
+                                            
+                                                    // Remove attachment field
+                                                    $(document).on('click', '.remove-attachment', function() {
+                                                        $(this).closest('.attachment-field').remove();
+                                                    });
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                 </div>
