@@ -74,13 +74,13 @@
             @endcan
 
             @can('list_staffs')
-                <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'staffs' ? 'active' : '' }}"
-                        href="{{ route('admin.staffs.index') }}">
-                        <div class="d-flex align-items-center">
-                            <i class="fa fa-angle-double-right"></i>{{ __('Members') }}
-                        </div>
-                    </a>
-                </li>
+            <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'members' ? 'active' : '' }}"
+                href="{{ route('admin.members.index') }}">
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-angle-double-right"></i>{{ __('Members') }}
+                </div>
+            </a>
+        </li>
             @endcan
         </ul>
     </li>
