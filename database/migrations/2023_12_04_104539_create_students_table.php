@@ -68,7 +68,7 @@ return new class extends Migration
             $table->string('previous_board_university_college');
             $table->string('previous_registration_no');
             $table->string('previous_institution_name');
-            $table->string('previous_study_records_attachment')->nullable();
+            $table->json('previous_study_records_attachment')->nullable();
             
             // Foreign Keys
             $table->foreignId('school_id')->nullable()->constrained('schools')->onDelete('set null');

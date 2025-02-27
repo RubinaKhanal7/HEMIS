@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.3",
         "anuzpandey/laravel-nepali-date": "^2.1",
-        "barryvdh/laravel-dompdf": "^3.0",
+        "barryvdh/laravel-dompdf": "^3.1",
         "ernilambar/nepali-date": "^1.0",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "^2.7",
