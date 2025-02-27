@@ -24,6 +24,28 @@
                     </a>
                 </li>
             @endcan
+
+            @can('list_admit_carddesigns')
+            <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'admit-carddesigns' ? 'active' : '' }}"
+                    href="{{ route('admin.id-carddesigns.index') }}">
+                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>
+                        {{ __('Id Card Design') }}
+
+                    </div>
+                </a>
+            </li>
+        @endcan
+
+        @can('list_generate_admitcards')
+            <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'generate-admitcards' ? 'active' : '' }}"
+                    href="{{ route('admin.generate-idcards.index') }}">
+                    <div class="d-flex align-items-center"><i
+                            class="fa fa-angle-double-right"></i>{{ __('Generate Id Card') }}
+
+                    </div>
+                </a>
+            </li>
+        @endcan
         </ul>
     </li>
     </li>
