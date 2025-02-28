@@ -2,6 +2,7 @@
     {{-- <hr class="my-4">     --}}
     <li class="nav-item">
 
+
         <!-- label-->
         <div class="row navbar-vertical-label-wrapper mt-3 mb-2">
             <div class="col-auto navbar-vertical-label">{{ __('Campus Management') }}</div>
@@ -19,6 +20,7 @@
         <ul class="nav collapse  {{ Request::segment(2) == 'school-houses' || Request::segment(2) == 'students' || Request::segment(2) == 'staffs' ? 'show' : '' }}"
             id="dashboard3">
 
+
             @can('list_school_houses')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::segment(2) == 'school-houses' ? 'active' : '' }}"
@@ -30,6 +32,7 @@
                 </li>
             @endcan
 
+
             @can('list_schools')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'schools' ? 'active' : '' }}"
                         href="{{ route('admin.schools.index') }}">
@@ -39,6 +42,7 @@
                     </a>
                 </li>
             @endcan
+
 
             @can('list_students')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'students' ? 'active' : '' }}"
@@ -50,6 +54,7 @@
                 </li>
             @endcan
 
+
             @can('list_staffs')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'staffs' ? 'active' : '' }}"
                         href="{{ route('admin.staffs.index') }}">
@@ -59,8 +64,37 @@
                     </a>
                 </li>
             @endcan
+
+
+            @can('list_membershiphead')
+           
+            <li class="nav-item">
+                <a class="nav-link {{ Request::segment(2) == 'membershiphead' ? 'active' : '' }}"
+                    href="{{ route('admin.membershiphead.index') }}">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-angle-double-right"></i>{{ __('Membership Head') }}
+                    </div>
+                </a>
+            </li>
+       
+            @endcan
+
+
+            @can('list_members')
+            <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'members' ? 'active' : '' }}"
+                href="{{ route('admin.members.index') }}">
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-angle-double-right"></i>{{ __('Members') }}
+                </div>
+            </a>
+        </li>
+            @endcan
         </ul>
     </li>
 
+
     </li>
 @endhasanyrole
+
+
+

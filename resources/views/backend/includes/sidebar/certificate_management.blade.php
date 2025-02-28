@@ -16,6 +16,7 @@
         <ul class="nav collapse  {{ Request::segment(2) == 'student-certificates' || Request::segment(2) == '' ? 'show' : '' }}"
             id="dashboard8">
 
+
             @can('list_student_certificates')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'student-certificates' ? 'active' : '' }}"
                         href="{{ route('admin.student-certificates.index') }}">
@@ -24,7 +25,36 @@
                     </a>
                 </li>
             @endcan
+
+
+            @can('list_idcard_design')
+            <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'admit-carddesigns' ? 'active' : '' }}"
+                    href="{{ route('admin.id-carddesigns.index') }}">
+                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>
+                        {{ __('Id Card Design') }}
+
+
+                    </div>
+                </a>
+            </li>
+        @endcan
+
+
+        @can('list_idcard')
+            <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'generate-admitcards' ? 'active' : '' }}"
+                    href="{{ route('admin.generate-idcards.index') }}">
+                    <div class="d-flex align-items-center"><i
+                            class="fa fa-angle-double-right"></i>{{ __('Generate Id Card') }}
+
+
+                    </div>
+                </a>
+            </li>
+        @endcan
         </ul>
     </li>
     </li>
 @endhasanyrole
+
+
+
