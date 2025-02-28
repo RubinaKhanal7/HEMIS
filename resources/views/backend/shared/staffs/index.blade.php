@@ -22,7 +22,6 @@
                                         <thead>
                                            
                                             <tr>
-                                                <th>Id</th>
                                                 <th>First Name</th>
                                                 <th>Last Name</th>
                                                 <th>Role / Position</th>
@@ -63,7 +62,6 @@
                 }
             },
             columns: [
-                { data: 'id', name: 'id' },
                 { data: 'first_name_english', name: 'first_name_english' },
                 { data: 'last_name_english', name: 'last_name_english' },
                 { data: 'role', name: 'role' },

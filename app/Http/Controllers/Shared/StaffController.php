@@ -459,12 +459,8 @@ class StaffController extends Controller
 
     public function getAllStaff(Request $request)
     {
-        // Check if it's an AJAX request for DataTable
         if ($request->ajax()) {
             try {
-                Log::info('Fetching staff data via AJAX');  // Add a log entry to confirm we're reaching this point
-    
-                // Select only the necessary columns for performance
                 $staffs = Staff::select([
                     'id',
                     'first_name_english',
@@ -474,8 +470,7 @@ class StaffController extends Controller
                     'job_type',
                     'category',
                 ]);
-    
-                // Apply search functionality if the search parameter exists
+
                 if ($search = $request->get('search')['value']) {
                     $staffs = $staffs->where(function($query) use ($search) {
                         $query->where('first_name_english', 'like', "%$search%")
@@ -486,41 +481,32 @@ class StaffController extends Controller
                             ->orWhere('category', 'like', "%$search%");
                     });
                 }
-    
-                // Apply sorting functionality
+
                 if ($order = $request->get('order')) {
                     $column = $request->get('columns')[$order[0]['column']]['data'];
                     $direction = $order[0]['dir'];
                     $staffs = $staffs->orderBy($column, $direction);
                 }
-    
-                // Apply pagination - paginate directly with DataTables pagination parameters
+
                 $staffs = $staffs->paginate($request->get('length', 10));
-    
-                Log::info('Fetched ' . $staffs->total() . ' staff records.');
-    
-                // Add the 'actions' column for each staff row (e.g., Edit and Delete buttons)
                 $data = $staffs->items();
                 foreach ($data as $staff) {
                     $staff->actions = view('backend.shared.staffs.partials.controller_action', compact('staff'))->render();
                 }
-    
-                // Return the data in the format that DataTables expects
                 return response()->json([
                     'draw' => intval($request->get('draw')),
                     'recordsTotal' => $staffs->total(),
                     'recordsFiltered' => $staffs->total(),
-                    'data' => $data  // The actual data for the table
+                    'data' => $data  
                 ]);
             } catch (\Exception $e) {
                 Log::error("Error fetching staff data: " . $e->getMessage());
                 return response()->json([
                     'error' => 'Failed to fetch staff data'
-                ], 500);  // Return a 500 error if something goes wrong
+                ], 500);
             }
         }
-    
-        // Return a 400 error if it's not an AJAX request
+
         return response()->json(['error' => 'Invalid request'], 400);
     }
     
@@ -538,19 +524,14 @@ class StaffController extends Controller
             if (!$request->hasFile('file')) {
                 return redirect()->back()->with('error', 'No file was uploaded');
             }
-            
-            // Begin a database transaction
             DB::beginTransaction();
             
             Excel::import(new StaffsImport(), $request->file('file'));
-            
-            // If we reach this point without exceptions, commit the transaction
             DB::commit();
             
             return redirect()->route('admin.staffs.index')->with('success', 'Staff data has been successfully imported.');
             
         } catch (\Exception $e) {
-            // Roll back the transaction in case of error
             DB::rollback();
             
             return redirect()->back()->with('error', 'Error importing staff data: ' . $e->getMessage());

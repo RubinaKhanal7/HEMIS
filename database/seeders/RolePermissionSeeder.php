@@ -402,6 +402,7 @@ class RolePermissionSeeder extends Seeder
             'edit_idcard',
             'delete_idcard',
             'list_idcard',
+            'list_staffreport',
         ];
 
         // Create the permissions
@@ -1063,6 +1064,7 @@ class RolePermissionSeeder extends Seeder
             'edit_idcard',
             'delete_idcard',
             'list_idcard',
+            'list_staffreport',
 
     //define permission for School Teacher
         $permissionForTeacher = [
