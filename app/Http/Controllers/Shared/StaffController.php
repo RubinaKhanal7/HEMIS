@@ -10,7 +10,9 @@ use App\Models\School;
 
 use App\Models\Student;
 use App\Models\User;
+use App\Models\Municipality;
 use App\Models\District;
+use App\Models\State;
 use App\Models\Department;
 use App\Models\SchoolUser;
 
@@ -203,153 +205,368 @@ public function show($id)
     }
     public function store(Request $request)
     {
-        try {
-            // Debugging to check the role value
-            // dd($request->input('role'));
+        $validated = $request->validate([
+            'first_name_nepali' => 'required|string|max:255',
+            'middle_name_nepali' => 'nullable|string|max:255',
+            'last_name_nepali' => 'required|string|max:255',
+            'first_name_english' => 'required|string|max:255',
+            'middle_name_english' => 'nullable|string|max:255',
+            'last_name_english' => 'required|string|max:255',
+            'mobile_number' => 'required|string|max:20',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|in:male,female,other',
+            'caste' => 'nullable|string|max:255',
+            'ethnicity' => 'required|in:Dalit,Janajati,Madhesi,Muslim,Tharu,Brahmin,Chhetri',
+            'edj' => 'nullable|boolean',
+            'disability_status' => 'nullable|boolean',
+            'citizenship_id' => 'required|string|unique:staffs',
+            'national_id' => 'nullable|string|unique:staffs',
+            'photo' => 'nullable|image|max:2048',
+            'citizenship_front' => 'nullable|image|max:2048',
+            'citizenship_back' => 'nullable|image|max:2048',
+            'spouse_name' => 'nullable|string|max:255',
+            'spouse_occupation' => 'nullable|string|max:255',
+            
+            'permanent_province' => 'required|string|max:255',
+            'permanent_district' => 'required|string|max:255',
+            'permanent_local_level' => 'required|string|max:255',
+            'permanent_ward_no' => 'required|string|max:10',
+            'permanent_tole' => 'nullable|string|max:255',
+            'permanent_house_no' => 'nullable|string|max:50',
+            
+            'temporary_province' => 'nullable|string|max:255',
+            'temporary_district' => 'nullable|string|max:255',
+            'temporary_local_level' => 'nullable|string|max:255',
+            'temporary_ward_no' => 'nullable|string|max:10',
+            'temporary_tole' => 'nullable|string|max:255',
+            'temporary_house_no' => 'nullable|string|max:50',
+            
+            'level_of_study' => 'nullable|array',
+            'board_university_college' => 'nullable|array',
+            'registration' => 'nullable|array',
+            'institution_name' => 'nullable|array',
+            'academic_documents' => 'nullable|array',
+            'academic_documents.*' => 'nullable|file|max:5120',
+            
+            'role' => 'required|string|max:255',
+            'level' => 'required|string|max:255',
+            'job_type' => 'required|in:Temporary,Permanent,Contract,Daily Basis',
+            'category' => 'required|in:Technical,Non-Technical',
+            'appointment_date' => 'required|date',
+            'resume' => 'nullable|file|max:5120',
+            'other_documents' => 'nullable|array',
+            'other_documents.*' => 'nullable|file|max:5120',
+            
+            'school_id' => 'nullable|exists:schools,id',
+            'user_id' => 'nullable|exists:users,id',
+        ]);
 
-            // CREATING USER WITH ITS RESPECTIVE VALIDATION FUNCTION
-            $userInput = $this->validateUserData($request);
+        // Handle file uploads
+        $data = $request->except([
+            'photo', 'citizenship_front', 'citizenship_back', 
+            'academic_documents', 'resume', 'other_documents'
+        ]);
 
-            if ($request->has('inputCroppedPic') && !is_null($request->inputCroppedPic)) {
-                $userInput['image'] = $this->saveUserImage($request->input('inputCroppedPic'));
-            }
-            if ($request->has('inputCroppedPic') && !is_null($request->inputCroppedPic)) {
-                if (!File::exists($this->imageSavePath)) {
-                    File::makeDirectory($this->imageSavePath, 0775, true, true);
-                }
-                $destinationPath = $this->imageSavePath . $this->getDateFormatFileName('jpg');
-                Image::make($request->input('inputCroppedPic'))
-                    ->encode('jpg')
-                    ->save(public_path($destinationPath));
-                $input['student_photo'] = $destinationPath;
-            }
-
-            // Include 'role' in user data
-            $userInput['role_id'] = $request->input('role');
-            // dd($userInput);
-
-            $staffNumber = $request->input('employee_id') ?? '';
-            // Generate username based on first letter of f_name, first letter of l_name, and employee number
-            $username = strtolower(substr($userInput['f_name'], 0, 1) . substr($userInput['l_name'], 0, 1) . '-' . $staffNumber);
-            // Assign the generated username to the user input
-            $userInput['username'] = $username;
-
-            $userInput['password'] = Hash::make('password');
-
-            // STAFF USER CREATED AND ASSIGNED
-            $staffUser = $this->createUser($userInput);
-            // dd($staffUser);
-            // $staffUser->assignRole($userInput['role_id']);
-
-            // CREATING STAFF WITH ITS RESPECTIVE VALIDATION
-            $staffInput = $this->validateUserData($request, true);
-            $staffInput['user_id'] = $staffUser->id;
-            $staffInput['school_id'] = session('school_id');
-
-
-            // $staffInput['employee_id'] = 1;
-            $staffInput['department_id'] = $request->input('department_id');
-            $staffInput['class_id'] = $request->input('class_id');
-            $staffInput['qualification'] = $request->input('qualification');
-            $staffInput['work_experience'] = $request->input('work_experience');
-            $staffInput['date_of_joining'] = $request->input('date_of_joining');
-            $staffInput['date_of_leaving'] = $request->input('date_of_leaving');
-            $staffInput['payscale'] = $request->input('payscale');
-            $staffInput['basic_salary'] = $request->input('basic_salary');
-            $staffInput['contract_type'] = $request->input('contract_type');
-            $staffInput['shift'] = $request->input('shift');
-            $staffInput['resignation_letter'] = $request->input('resignation_letter');
-            $staffInput['joining_letter'] = $request->input('joining_letter');
-            $staffInput['medical_leave'] = $request->input('medical_leave');
-            $staffInput['casual_leave'] = $request->input('casual_leave');
-            $staffInput['maternity_leave'] = $request->input('maternity_leave');
-            $staffInput['role'] = $request->input('role');
-            // $staffInput['location'] = $request->input('location');
-            $staffInput['other_document'] = $request->input('other_document');
-
-            $resumePath = $this->saveResume($request);
-
-            if (!is_null($resumePath)) {
-                $staffInput['resume'] = $resumePath;
-            }
-
-            $staffInput['staff_photo'] = $staffUser->image;
-
-            // Include 'role' in staff data
-            $staffInput['role'] = $request->input('role');
-
-            // Ensure 'role' is set to 'role_id'
-            $staffInput['role_id'] = $request->input('role');
-            $this->saveStaff($staffInput);
-
-            // Create entry in the SchoolUser pivot table
-            $this->createSchoolUserEntry($staffInput['school_id'], $staffUser->id);
-
-            return redirect()->route('admin.staffs.index')->withToastSuccess('Staff successfully created');
-        } catch (\Exception $e) {
-            return back()->withToastError($e->getMessage())->withInput();
+        // Handle regular image uploads
+        if ($request->hasFile('photo')) {
+            $photoPath = $this->uploadFile($request->file('photo'), 'staff/photos');
+            $data['photo'] = $photoPath;
         }
-    }
+        
+        if ($request->hasFile('citizenship_front')) {
+            $frontPath = $this->uploadFile($request->file('citizenship_front'), 'staff/citizenship');
+            $data['citizenship_front'] = $frontPath;
+        }
+        
+        if ($request->hasFile('citizenship_back')) {
+            $backPath = $this->uploadFile($request->file('citizenship_back'), 'staff/citizenship');
+            $data['citizenship_back'] = $backPath;
+        }
+        
+        if ($request->hasFile('resume')) {
+            $resumePath = $this->uploadFile($request->file('resume'), 'staff/resumes');
+            $data['resume'] = $resumePath;
+        }
 
+        // Handle arrays of academic documents
+        if ($request->hasFile('academic_documents')) {
+            $academicDocPaths = [];
+            foreach ($request->file('academic_documents') as $key => $file) {
+                if ($file) {
+                    $path = $this->uploadFile($file, 'staff/academic_documents');
+                    $academicDocPaths[$key] = $path;
+                }
+            }
+            $data['academic_documents'] = json_encode($academicDocPaths);
+        }
+        
+        // Handle other documents array
+        if ($request->hasFile('other_documents')) {
+            $otherDocPaths = [];
+            foreach ($request->file('other_documents') as $key => $file) {
+                if ($file) {
+                    $path = $this->uploadFile($file, 'staff/other_documents');
+                    $otherDocPaths[$key] = $path;
+                }
+            }
+            $data['other_documents'] = json_encode($otherDocPaths);
+        }
+
+        // Convert json fields
+        if (isset($data['level_of_study'])) {
+            $data['level_of_study'] = json_encode($data['level_of_study']);
+        }
+        
+        if (isset($data['board_university_college'])) {
+            $data['board_university_college'] = json_encode($data['board_university_college']);
+        }
+        
+        if (isset($data['registration'])) {
+            $data['registration'] = json_encode($data['registration']);
+        }
+        
+        if (isset($data['institution_name'])) {
+            $data['institution_name'] = json_encode($data['institution_name']);
+        }
+
+        $staff = Staff::create($data);
+
+        return redirect()->route('admin.staffs.index')->withToastSuccess('Staff Created successfully');
+    }
     public function edit(string $id)
     {
         try {
             $staff = Staff::findOrFail($id);
-            $states = $this->formService->getProvinces();
-            $roles = Role::whereIn('name', ['Teacher', 'Accountant', 'Librarian', 'Principal', 'Receptionist'])->get();
-            $selectedRole = $staff->role_id;
-            $departments = Department::all();
             $page_title = 'Staff Edit Form';
-            // FETCHING DISTRICT FOR SELECTED STATE
-            $districts = $staff->user->district_bystate($staff->user->state_id);
-            // FETCHING MUNICIPALITY FOR SELECTED DISTRICT
-            $municipalities = $staff->user->municipalities_bydistrict($staff->user->district_id);
-
-            // FETCHING WARDS BY MUNICIAITY
-            $wards = User::getWards($staff->user->municipality_id);
-
-
-            return view('backend.shared.staffs.update', compact('staff', 'page_title', 'states', 'roles', 'selectedRole', 'districts', 'municipalities', 'wards', 'departments'));
+            $municipalities = Municipality::all();
+            $districts = District::all();
+            $states = State::all();
+            $wards = User::getWards($staff->municipality_id);
+            $adminStateId = Auth::user()->state_id;
+            $adminDistrictId = Auth::user()->district_id;
+            $adminMunicipalityId = Auth::user()->municipality_id;
+    
+            // Decode JSON academic information
+            $academics = [];
+            if ($staff->level_of_study) {
+                $levels = json_decode($staff->level_of_study, true);
+                $institutions = json_decode($staff->institution_name, true);
+                $boards = json_decode($staff->board_university_college, true);
+                $registrations = json_decode($staff->registration, true);
+                $documents = json_decode($staff->academic_documents, true) ?? [];
+    
+                foreach ($levels as $index => $level) {
+                    $academics[] = [
+                        'level_of_study' => $level,
+                        'institution_name' => $institutions[$index] ?? '',
+                        'board_university_college' => $boards[$index] ?? '',
+                        'registration' => $registrations[$index] ?? '',
+                        'document_path' => $documents[$index] ?? null,
+                    ];
+                }
+            }
+    
+            return view('backend.shared.staffs.update', compact('staff', 'page_title', 'states', 'districts', 'municipalities', 'wards', 'academics','adminStateId', 'adminMunicipalityId', 'adminDistrictId',));
         } catch (\Exception $e) {
             return back()->withToastError($e->getMessage());
         }
     }
+    
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Staff $staff)
     {
-        try {
-            $validatedUserData = $this->validateUserData($request);
-            $validatedStaffData = $this->validateUserData($request, true);
-            $staff = Staff::findOrFail($id);
+        $validated = $request->validate([
+            'first_name_nepali' => 'required|string|max:255',
+            'middle_name_nepali' => 'nullable|string|max:255',
+            'last_name_nepali' => 'required|string|max:255',
+            'first_name_english' => 'required|string|max:255',
+            'middle_name_english' => 'nullable|string|max:255',
+            'last_name_english' => 'required|string|max:255',
+            'mobile_number' => 'required|string|max:20',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|in:male,female,other',
+            'caste' => 'nullable|string|max:255',
+            'ethnicity' => 'required|in:Dalit,Janajati,Madhesi,Muslim,Tharu,Brahmin,Chhetri',
+            'edj' => 'nullable|boolean',
+            'disability_status' => 'nullable|boolean',
+            'citizenship_id' => 'required|string|unique:staffs,citizenship_id,' . $staff->id,
+            'national_id' => 'nullable|string|unique:staffs,national_id,' . $staff->id,
+            'photo' => 'nullable|image|max:2048',
+            'citizenship_front' => 'nullable|image|max:2048',
+            'citizenship_back' => 'nullable|image|max:2048',
+            'spouse_name' => 'nullable|string|max:255',
+            'spouse_occupation' => 'nullable|string|max:255',
+            
+            'permanent_province' => 'required|string|max:255',
+            'permanent_district' => 'required|string|max:255',
+            'permanent_local_level' => 'required|string|max:255',
+            'permanent_ward_no' => 'required|string|max:10',
+            'permanent_tole' => 'nullable|string|max:255',
+            'permanent_house_no' => 'nullable|string|max:50',
+            
+            'temporary_province' => 'nullable|string|max:255',
+            'temporary_district' => 'nullable|string|max:255',
+            'temporary_local_level' => 'nullable|string|max:255',
+            'temporary_ward_no' => 'nullable|string|max:10',
+            'temporary_tole' => 'nullable|string|max:255',
+            'temporary_house_no' => 'nullable|string|max:50',
+            
+            'level_of_study' => 'nullable|array',
+            'board_university_college' => 'nullable|array',
+            'registration' => 'nullable|array',
+            'institution_name' => 'nullable|array',
+            'academic_documents' => 'nullable|array',
+            'academic_documents.*' => 'nullable|file|max:5120',
+            
+            'role' => 'required|string|max:255',
+            'level' => 'required|string|max:255',
+            'job_type' => 'required|in:Temporary,Permanent,Contract,Daily Basis',
+            'category' => 'required|in:Technical,Non-Technical',
+            'appointment_date' => 'required|date',
+            'resume' => 'nullable|file|max:5120',
+            'other_documents' => 'nullable|array',
+            'other_documents.*' => 'nullable|file|max:5120',
+            
+            'school_id' => 'nullable|exists:schools,id',
+            'user_id' => 'nullable|exists:users,id',
+            
+            'existing_academic_documents' => 'nullable|array',
+            'existing_resume' => 'nullable|string',
+            'existing_other_documents' => 'nullable|array',
+        ]);
     
-            DB::beginTransaction();
+        // Handle file uploads
+        $data = $request->except([
+            'photo', 'citizenship_front', 'citizenship_back', 
+            'academic_documents', 'resume', 'other_documents',
+            'existing_academic_documents', 'existing_resume', 'existing_other_documents'
+        ]);
     
-            if ($staff->user) {
-                if ($request->has('inputCroppedPic') && !is_null($request->inputCroppedPic)) {
-                    $userInput['image'] = $this->saveUserImage($request->input('inputCroppedPic'));
-                }
-                $staff->user->update($validatedUserData);
-                if ($request->has('role_id')) {
-                    $staff->user->update(['role_id' => $request->role_id]);
-                    $staff->user->syncRoles([(int) $request->role_id]);
-                }
+        // Handle regular image uploads
+        if ($request->hasFile('photo')) {
+            // Delete old file if exists
+            if ($staff->photo) {
+                $this->deleteFile('staff/photos/' . $staff->photo);
             }
-
-            $staff->update($validatedStaffData);
-            if ($request->has('role')) {
-                $staff->update(['role' => $request->role]);
-                if ($staff->user) {
-                    $staff->user->update(['role_id' => $request->role]);
-                }
-            }
-    
-            DB::commit();
-    
-            return redirect()->route('admin.staffs.index')->withToastSuccess('Staff successfully Updated');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withToastError($e->getMessage())->withInput();
+            $photoPath = $this->uploadFile($request->file('photo'), 'staff/photos');
+            $data['photo'] = $photoPath;
         }
+        
+        if ($request->hasFile('citizenship_front')) {
+            if ($staff->citizenship_front) {
+                $this->deleteFile('staff/citizenship/' . $staff->citizenship_front);
+            }
+            $frontPath = $this->uploadFile($request->file('citizenship_front'), 'staff/citizenship');
+            $data['citizenship_front'] = $frontPath;
+        }
+        
+        if ($request->hasFile('citizenship_back')) {
+            if ($staff->citizenship_back) {
+                $this->deleteFile('staff/citizenship/' . $staff->citizenship_back);
+            }
+            $backPath = $this->uploadFile($request->file('citizenship_back'), 'staff/citizenship');
+            $data['citizenship_back'] = $backPath;
+        }
+        
+        if ($request->hasFile('resume')) {
+            if ($staff->resume) {
+                $this->deleteFile('staff/resumes/' . $staff->resume);
+            }
+            $resumePath = $this->uploadFile($request->file('resume'), 'staff/resumes');
+            $data['resume'] = $resumePath;
+        } elseif ($request->has('existing_resume')) {
+            $data['resume'] = $request->existing_resume;
+        }
+    
+        // Handle arrays of academic documents
+        $existingAcademicDocs = [];
+        if ($request->has('existing_academic_documents')) {
+            $existingAcademicDocs = $request->existing_academic_documents;
+        } elseif ($staff->academic_documents) {
+            $existingAcademicDocs = json_decode($staff->academic_documents, true) ?: [];
+        }
+        
+        $newAcademicDocs = $existingAcademicDocs;
+        if ($request->hasFile('academic_documents')) {
+            foreach ($request->file('academic_documents') as $key => $file) {
+                if ($file) {
+                    $path = $this->uploadFile($file, 'staff/academic_documents');
+                    $newAcademicDocs[$key] = $path;
+                }
+            }
+        }
+        $data['academic_documents'] = json_encode($newAcademicDocs);
+        
+        // Handle other documents array
+        $existingOtherDocs = [];
+        if ($request->has('existing_other_documents')) {
+            $existingOtherDocs = $request->existing_other_documents;
+        } elseif ($staff->other_documents) {
+            $existingOtherDocs = json_decode($staff->other_documents, true) ?: [];
+        }
+        
+        $newOtherDocs = $existingOtherDocs;
+        if ($request->hasFile('other_documents')) {
+            foreach ($request->file('other_documents') as $file) {
+                if ($file) {
+                    $path = $this->uploadFile($file, 'staff/other_documents');
+                    $newOtherDocs[] = $path;
+                }
+            }
+        }
+        $data['other_documents'] = json_encode($newOtherDocs);
+    
+        // Convert json fields
+        if (isset($data['level_of_study'])) {
+            $data['level_of_study'] = json_encode($data['level_of_study']);
+        }
+        
+        if (isset($data['board_university_college'])) {
+            $data['board_university_college'] = json_encode($data['board_university_college']);
+        }
+        
+        if (isset($data['registration'])) {
+            $data['registration'] = json_encode($data['registration']);
+        }
+        
+        if (isset($data['institution_name'])) {
+            $data['institution_name'] = json_encode($data['institution_name']);
+        }
+    
+        $staff->update($data);
+    
+        return redirect()->route('admin.staffs.index')->withToastSuccess('Staff updated successfully');
+    }
+    
+    // Helper method for file deletion
+    protected function deleteFile($path)
+    {
+        $fullPath = public_path('uploads/' . $path);
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
+        }
+    }
+
+    /**
+     * Helper method to upload files
+     *
+     * @param  \Illuminate\Http\UploadedFile  $file
+     * @param  string  $folder
+     * @return string
+     */
+    private function uploadFile($file, $folder)
+    {
+        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $path = 'uploads/' . $folder;
+        
+        // Create directory if it doesn't exist
+        if (!File::isDirectory(public_path($path))) {
+            File::makeDirectory(public_path($path), 0777, true);
+        }
+        
+        $file->move(public_path($path), $fileName);
+        
+        return $path . '/' . $fileName;
     }
 
     public function destroy(string $id)
