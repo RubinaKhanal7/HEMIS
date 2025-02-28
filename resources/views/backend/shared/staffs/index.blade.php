@@ -45,38 +45,40 @@
 
 
 @section('scripts')
-    <script>
-        $(document).ready(function() {
-            $('#staff-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '{{ route('admin.staffs.get') }}',  // The route that will fetch the data
-                    type: 'POST',
-                    data: function(d) {
-                        // Send CSRF token to ensure the request is legitimate
-                        d._token = '{{ csrf_token() }}';
-                    },
-                    error: function(xhr, error, thrown) {
-                        alert('An error occurred while fetching the data. Please try again.');
-                    }
+<script>
+    $(document).ready(function() {
+        $('#staff-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('admin.staffs.get') }}',  
+                type: 'POST',
+                data: function(d) {
+                    // Send CSRF token to ensure the request is legitimate
+                    d._token = '{{ csrf_token() }}';
                 },
-                columns: [
-                    { data: 'id', name: 'id' },
-                    { data: 'first_name_english', name: 'first_name_english' },
-                    { data: 'last_name_english', name: 'last_name_english' },
-                    { data: 'role', name: 'role' },
-                    { data: 'level', name: 'level' },
-                    { data: 'job_type', name: 'job_type' },
-                    { data: 'category', name: 'category' },
-                    { data: 'actions', name: 'actions' }
-                ],
-                drawCallback: function(settings) {
-                    // Handle any post-table rendering tasks here
+                error: function(xhr, error, thrown) {
+                    console.error('Error fetching staff data:', error);  // Log error details for debugging
+                    alert('An error occurred while fetching the data. Please try again.');
                 }
-            });
+            },
+            columns: [
+                { data: 'id', name: 'id' },
+                { data: 'first_name_english', name: 'first_name_english' },
+                { data: 'last_name_english', name: 'last_name_english' },
+                { data: 'role', name: 'role' },
+                { data: 'level', name: 'level' },
+                { data: 'job_type', name: 'job_type' },
+                { data: 'category', name: 'category' },
+                { data: 'actions', name: 'actions' }
+            ],
+            drawCallback: function(settings) {
+                // Handle any post-table rendering tasks here
+            }
         });
-    </script>
+    });
+</script>
+
 @endsection
 
 

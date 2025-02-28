@@ -457,12 +457,13 @@ class StaffController extends Controller
         }
     }
 
-
     public function getAllStaff(Request $request)
     {
         // Check if it's an AJAX request for DataTable
         if ($request->ajax()) {
             try {
+                Log::info('Fetching staff data via AJAX');  // Add a log entry to confirm we're reaching this point
+    
                 // Select only the necessary columns for performance
                 $staffs = Staff::select([
                     'id',
@@ -473,7 +474,6 @@ class StaffController extends Controller
                     'job_type',
                     'category',
                 ]);
-    
     
                 // Apply search functionality if the search parameter exists
                 if ($search = $request->get('search')['value']) {
@@ -487,26 +487,23 @@ class StaffController extends Controller
                     });
                 }
     
-    
                 // Apply sorting functionality
                 if ($order = $request->get('order')) {
-                    $staffs = $staffs->orderBy(
-                        $request->get('columns')[$order[0]['column']]['data'],
-                        $order[0]['dir']
-                    );
+                    $column = $request->get('columns')[$order[0]['column']]['data'];
+                    $direction = $order[0]['dir'];
+                    $staffs = $staffs->orderBy($column, $direction);
                 }
     
-    
-                // Pagination
+                // Apply pagination - paginate directly with DataTables pagination parameters
                 $staffs = $staffs->paginate($request->get('length', 10));
     
+                Log::info('Fetched ' . $staffs->total() . ' staff records.');
     
                 // Add the 'actions' column for each staff row (e.g., Edit and Delete buttons)
                 $data = $staffs->items();
                 foreach ($data as $staff) {
-                    $staff->actions = view('backend.shared.staffs.partials.actions', compact('staff'))->render();
+                    $staff->actions = view('backend.shared.staffs.partials.controller_action', compact('staff'))->render();
                 }
-    
     
                 // Return the data in the format that DataTables expects
                 return response()->json([
@@ -516,7 +513,6 @@ class StaffController extends Controller
                     'data' => $data  // The actual data for the table
                 ]);
             } catch (\Exception $e) {
-                // Log any exceptions for debugging
                 Log::error("Error fetching staff data: " . $e->getMessage());
                 return response()->json([
                     'error' => 'Failed to fetch staff data'
@@ -524,10 +520,9 @@ class StaffController extends Controller
             }
         }
     
-    
         // Return a 400 error if it's not an AJAX request
         return response()->json(['error' => 'Invalid request'], 400);
-    }  
+    }
     
 
     public function importStaffs()
