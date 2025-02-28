@@ -386,7 +386,23 @@ class RolePermissionSeeder extends Seeder
             'edit_programs',
             'delete_programs',
             'list_programs',
-
+            'create_membershiphead',
+            'edit_membershiphead',
+            'delete_membershiphead',
+            'list_membershiphead',
+            'create_members',
+            'edit_members',
+            'delete_members',
+            'list_members',
+            'create_idcard_design',
+            'edit_idcard_design',
+            'delete_idcard_design',
+            'list_idcard_design',
+            'create_idcard',
+            'edit_idcard',
+            'delete_idcard',
+            'list_idcard',
+            'list_staffreport',
         ];
 
         // Create the permissions
@@ -1032,6 +1048,23 @@ class RolePermissionSeeder extends Seeder
             'edit_programs',
             'delete_programs',
             'list_programs',
+            'create_membershiphead',
+            'edit_membershiphead',
+            'delete_membershiphead',
+            'list_membershiphead',
+            'create_members',
+            'edit_members',
+            'delete_members',
+            'list_members',
+            'create_idcard_design',
+            'edit_idcard_design',
+            'delete_idcard_design',
+            'list_idcard_design',
+            'create_idcard',
+            'edit_idcard',
+            'delete_idcard',
+            'list_idcard',
+            'list_staffreport',
 
     //define permission for School Teacher
         $permissionForTeacher = [
@@ -2270,3 +2303,4 @@ class RolePermissionSeeder extends Seeder
         }
     }
 }
+

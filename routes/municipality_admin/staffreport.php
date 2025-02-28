@@ -1,5 +1,5 @@
 <?php
-use App\Http\Controllers\MunicipalityAdmin\StaffReportController;
+use App\Http\Controllers\SchoolAdmin\StaffReportController;
 
 
 Route::get('admin/staff_reports', [StaffReportController::class, 'index'])->name('staff_reports.index');

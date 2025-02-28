@@ -14,6 +14,7 @@ src="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/js/nepali.d
             });
         }
 
+
         // Initialize Nepali Datepicker for "Date of Birth" field
         var dobInput = document.getElementById("dob-datepicker");
         if (dobInput) {
@@ -24,6 +25,8 @@ src="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/js/nepali.d
                 ndpYearCount: 200
             });
         }
+
+
 
 
         // Initialize Nepali Datepicker for another field
@@ -47,6 +50,7 @@ src="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/js/nepali.d
             });
         }
 
+
         var admissionInput = document.getElementById("admission-datepicker");
         if (admissionInput) {
             admissionInput.nepaliDatePicker({
@@ -56,6 +60,17 @@ src="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/js/nepali.d
                 ndpYearCount: 200
             });
         }
+        var appointmentInput = document.getElementById("appointment-nepali-datepicker");
+        if (appointmentInput) {
+            appointmentInput.nepaliDatePicker({
+                dateFormat: "YYYY-MM-DD",
+                ndpYear: true,
+                ndpMonth: true,
+                ndpYearCount: 200
+            });
+        }
+       
+
 
         //initialize depali datepicker for model
         $("#model-nepali-datepicker").nepaliDatePicker();
@@ -68,6 +83,7 @@ src="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/js/nepali.d
             ndpYearCount: 200
         });
 
+
         $("#model-nepali-datepicker2").nepaliDatePicker({
             container: "#createLeaveType",
             dateFormat: "YYYY-MM-DD",
@@ -77,3 +93,6 @@ src="https://nepalidatepicker.sajanmaharjan.com.np/nepali.datepicker/js/nepali.d
         });
     });
 </script>
+
+
+

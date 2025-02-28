@@ -25,6 +25,9 @@
                 </li>
             @endcan
 
+
+
+
             @can('list_inventory_report')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'extracurricular-head' ? 'active' : '' }}"
                         href="{{ route('admin.municipalityAdmin.inventoryReport.report') }}">
@@ -44,6 +47,12 @@
         @endcan
 
 
+
+
+
+
+
+
         @can('view_municipality_headteacher_logs')
                 <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'municipality-headteacher-logs' ? 'active' : '' }}"
                         href="{{ route('admin.municipality-headteacher-logs.index') }}">
@@ -52,6 +61,9 @@
                     </a>
                 </li>
         @endcan
+
+
+
 
         @can('school_attendance_report')
             <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'notice-head' ? 'active' : '' }}"
@@ -62,15 +74,21 @@
             </li>
          @endcan
 
-        @can('list_headteacherlog_reports')
-            <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'headteacherlog-reports' ? 'active' : '' }}"
-                    href="{{ route('admin.headteacherlog-reports.index') }}">
-                    <div class="d-flex align-items-center"><i class="fa fa-angle-double-right"></i>{{__('Staff Report')}}
-                    </div>
-                </a>
-            </li>
+
+
+
+        @can('list_staffreport')
+        <li class="nav-item">
+            <a class="nav-link {{ Request::segment(2) == 'staff-reports' ? 'active' : '' }}"
+               href="{{ route('admin.staff-reports.index') }}">
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-angle-double-right"></i>{{__('Staff Report')}}
+                </div>
+            </a>
+        </li>
+ 
         @endcan
-      
+     
         @can('view_student_profile')
             <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'notice-head' ? 'active' : '' }}"
                     href="{{ route('admin.student-profile.index') }}">
@@ -83,4 +101,12 @@
     </li>
     </li>
 
+
+
+
  @endhasanyrole
+
+
+
+
+

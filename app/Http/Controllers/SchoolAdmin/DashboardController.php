@@ -1,7 +1,11 @@
 <?php
 
 
+
+
 namespace App\Http\Controllers\SchoolAdmin;
+
+
 
 
 use App\Models\Unit;
@@ -26,10 +30,13 @@ use App\Models\Notice;
 use App\Models\NoticeView;
 use Illuminate\Support\Facades\Auth;
 
+
 class DashboardController extends Controller
 {
     protected $dashboardService;
     protected $schoolService;
+
+
 
 
     public function __construct(DashboardService $dashboardService, SchoolService $schoolService)
@@ -39,10 +46,14 @@ class DashboardController extends Controller
     }
 
 
+
+
  public function index(Request $request)
 {
     $user = Auth::user();
     $schoolName = $user->f_name;
+
+
 
 
     // Calculate initials from the school name
@@ -53,7 +64,11 @@ class DashboardController extends Controller
     }
 
 
+
+
     $schoolId = Auth::user()->school_id;
+
+
 
 
     // Count total students, boys, and girls
@@ -61,6 +76,8 @@ class DashboardController extends Controller
     $totalStudents = Student::where('school_id', $schoolId)
        
         ->count();
+
+
 
 
     $totalGirls = StudentSession::where('school_id', $schoolId)
@@ -71,6 +88,8 @@ class DashboardController extends Controller
         ->count();
 
 
+
+
     $totalBoys = StudentSession::where('school_id', $schoolId)
         ->where('is_active', 1)
         ->whereHas('student.user', function ($query) {
@@ -79,9 +98,13 @@ class DashboardController extends Controller
         ->count();
 
 
+
+
     // Convert today's date to Nepali date
     $today = Carbon::today()->format('Y-m-d');
     $nepaliDateToday = LaravelNepaliDate::from($today)->toNepaliDate();
+
+
 
 
     // Get class-wise attendance data
@@ -96,11 +119,15 @@ class DashboardController extends Controller
         ->get();
 
 
+
+
     // Initialize total present and absent counts for boys and girls
     $totalPresentBoys = 0;
     $totalPresentGirls = 0;
     $totalAbsentBoys = 0;
     $totalAbsentGirls = 0;
+
+
 
 
     // Process class-wise attendance data
@@ -125,9 +152,13 @@ class DashboardController extends Controller
     }
 
 
+
+
     // Calculate total present and absent students
     $presentStudents = $totalPresentBoys + $totalPresentGirls;
     $absentStudents = $totalAbsentBoys + $totalAbsentGirls;
+
+
 
 
     // Calculate staff attendance
@@ -144,7 +175,11 @@ class DashboardController extends Controller
         ->whereDate('date', $nepaliDateToday)->count();
 
 
+
+
     $page_title = Auth::user()->getRoleNames()[0] . ' ' . "Dashboard";
+
+
 
 
     // Additional data fetches (if any services are being used)
@@ -160,13 +195,19 @@ class DashboardController extends Controller
     // Log::info("Unread notices fetched: " . $unreadNotices->count());
 
 
+
+
     $noticeCount = $noticeData['count'];
 
+
     $classesWithIncompleteAttendance = $this->getClassesWithIncompleteAttendance();
+
 
     $isHoliday = StudentAttendance::where('date', $nepaliDateToday)
     ->where('attendance_type_id', 4)
     ->exists();
+
+
 
 
     // Return view with compacted data
@@ -178,6 +219,7 @@ class DashboardController extends Controller
         'staff_attendance', 'noticeCount', 'staff_data', 'class_wise_student_attendances', 'class_wise_students','classesWithIncompleteAttendance','isHoliday'
     ));
 }
+
 
 public function schoolDashboard() {
     // Get today's Nepali date
@@ -193,6 +235,7 @@ public function schoolDashboard() {
     ]);
 }
 
+
 private function fetchMunicipalityNoticeData()
 {
     $municipalityId = Auth::user()->municipality_id;
@@ -201,13 +244,21 @@ private function fetchMunicipalityNoticeData()
     })->get();
 
 
+
+
     $count = $notices->count();
+
+
 
 
     return [
         'count' => $count,
     ];
 }
+
+
+
+
 
 
 
@@ -224,8 +275,16 @@ public function markNoticeAsRead($noticeId)
 
 
 
+
+
+
+
     return response()->json(['success' => true]);
 }
+
+
+
+
 
 
 
@@ -233,6 +292,8 @@ public function markNoticeAsRead($noticeId)
     private function getClassWiseStudents()
 {
     $schoolId = Auth::user()->school_id;
+
+
 
 
     // Join the students table with the classes table and count the students per class
@@ -244,14 +305,20 @@ public function markNoticeAsRead($noticeId)
     ->toArray();
 
 
+
+
     return $this->formatChartData($classWiseStudents, 'class_name', 'total_students', 'Class wise Student Count');
 }
+
+
 
 
 private function getClassWiseStudentAttendance()
 {
     $schoolId = Auth::user()->school_id;
     $today = LaravelNepaliDate::from(Carbon::today()->format('Y-m-d'))->toNepaliDate();
+
+
 
 
     $classWiseAttendance = DB::table('student_sessions')
@@ -272,10 +339,14 @@ private function getClassWiseStudentAttendance()
         ->get();
 
 
+
+
     $labels = $classWiseAttendance->pluck('class_name');
     $totalStudents = $classWiseAttendance->pluck('total_students');
     $presentStudents = $classWiseAttendance->pluck('present_students');
     $absentStudents = $classWiseAttendance->pluck('absent_students');
+
+
 
 
     return [
@@ -306,9 +377,15 @@ private function getClassWiseStudentAttendance()
 
 
 
+
+
+
+
 private function getClassesWithIncompleteAttendance() {
     $schoolId = Auth::user()->school_id;
     $today = LaravelNepaliDate::from(Carbon::today()->format('Y-m-d'))->toNepaliDate();
+
+
 
 
     $classesWithIncompleteAttendance = DB::table('classes')
@@ -333,8 +410,13 @@ private function getClassesWithIncompleteAttendance() {
         ->get();
 
 
+
+
     return $classesWithIncompleteAttendance;
 }
+
+
+
 
 
 
@@ -350,8 +432,12 @@ private function getClassesWithIncompleteAttendance() {
             ->toArray();
 
 
+
+
         return $this->formatChartData($staffRoles, 'role', 'count', 'Staff Count by Role');
     }
+
+
 
 
     private function getStaffAttendanceData()
@@ -394,10 +480,14 @@ private function getClassesWithIncompleteAttendance() {
     }
 
 
+
+
     private function formatChartData($data, $labelKey, $dataKey, $label)
     {
         $labels = array_column($data, $labelKey);
         $values = array_column($data, $dataKey);
+
+
 
 
         return [
@@ -413,6 +503,12 @@ private function getClassesWithIncompleteAttendance() {
     }
    
 }
+
+
+
+
+
+
 
 
 

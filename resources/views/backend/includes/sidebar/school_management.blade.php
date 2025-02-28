@@ -60,7 +60,7 @@
                 </li>
             @endcan
 
-            @can('list_staffs')
+            @can('list_membershiphead')
             
             <li class="nav-item">
                 <a class="nav-link {{ Request::segment(2) == 'membershiphead' ? 'active' : '' }}"
@@ -73,7 +73,7 @@
         
             @endcan
 
-            @can('list_staffs')
+            @can('list_members')
             <li class="nav-item"><a class="nav-link {{ Request::segment(2) == 'members' ? 'active' : '' }}"
                 href="{{ route('admin.members.index') }}">
                 <div class="d-flex align-items-center">
